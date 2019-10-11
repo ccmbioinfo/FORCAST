@@ -1,4 +1,4 @@
-# CasCADe
+# CasCADe: a fully integrated and open source pipeline to design CRISPR mutagenesis experiments
 
 ### Hardware requirements
  - CasCADe requires a debian based Linux system with a minimum 8GB of RAM and 100GB of hard disk space. 
