@@ -1,0 +1,35 @@
+<tr id="row_{{guideID}}"
+	{% if inDatabase %}
+		class="in-database"
+	{% endif %}
+>
+<td>{{ guideID }}
+	{% if inDatabase == True %}
+		<i class="fa fa-pencil fa-fw hover-icon" id="{{guideID}}_checkbox" data-toggle="popover" data-trigger="click" data-html="true" title='Add "{{guideID}}" to Database' data-placement='top' data-content="{{rowPopover|safe}}">
+		</i>
+	{% else %}
+		<i class="fa fa-floppy-o fa-fw hover-icon" id="{{guideID}}_checkbox" data-toggle="popover" data-trigger="click" data-html="true" title='Add "{{guideID}}" to Database' data-placement='top' data-content="{{rowPopover|safe}}">
+		</i>
+	{% endif %}
+</td>
+<td>{{ guideSeq }}</td>
+<td>{{ guideLocation }}</td>
+{% if 'MIT' in guide %}
+	{% if guide['max_exceeded'] == True %}
+		<td>-</td>
+	{% else %}
+		<td>{{ guide["MIT"] }}</td>
+	{% endif %}
+{% endif %}
+{% if 'CFD' in guide %}
+	{% if guide['max_exceeded'] == True %}
+		<td>-</td>
+	{% else %}
+		<td>{{ guide["CFD"] }}</td>
+	{% endif %}
+{% endif %}
+<td>
+	{{offtargetModal}}	
+</td>
+</tr>
+<!--onclick="toggleCheckbox('{{guideID}}');"-->

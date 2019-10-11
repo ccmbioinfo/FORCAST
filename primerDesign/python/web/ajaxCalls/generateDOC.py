@@ -1,0 +1,217 @@
+#!/usr/bin/python
+import cgi,sys,os
+import csv
+import bson
+from bson.objectid import ObjectId
+import pymongo
+from pymongo import MongoClient
+sys.path.append('../..')
+from Config import Config
+
+fileDir = "primerDesign/python/files/docFiles"
+
+STRAND = ''
+
+def getGuides(ids, dbConnection):
+	"""
+	Gets guides from Mongo database using list of guide record ids
+	"""
+	guideCollection = dbConnection.guideCollection
+	guideResults = []
+	for curr_id in ids:
+		guide = guideCollection.find_one({"_id": ObjectId(curr_id)})
+		guideResults.append(guide)
+
+	return guideResults
+
+def findPrimers(ids, dbConnection):
+        """
+        Gets primers from Mongo database that have been designed with this specific
+        set of guides
+        """
+        primerCollection = dbConnection.primerCollection
+        primerResults = []
+        primers = primerCollection.find({"guides.ids" : { "$size" : len(ids), "$all": ids }, "status" : "Accepted"})
+        for primer in primers:
+                primerResults.append(primer)
+        
+	return primerResults
+
+def setGeneStrand(ensid, dbConnection):
+	global STRAND
+	geneCollection = dbConnection.curr_geneCollection
+	gene = geneCollection.find_one({"ENSID": str(ensid)})
+	
+	try:
+		STRAND = gene['strand']
+	except Exception, e:
+		print("Error, unable to get strand information for gene with ENSID: " + str(ensid))
+		sys.exit()
+	
+	return
+	
+
+def setupDocument():
+	setupHTML = '''
+	<!DOCTYPE html>
+	<html>
+	<head>
+		<title>Test</title>
+	</head>
+	<body>
+	'''
+	return setupHTML
+
+
+def writeGuideTable(guideResults):
+	
+	tableHTML = '''
+	<table border="1" style="border-collapse: collapse; text-align: center;" color="#000000">
+			<thead>
+			<tr>
+			<th style="font-family: 'Arial'; font-size: 10px; font-weight: bold; vertical-align: bottom;">gRNA</th>
+			<th style="font-family: 'Arial'; font-size: 10px; font-weight: bold; vertical-align: bottom;">Sequence</th>
+			<th style="font-family: 'Arial'; font-size: 10px; font-weight: bold; vertical-align: bottom;">Location (Strand)</th>
+			<th style="font-family: 'Arial'; font-size: 10px; font-weight: bold; vertical-align: bottom;">Specificity Score</th>
+			<th style="font-family: 'Arial'; font-size: 10px; font-weight: bold; vertical-align: bottom;">No. off-target sites<br>Total {0-1-2-3-4} mismatches</th>
+			</tr>
+			</thead>
+			<tbody style="font-family: 'Arial'; font-size: 12px;">
+	'''
+	
+	for guide in guideResults:
+		# terrible consequence of combining python 2.7, and url encoding...
+		offTargets = str(guide['otDesc'].encode('utf8')).split("\xe2\x80\x89-\xe2\x80\x89")
+		sumOffTargets = sum([int(x) for x in offTargets])
+		formatOffTargets = str(sumOffTargets) + " {" + (" - ").join(offTargets)  + "}"
+		tableHTML += '''
+		<tr>
+		<td>{guide[label]}</td>
+		<td>{guide[guideSeq]}</td>
+		<td>{guide[guideLocation]}</td> 
+		<td>{guide[guideScore]}</td> 
+		<td>{formatOffTargets}</td>'''.format(**locals())
+
+	tableHTML += '''
+	</tr></tbody></table>
+	'''
+	return tableHTML
+
+def writePrimerTable(primerResults):
+	
+	tableHTML = '''
+	<br>
+	<table border="1" style="border-collapse: collapse; text-align: center;" color="#000000">
+		<thead>
+		<tr>
+		<th style="font-family: 'Arial'; font-size: 10px; font-weight: bold; vertical-align: bottom;" colspan="2">Type</th>
+		<th style="font-family: 'Arial'; font-size: 10px; font-weight: bold; vertical-align: bottom;">Sequence</th>
+		<th style="font-family: 'Arial'; font-size: 10px; font-weight: bold; vertical-align: bottom;">Length</th>
+		<th style="font-family: 'Arial'; font-size: 10px; font-weight: bold; vertical-align: bottom;">T<sup>m</sup></th>
+		<th style="font-family: 'Arial'; font-size: 10px; font-weight: bold; vertical-align: bottom;">Location (Strand)</th>
+		<th style="font-family: 'Arial'; font-size: 10px; font-weight: bold; vertical-align: bottom;">Product Size</th>
+		</tr>
+		</thead>
+		<tbody style="font-family: 'Arial'; font-size: 12px;">
+	'''
+
+	for primer in primerResults:
+		leftTM = str(round(float(primer['leftTM']),1))
+		rightTM = str(round(float(primer['rightTM']),1))
+		chrm = str(primer['chr'])
+		if STRAND == '+':
+			leftLocation = int(primer['left_genomicLocation'])
+			leftLocation = chrm + ":" + str(leftLocation) + "-" + str(leftLocation+int(primer['leftlen'])) + "(+1)"
+			rightLocation = int(primer['right_genomicLocation'])
+			rightLocation = chrm + ":" + str(rightLocation) + "-" + str(rightLocation-int(primer['rightlen'])) + "(-1)"	
+		elif STRAND == '-':
+			leftLocation = int(primer['left_genomicLocation'])
+			leftLocation = chrm + ":" + str(leftLocation) + "-" + str(leftLocation-int(primer['leftlen'])) + "(-1)"
+			rightLocation = int(primer['right_genomicLocation'])
+			rightLocation = chrm + ":" + str(rightLocation) + "-" + str(rightLocation-int(primer['rightlen'])) + "(+1)"	
+		else:
+			print("Error: invalid strand for gene. '" + str(STRAND) + "'")	
+		tableHTML += '''
+		<tr>
+		<td rowspan="2">{primer[type]}</td>
+		<td>Forward</td>
+		<td>{primer[leftprimer]}</td>
+		<td>{primer[leftlen]}</td>
+		<td>{leftTM}</td>
+		<td>{leftLocation}</td>
+		<td rowspan="2">{primer[productSize]}</td>
+		</tr>
+		<tr>
+		<td>Reverse</td>
+		<td>{primer[rightprimer]}</td>
+		<td>{primer[rightlen]}</td>
+		<td>{rightTM}</td>
+		<td>{rightLocation}</td>
+		</tr>
+		'''.format(**locals())
+	
+	tableHTML += '''
+	</tr></tbody></table>
+	'''
+	
+	return tableHTML	
+		
+		
+
+def writeDOC(geneName, genome, ROOT_PATH, guideResults, primerResults):
+	filename = str(geneName) + "_gRNAs-and-primers.doc"
+	doc_genomeDir = os.path.join(ROOT_PATH, fileDir, genome)
+        # check that the genome has a csv dir
+        if not os.path.exists(doc_genomeDir):
+                os.makedirs(doc_genomeDir)
+	
+	filepath = os.path.join(doc_genomeDir, filename)
+	try:
+		fileString = setupDocument()
+		fileString += writeGuideTable(guideResults) 
+		fileString += writePrimerTable(primerResults)
+		fileString += "</body></html>" # closing tags
+	except Exception, e:
+		print str(e)
+	try:
+		with open(filepath, mode='w') as docfile:
+			docfile.write(fileString)
+	except Exception, e:
+		print("Error: " + str(e))
+	
+	return filename	
+
+def main():
+	print("Content-type: text/html\n")	
+	args = cgi.FieldStorage()
+	try:
+		geneName = args.getvalue('gene')
+		ensid = args.getvalue('ENSID')
+		genome = args.getvalue('genome')
+		ids = [] # to store the guide ids	
+		found_all = False
+		count = str(0)
+		# get all the guide ids passed via ajax
+		while not found_all:
+			if count in args:
+				ids.append(args.getvalue(count))
+				count = str(int(count) + 1)
+			else:
+				found_all = True	
+	except Exception, e:
+		print("Problem with calls to script " + str(e))
+
+	try:
+		# get connection to the genome's database
+		dbConnection = Config(genome)
+		
+		setGeneStrand(ensid, dbConnection)
+		guideResults = getGuides(ids, dbConnection)
+		primerResults = findPrimers(ids, dbConnection)
+		filename = writeDOC(geneName, genome, dbConnection.ROOT_PATH,  guideResults, primerResults)
+		print os.path.join("files/docFiles", genome, filename)
+	except Exception, e:
+		print str(e)
+
+if __name__ == "__main__":
+	main()

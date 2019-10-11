@@ -1,0 +1,114 @@
+{
+   "plugins" : [
+      {
+         "gradient" : 0,
+         "name" : "NeatCanvasFeatures"
+      },
+      {
+         "location" : "plugins/ColorByCDS",
+         "name" : "ColorByCDS"
+      },
+      {
+         "name" : "ExportSequence"
+      }
+   ],
+   "names" : {
+      "type" : "Hash",
+      "url" : "names/"
+   },
+   "tracks" : [
+      {
+         "key" : "Reference sequence",
+         "category" : "Reference sequence",
+         "type" : "ExportSequence/ExportSequence",
+         "chunkSize" : 20000,
+         "label" : "DNA",
+         "storeClass" : "JBrowse/Store/Sequence/StaticChunked",
+         "seqType" : "dna",
+         "urlTemplate" : "seq/{refseq_dirpath}/{refseq}-"
+      },
+      {
+         "urlTemplate" : "tracks/Genes/{refseq}/trackData.json",
+         "hooks" : {
+            "modify" : "function( track, feature, div ) { setColor='green'; if(feature.get('type') == 'ncRNA_gene'){ setColor='#8F6F8B';} else if(feature.get('type') == 'pseudogene'){setColor='#575256';} div.style.backgroundColor = setColor; }"
+         },
+         "onClick" : {
+            "url" : "function(){ var genome_match = location.href.match(/data=data\.(.+?)\&/); return 'https://'+location.hostname+'/primerDesign/python/geneFeatures.html?gene={Name}&ensid={gene_id}&org='+genome_match[1] }", 
+            "action" : "iframeDialog",
+            "label" : "{Name} Info, Guides, and Primers"
+         },
+         "label" : "Genes",
+         "storeClass" : "JBrowse/Store/SeqFeature/NCList",
+         "compress" : 0,
+         "trackType" : "CanvasFeatures",
+         "type" : "HTMLFeatures",
+         "key" : "Genes",
+         "style" : {
+            "className" : "feature2",
+            "description" : null
+         }
+      },
+      {
+         "key" : "PAM and Guide Sequence",
+         "style" : {
+            "description" : false,
+            "className" : "feature2",
+            "color" : "function(feature){if(feature.get('type') === 'mRNA'){if(feature.get('status') === 'Accepted'){return '#82d87d';} else if(feature.get('status') === 'Rejected'){return '#d87d7d';}}}"
+         },
+         "trackType" : "CanvasFeatures",
+         "category" : "CRISPR",
+         "type" : "CanvasFeatures",
+         "label" : "PAMgRNA",
+         "storeClass" : "JBrowse/Store/SeqFeature/GFF3",
+         "urlTemplate" : "gRNA_CRISPR.gff",
+         "onClick" : {
+            "action" : "iframeDialog",
+            "iconClass" : "dijitIconDatabase",
+            "url" : "function(){ var genome_match = location.href.match(/data=data\.(.+?)\&/); return 'https://'+location.hostname+'/primerDesign/python/geneFeatures.html?gene={batchName}&ensid={ensid}&org='+genome_match[1] }", 
+            "title" : "{batchName} Info, Guides and Primers",
+            "label" : "<ul><li>Specificity Score: <b>{guideScore}</b></li><li>Off-targets for 0-1-2-3-4 mismatches:<b> {otDesc}</b>&nbsp&nbsp</li><p>Notes: <b>{Notes}</b></p></ul>"
+         }
+      },
+      {
+	"key" : "Primer Sequences",
+	"style" : {
+		"description" : false,
+		"className" : "feature2",
+		"color" : "function(feature){if(feature.get('name').indexOf('WT') != -1){if(feature.get('name').indexOf('forward') != -1){return '#ad5bff';}else{return '#c993ff';}}else{if(feature.get('name').indexOf('forward') != -1){return '#47cdff';}else{return '#9ee5ff';}}}"
+	},
+	"trackType" : "CanvasFeatures",
+	"category" : "CRISPR",
+	"type" : "CanvasFeatures",
+	"label" : "Primers",
+	"storeClass" : "JBrowse/Store/SeqFeature/GFF3",
+	"urlTemplate" : "acceptedPrimers.gff",
+	"onClick" : {
+		"action" : "iframeDialog",
+		"iconClass" : "dijitIconDatabase",
+		"url" : "function(){ var genome_match = location.href.match(/data=data\.(.+?)\&/); return 'https://'+location.hostname+'/primerDesign/python/geneFeatures.html?gene={batchName}&ensid={ensid}&org='+genome_match[1] }", 
+		"title" : "{batchName} Info, Guides, and Primers",
+		"label" : "<ul><li>Gene: <b>{batchName}&nbsp&nbsp&nbsp</b></li><li>TM: <b>{tm}&nbsp&nbsp&nbsp</b></li><li>GC%: <b>{gc}&nbsp&nbsp&nbsp&nbsp</b></li><p>Notes: {pair_notes}</li></p></ul>"
+	}	
+      },
+      {
+         "compress" : 0,
+         "trackType" : "CanvasFeatures",
+         "type" : "CanvasFeatures",
+         "key" : "Transcripts",
+         "glyph" : "function(feature) { if (feature.get('type').indexOf('mRNA') > -1) {return 'ColorByCDS/View/FeatureGlyph/ProcessedTranscript';} else{return 'JBrowse/View/FeatureGlyph/Segments';} }",
+         "style" : {
+            "description" : "type",
+            "className" : "feature"
+         },
+         "urlTemplate" : "tracks/Transcripts/{refseq}/trackData.json",
+         "onClick" : {
+            "title" : "{name} {type}",
+            "label" : "<table border=1 style='text-align:center'><tr><td>Ensembl start frame</td><td>Ensembl end frame</td><td>Color</tr></th><tr><td>-1</td><td>-1</td><td style='width:10px;' bgcolor='black'></td></tr><tr><td>-1</td><td>0</td><td style='width:10px;' bgcolor='#f4ce42'></td></tr><tr><td>-1</td><td>1</td><td style='width:10px;' bgcolor='#f4ee41'></td></tr><tr><td>-1</td><td>2</td><td style='width:10px;' bgcolor='#d9f441'></td></tr><tr><td>0</td><td>-1</td><td style='width:10px;' bgcolor='#41f4ac'></td></tr><tr><td>1</td><td>-1</td><td style='width:10px;' bgcolor='#41f4d9'></td></tr><tr><td>2</td><td>-1</td><td style='width:10px;' bgcolor='#41c4f4'></td></tr><tr><td>0</td><td>0</td><td style='width:10px;' bgcolor='#f00000'></td></tr><tr><td>0</td><td>1</td><td style='width:10px;' bgcolor='#a00000'></td></tr><tr><td>0</td><td>2</td><td style='width:10px;' bgcolor='#500000'></td></tr><tr><td>1</td><td>0</td><td style='width:10px;' bgcolor='#00f000'></td></tr><tr><td>1</td><td>1</td><td style='width:10px;' bgcolor='#00a000'></td></tr><tr><td>1</td><td>2</td><td style='width:10px;' bgcolor='#005000'></td></tr><tr><td>2</td><td>0</td><td style='width:10px;' bgcolor='#0000f0'></td></tr><tr><td>2</td><td>1</td><td style='width:10px;' bgcolor='#0000a0'></td></tr><tr><td>2</td><td>2</td><td style='width:10px;' bgcolor='#000050'></td></tr></table>"
+         },
+         "maxHeight" : 2000,
+         "label" : "Transcripts",
+         "storeClass" : "JBrowse/Store/SeqFeature/NCList"
+      }
+   ],
+   "formatVersion" : 1
+}

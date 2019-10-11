@@ -1,0 +1,125 @@
+body{
+	padding: 30px;
+	text-align: center;
+	min-width:1024px;
+}
+
+#removedNote {
+	text-align: left;
+}
+
+.downloadLink {
+	text-decoration: none;
+}
+
+#loadingIcon {
+	vertical-align: middle;
+}
+
+.centreCell {
+	text-align: center;
+	padding-top: 0;
+	padding-bottom: 0;
+}
+
+#retryText {
+	display: block;
+	text-align: center;
+}
+
+.card-header {
+	text-align: left;
+}
+
+.card-link {
+	font-size: 1.25rem;
+	font-weight: 600;
+}
+
+pre {
+	margin-bottom: 0;
+	font-family: -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif,"Apple Color Emoji","Segoe UI Emoji","Segoe UI Symbol";
+}
+
+
+.table td {
+	padding: 0.25rem;
+	vertical-align: middle;
+}
+
+.primerNotes {
+	height: 100%;
+	padding: 0;
+	vertical-align: middle;
+}
+
+.alignButton{
+	float: right;
+	display: block;
+	clear: both;
+	margin-right: 5px;
+}
+
+table.center {
+	margin: auto;
+}
+
+#primerResultsTable {	
+	text-align: center;	
+	max-width: 1500px;
+	margin: auto;
+}
+
+#existingPrimersTable{
+	max-width: 1350px;
+	margin: auto;
+}
+
+#dropdownDownloadLinks {
+	float: left;	
+}
+
+.table-bordered, .table-bordered td, .table-bordered th{
+	border: 1px solid #adadad;	
+}
+
+.table-bordered thead th {
+	border: 1px solid #adadad;
+
+}
+
+#existingPrimersTable tr:nth-child(4n), #existingPrimersTable tr:nth-child(4n - 1) , .primerTable tr:nth-child(4n), .primerTable tr:nth-child(4n -1){
+	background-color: rgba(0,0,0,0.075);
+}
+
+th {
+	background-color: rgba(0,0,0,.05);
+}
+
+#primerResultsTable td {
+	padding: 0.5rem;
+
+}
+
+#blastHitsTable tr, #forwardBindingSitesTable tr, #reverseBindingSitesTable tr{
+	background-color: rgba(0,0,0,0);
+}
+
+.no-padding {
+	padding: 0px;
+}
+
+.accepted-dropdown {
+	color: green;
+	background: Transparent;
+}
+
+.rejected-dropdown {
+	color: #fb3c3c;
+	background: Transparent;
+}
+
+.bordered-button {
+	border: 1px solid #334456;		
+}
+

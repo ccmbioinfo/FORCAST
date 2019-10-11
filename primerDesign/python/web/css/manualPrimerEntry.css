@@ -1,0 +1,123 @@
+body {
+	text-align: center;
+	padding: 15px;
+	padding-top: 25px;
+}
+
+form {
+	padding: 0;
+	width: 95%;
+	margin: 0 auto;
+
+}
+
+p {
+	margin-bottom: 0;
+	line-height: 1.5;
+}
+
+table{
+	width: 75%;
+	margin: 0 auto;
+}
+thead{
+	color: black;
+	background-color: rgba(0,0,0,0.1);
+}
+
+table.table-bordered {
+	border:1px solid darkgrey;
+	background-color: white;
+	color: black;
+	margin-top:20px;
+}
+
+table.table-bordered > thead > tr > th{
+	border:1px solid darkgrey;
+}
+
+table.table-bordered > tbody > tr > td{
+	border:1px solid darkgrey;
+}
+
+.center-row {
+	padding-top: 5px;
+	padding-bottom: 5px;
+
+}
+
+.left-align {
+	text-align: left;
+}
+
+.right-align {
+	text-align: right;
+}
+
+.center-align {
+	text-align: center;
+}
+
+.padding-left {
+	padding-left: 5px;
+}
+
+.no-padding {
+	padding: 0px;
+}
+
+.less-padding {
+	padding: 5px;
+}
+
+.no-side-padding {
+	padding-left : 0px;
+	padding-right : 0px;
+}
+
+.button-padding {
+	padding: 5px;
+	padding-right: 30px;
+
+}
+
+.vertical-align {
+	margin-top: auto;
+	margin-bottom: auto;
+}
+
+.input-warning {
+	color: #b90e1e;
+	background-color: #f8d7da !important;
+	border-color: #f8d7da;
+	font-weight: bold;
+}
+
+.input-success {
+	background-color: #dff0d8 !important;
+
+}
+
+.loading-msg {
+	display: none;
+	color: #007bff;
+	font-weight: bold;
+}
+
+#blastWarning {
+	color: #b90e1e;
+	display: none;
+	background-color: #f8d7da;
+	border-color: #f8d7da;
+}
+
+#forwardBlastResults, #reverseBlastResults{
+	width: 75%;
+	text-align: center;	
+	margin: auto;
+}
+
+#pairTypeSelect {
+	width: 55px;
+	margin: auto;
+}
