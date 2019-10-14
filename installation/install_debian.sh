@@ -67,9 +67,9 @@ echo "deb [ arch=amd64,arm64 ] https://repo.mongodb.org/apt/ubuntu xenial/mongod
 apt-get update
 apt-get install -y mongodb-org
 
-# Now install python modules and jbrowse dependencies 
-python -m pip --default-timeout=1000 install -r requirements.txt
-python3 -m pip --default-timeout=1000 install -r requirements_v3.txt
+# Now install python modules and jbrowse dependencies
+python -m pip --default-timeout=10000 install -r requirements.txt
+python3 -m pip --default-timeout=10000 install -r requirements_v3.txt
 
 cd $root_dir/jbrowse
 ./setup.sh
