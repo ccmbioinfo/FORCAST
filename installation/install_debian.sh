@@ -59,6 +59,7 @@ done
 
 #upgrade pip due to issues with ubuntu default pip
 pip install --upgrade pip
+pip install --upgrade python3-pip
 
 #Now install Mongodb 3.6.12
 apt-get install -y apt-transport-https
