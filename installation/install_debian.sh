@@ -45,7 +45,7 @@ done
 #now install dependencies for Jbrowse and GuideFinder.
 
 echo "Installing dependencies for Jbrowse and GuideFinder"
-Jbrowse_crispr_dependencies=(git wget apache2 bwa bedtools krb5-user python2.7 python-tk python3 python-pip python3-pip samtools  zlib1g-dev)
+Jbrowse_crispr_dependencies=(git wget apache2 bwa bedtools krb5-user python2.7 python3 python-pip python3-pip samtools zlib1g-dev)
 
 for i in "${Jbrowse_crispr_dependencies[@]}";
 do
@@ -57,10 +57,6 @@ else
 fi
 done
 
-#upgrade pip due to issues with ubuntu default pip
-pip install --upgrade pip
-pip install --upgrade python3-pip
-
 #Now install Mongodb 3.6.12
 apt-get install -y apt-transport-https
 sudo apt-key adv --keyserver hkp://keyserver.ubuntu.com:80 --recv 2930ADAE8CAF5059EE73BB4B58712A2291FA4AD5
@@ -69,8 +65,8 @@ apt-get update
 apt-get install -y mongodb-org
 
 # Now install python modules and jbrowse dependencies
-python -m pip --default-timeout=10000 install -r requirements.txt
-python3 -m pip --default-timeout=10000 install -r requirements_v3.txt
+pip2 --default-timeout=10000 install -r requirements.txt
+pip3 --default-timeout=10000 install -r requirements_v3.txt
 
 cd $root_dir/jbrowse
 ./setup.sh
