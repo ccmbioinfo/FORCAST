@@ -97,7 +97,11 @@ class Config:
 
 		chr_sizes = {}	
 		for chr in data:
-			chr_sizes[chr['name']] = chr['length']
+			try:
+				chr_sizes[chr['name']] = chr['end'] - chr['start']
+			except KeyError as e:
+				# old format had length key, catch so code runs on both
+				chr_sizes[chr['name']] = chr['length']
 
 		return chr_sizes
 	
