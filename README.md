@@ -8,11 +8,11 @@
   Run the following commands to install git.
   ```
     sudo apt-get update
-    sudo apt-get install -y git
+    sudo apt-get install -y git apache2
   ```
-  Navigate to a folder where you would like to install CasCADe (must be a folder that can be served by apache2, e.g. ```/var/www/html``` and type
+  Navigate to a folder where you would like to install CasCADe (must be a folder that can be served by apache2, e.g. ```/var/www/html```, remove the index.html file if it exists, and type
   ```
-    git clone https://github.com/nvteja/CasCADe.git 
+    git clone https://github.com/ccmbioinfo/CasCADe.git
   ```    
   to clone the CasCADe repo.
  Then, run the installation script using the command below
@@ -26,9 +26,9 @@ for example if you cloned CasCADe to  the folder /var/www/html/CasCADe then you 
  ```
 If the installation process halts with a message ```Default Kerberos version 5 realm:```, press Enter
 
-After the installation step is completed, navigate to the ```setup_script``` folder under the root directory for example: ``` /var/www/html/CasCADe/setup_script``` and run the following command to setup Jbrowse, the BLAST database and mongodb.
+After the installation step is completed, start the mongodb server by running ```systemctl start mongod```. Then, navigate to the ```setup_script``` folder under the root directory for example: ``` /var/www/html/CasCADe/setup_script``` and run the following command to setup Jbrowse, the BLAST database and mongodb for the organism of your choice (-g flag requires the Ensembl name of the organism and -v flag requries the assembly version). Command below uses mus_mucsulus and mm10 as an example. You can find the list of Ensembl genomes at this link: ``` ftp://ftp.ensembl.org/pub/release-98/fasta/```
 ```
-    python3 setup.py -r /var/www/html/CasCADe -g mus_musculus -v mm10 -b /var/www/html/CasCADe/dependencies/ncbi-blast-2.7.1+/bin
+    python3 setup.py -r /var/www/html/CasCADe -g mus_musculus -v mm10 -fa2bit /var/www/html/tools/usrLocalBin/faToTwoBit -b /var/www/html/CasCADe/dependencies/ncbi-blast-2.7.1+/bin
 ```
 replace ```/var/www/html/CasCADe``` in the command above with the full path to your root directory, if it's different. 
 
