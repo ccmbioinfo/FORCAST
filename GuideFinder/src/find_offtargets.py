@@ -281,7 +281,7 @@ def countOffTargets(batchID, potentialGuides, rgen, tempfile_directory):
 				strand = location[-1]
 				# only add off-target to guide's dict if it has the motif
 				if hasMotif(offTargetMotifs, pamLocation, strand, seq):
-					if sum(potentialGuides[guideID]['offtarget_counts']) > 1000:
+					if sum(potentialGuides[guideID]['offtarget_counts']) >= 1000:
 						# don't track any more
 						potentialGuides[guideID]['max_exceeded'] = True 
 					else:
@@ -302,7 +302,8 @@ def convertExtendedBedToFasta(batchID, genome, genome_fa, tempfile_directory):
 	p = Popen(bashCommand, stdin=PIPE, stdout=PIPE, stderr=PIPE)
 
 	out, err = p.communicate()
-	if err:
+	if err and not err.startswith(b'Warning'):
+		# ignore warnings
 		raise Exception("Error in bedtools getfasta command: " + str(err))	
 	
 	return

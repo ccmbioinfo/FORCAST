@@ -24,14 +24,19 @@ sys.path.append(os.path.join(dir_path, "../../primerDesign/python"))
 from Config3 import Config
 import get_sequence, find_grna, find_offtargets, score_offtargets, categorize_offtargets
 
-# for debugging:
-import cgitb
-cgitb.enable()
-
 class GuideResults:
     def __init__(self, **kwargs):
         """ class for controlling the guide searching workflow and displaying results """
-        
+
+        # track whether web or cli
+        self.cli = kwargs['command-line'] 
+        if self.cli:
+            self.output_file = kwargs['output']
+        else:
+            # for debugging:
+            import cgitb
+            cgitb.enable()
+
         # validate searchInput
         if 'searchInput' not in kwargs:
             self.sendErrorHTML("'searchInput' parameter not set")
@@ -74,9 +79,15 @@ class GuideResults:
         if len(self.guideDict.keys()) > 0:
             self.writeCsvFiles()
             self.writeJsonFile()
-            self.sendResultHTML()
+            if not self.cli:
+                self.sendResultHTML()
+            else:
+                print("Completed.")
         else:
-            self.sendNoResultHTML()
+            if not self.cli:
+                self.sendNoResultHTML()
+            else:
+                print("No guides found in input region")
 
     def renderTemplate(self, template_name, template_values):
         """ given the name of the template, goes to the templates folder, renders it, and returns the result """
@@ -381,14 +392,29 @@ class GuideResults:
         else:
                 raise ValueError("Incorrect number of records returned from RGEN database for rgenID: " + str(rgenID))
                 return
-    
+
+
     def writeCsvFiles(self):
         """ for each guide, write a csv file of its off-targets to the tempfiles directory """
-        for guideID, guide in self.guideDict.items():
-            csv_path = os.path.join(self.dbConnection.ROOT_PATH,'GuideFinder/tempfiles', self.batchID+"_"+guideID+".csv")
-            try:
-                with open(csv_path, mode='w') as csv_file:
-                    writer = csv.writer(csv_file, delimiter=',')
+        if self.cli:
+            # if cli, put all guides into same csv
+            total_offtargets_processed = 0
+            with open(self.output_file, mode='w') as csv_file:
+                writer = csv.writer(csv_file, delimiter=",")
+                for guideID, guide in self.guideDict.items():
+                    writer.writerow([str(guideID)+":"])
+                    if guide['max_exceeded']:
+                        writer.writerow(['Max off target sites exceeded ('+str(sum(guide['offtarget_counts']))+" shown)"])
+                        total_offtargets_processed += 1000
+                    else:
+                        writer.writerow(['Total number of potential off-target sites:' + str(sum(guide['offtarget_counts']))])
+                        total_offtargets_processed += sum(guide['offtarget_counts']) 
+                    writer.writerow(['Off-target Counts: ' + "-".join(map(str,guide['offtarget_counts']))])
+                    writer.writerow(['No mismatches in Seed: ' +  "-".join(map(str,guide['offtargets_seed']))])
+                    if guide['MIT'] and not guide['max_exceeded']:
+                        writer.writerow(['MIT Score: ' + str(guide['MIT'])])
+                    if guide['CFD'] and not guide['max_exceeded']:
+                        writer.writerow(['CFD Score: ' + str(guide['CFD'])])
                     writer.writerow(['Location', 'Sequence', 'Mismatches', 'Context'])
                     writer.writerow([self.calculateLocation(guide), self.formatSequence(guide['guide_seq'], guide['pam_seq']), '0', 'guide'])
                     for offtarget in guide['offtargets']:
@@ -397,9 +423,24 @@ class GuideResults:
                         row.append(countLower(offtarget['seq']))
                         row.append(offtarget['context'])
                         writer.writerow(row)
-            except Exception as e:
-                self.sendErrorHTML(str(e))
-    
+                    writer.writerow(['TOTAL PROCESSED: ', str(total_offtargets_processed)])
+        else:    
+            for guideID, guide in self.guideDict.items():            
+                csv_path = os.path.join(self.dbConnection.ROOT_PATH,'GuideFinder/tempfiles', self.batchID+"_"+guideID+".csv")
+                try:
+                    with open(csv_path, mode='w') as csv_file:
+                        writer = csv.writer(csv_file, delimiter=',')
+                        writer.writerow(['Location', 'Sequence', 'Mismatches', 'Context'])
+                        writer.writerow([self.calculateLocation(guide), self.formatSequence(guide['guide_seq'], guide['pam_seq']), '0', 'guide'])
+                        for offtarget in guide['offtargets']:
+                            row = [offtarget['loc']]
+                            row.append(self.formatSequence(offtarget['seq'], offtarget['pam']))
+                            row.append(countLower(offtarget['seq']))
+                            row.append(offtarget['context'])
+                            writer.writerow(row)
+                except Exception as e:
+                    self.sendErrorHTML(str(e))
+        
     def getENSID(self):
         """ given the gene symbol, return the ENSEMBL ID from the stored gene collection """
         geneCollection = self.dbConnection.curr_geneCollection
@@ -442,9 +483,13 @@ class GuideResults:
         tempfiles_path = os.path.join(self.dbConnection.ROOT_PATH,'GuideFinder/tempfiles')
 
         get_sequence.fetch_sequence(twoBitToFa_path, self.searchInput, genome_2bit, os.path.join(tempfiles_path,batchID+'_out.fa'))
-        guideDict = find_grna.find_grna(self.rgenID, "20", os.path.join(tempfiles_path, batchID+'_out.fa'))
+        if self.cli: print("Determining guides in search region...")
+        guideDict = find_grna.find_grna(self.rgenID, 0, os.path.join(tempfiles_path, batchID+'_out.fa'))
+        if self.cli: print("Searching for potential off target sites...")
         guideDict = find_offtargets.findOffTargets(guideDict, self.rgenID, self.genome, batchID, genome_fa, tempfiles_path)
+        if self.cli: print("Scoring potential off target sites and guides...")
         guideDict = score_offtargets.scoreOffTargets(guideDict, self.rgenID)
+        if self.cli: print("Categorizing potential off target sites...")
         guideDict = categorize_offtargets.categorizeOffTargets(guideDict, self.rgenID, self.genome, batchID)
 
         return guideDict, batchID
@@ -474,17 +519,24 @@ def main():
                 if inputForm.getvalue(arg) is not None:
                     paramters[arg] = inputForm.getvalue(arg)
 
+            parameters['command-line'] = False
             GuideResults(**paramters)
+    
     else:
+        if len(sys.argv) != 6:
+            print("Please provide the genome of interest, search input coordinates, gene, rgenID, and output file (.csv) in order")
+            print("Optionally, provide the off-target PAMs to consider")
+            sys.exit()
+		
         parameters = {
-            'action': 'initialize',
-            'searchInput': 'chr4:20046057-20046185',
-            'genome': 'mm10',
-            'gene': 'Ggh',
-            'rgenID': '1'
+            'genome': sys.argv[1],
+            'searchInput': sys.argv[2],
+            'gene': sys.argv[3],
+            'rgenID': sys.argv[4],
+            'output': sys.argv[5],
+            'command-line': True
         }
         GuideResults(**parameters)
-
 
 if __name__ == "__main__":
     main()

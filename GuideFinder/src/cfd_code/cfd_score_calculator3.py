@@ -1,3 +1,5 @@
+#!/usr/bin/python3
+
 #Calculates the Cutting Frequency Determination score
 #Requirements: 1. Pickle file with mismatch scores in working directory
 #              2. Pickle file containing PAM scores in working directory 

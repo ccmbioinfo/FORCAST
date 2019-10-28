@@ -38,6 +38,9 @@ def cfdScore(guideDict):
 	"""
 	mm_scores, pam_scores = cfd.get_mm_pam_scores()
 	for guideID, guide in guideDict.items():
+		if guide['max_exceeded']:
+			guide['CFD'] = 0
+			continue
 		guideSeq = str(guide['guide_seq'])
 		cumulative_score = []
 		for offtarget in guide['offtargets']:
@@ -65,6 +68,9 @@ def mitScore(guideDict, rgenRecod):
 	M=[0,0,0.014,0,0,0.395,0.317,0,0.389,0.079,0.445,0.508,0.613,0.851,0.732,0.828,0.615,0.804,0.685,0.583]
 	
 	for guideID, guide in guideDict.items():	
+		if guide['max_exceeded']:
+			guide['MIT'] = 0
+			continue
 		guideSeq = str(guide['guide_seq'])
 		cumulative_score = []
 		for offtarget in guide['offtargets']:
@@ -100,6 +106,8 @@ def mitScore(guideDict, rgenRecod):
 			if str(guide['pam_seq'][-2:]).upper() != offPam[-2:].upper():
 				if offPam[-2:].upper() == 'AG':
 					score = score * 0.26
+				elif offPam[-2:].upper() == 'CG':
+					score = score * 0.11
 				elif offPam[-2:].upper() == 'GA':
 					score = score * 0.07
 				else:
@@ -121,6 +129,8 @@ def defaultRank(guideDict):
 	"""
 	for guideID, guide in guideDict.items():
 		cumulative_rank = 0
+		if guide['max_exceeded']:
+			cumulative_rank = 10**(5) # add large weight
 		for i, count in enumerate(guide['offtarget_counts']):
 			cumulative_rank += (int(count)*(10**(4-i)))
 
@@ -134,10 +144,8 @@ def scoreOffTargets(guideDict, rgenID):
 
 	if scores:
 		if 'MIT' in scores:
-			#print("Calculating MIT Scores")
 			mitScore(guideDict, rgen["OffTargetPAMS"])
 		if 'CFD' in scores:
-			#print("Calculating CFD Scores")
 			cfdScore(guideDict)
 		
 	defaultRank(guideDict)		
