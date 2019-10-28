@@ -371,6 +371,20 @@ def load_geneinfo_RGENs_into_Mongo(jbrowse_download_directory, mongo_username, m
     print("Successfully connected to Mongodb")
     if mongo_database is None: #fix this.
         mongo_database = genome_version
+
+    # load the RGEN json file into the RGEN database if it doesn't already exist
+    if 'RGEN' not in pyMongoClient.list_database_names():
+        rgenDB = pyMongoClient['RGEN']
+        try:
+            with open('rgens.json') as json_file:
+                rgenJSON = json.load(json_file)
+                collection = rgenDB['rgenCollection']
+                collection.insert(rgenJSON)
+                print("Successfully inserted RGENs into Mongo database")
+        except Exception as e:
+            print("Error inserting RGENs into Mongo database: "+ str(e))
+    else:
+        print("RGEN collection already exists in Mongo database, will not overwrite")
     
     for collection_name in (gene_info_collection, meta_data_collection):
         if collection_name in pyMongoClient[mongo_database].collection_names():
@@ -394,15 +408,6 @@ def load_geneinfo_RGENs_into_Mongo(jbrowse_download_directory, mongo_username, m
         meta_data_collection_obj.insert_one({'org_name': genome.lower()})
     except Exception as err:
         return(err)
-
-    # load the RGEN json file into the RGEN database if it doesn't already exist
-    if 'RGEN' not in pyMongoClient.list_database_names():
-        rgenDB = pyMongoClient['RGEN']
-        #TODO: wrap in try/catch
-        with open('rgens.json') as json_file:
-            rgenJSON = json.load(json_file)
-            collection = rgenDB['rgenCollection']
-            collection.insert(rgenJSON)
 
     return True
 
