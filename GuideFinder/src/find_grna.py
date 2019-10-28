@@ -66,7 +66,12 @@ def return_all_pams(pam):
 
     '''
 
-    ambiguity_to_nuc = {'A':'A', 'G':'G',' C':'C', 'T':'T', 'N': ['A','C','G','T'], 'R': ['A','G']}
+    ambiguity_to_nuc = {
+        'A': 'A', 'T': 'T', 'G': 'G', 'C': 'C',
+        'R': ['A','G'], 'Y': ['C','T'], 'S': ['G','C'], 'W': ['A','T'], 'K': ['G','T'], 'M': ['A','C'],
+        'B': ['C','G','T'], 'D': ['A','G','T'], 'H': ['A','C','T'], 'V': ['A','C','G'],
+        'N': ['A','C','G','T']
+    }
 
     forward_pam_motifs = [nuc for nuc in ambiguity_to_nuc[pam[0]]]
     for pam_nuc in pam[1:]:
