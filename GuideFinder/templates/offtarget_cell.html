@@ -4,11 +4,12 @@
 <span class="text-nowrap small-font top">
 	({% for count in guide["offtargets_seed"][:-1] %}{{count}}-{% endfor %}{{guide["offtargets_seed"][-1]}})
 </span>
-<div class="top small-line">
-	<a href="{{csvFile}}" class='small-font' download>
-		Download All
+<div class="top small-line small-font">
+	<a href="{{csvFile}}" download>
+		Download All ({{totalCount}} Total)
 	</a>
 </div>
+
 {% if guide['max_exceeded'] == True %}
 	<div class="max-exceeded">
 		Maximum number of off-targets exceeded, subset shown.

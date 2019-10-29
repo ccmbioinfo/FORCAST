@@ -232,7 +232,8 @@ class GuideResults:
             'guide': guide,
             'offtargetCounts': self.offtargetCountsHTML(guideID, guide),
             'offtargetModals': self.offtargetModalHTML(guideID, guide),
-            'csvFile': os.path.join('../tempfiles', self.batchID+"_"+guideID+".csv")
+            'csvFile': os.path.join('../tempfiles', self.batchID+"_"+guideID+".csv"),
+            'totalCount': str(sum(guide['offtarget_counts']))
         }
         return self.renderTemplate("offtarget_cell.html", template_values)
     
