@@ -27,6 +27,12 @@ class Config:
 		self.PRIMER3_SETTINGS = os.path.join(self.ROOT_PATH, 'config/primer3settings.conf')
 		# where the primer3 in and output files are written
 		self.PRIMER3_DIR = os.path.join(self.ROOT_PATH, 'primerDesign/python/files/primer3Files')
+		if self.config:
+			# if credentials are set, connect to mongodb using them
+			self.client = MongoClient('mongodb://%s:%s@localhost' % (self.config['username'], self.config['password']))
+		else:
+			# generically connect to db
+			self.client = MongoClient()
 		# get the rgen collection (genome agnostic)
 		self.rgenCollection = self.getRGENs()		
 			
@@ -73,13 +79,9 @@ class Config:
 				
 
 	def getRGENs(self):
-		if self.config:
-			# if credentials are set, connect to mongodb using them
-			client = MongoClient('mongodb://%s:%s@localhost' % (self.config['username'], self.config['password']))
-		else:
-			client = MongoClient()
+		" return the rgen collection"
 
-		db = client['RGEN']	
+		db = self.client['RGEN']	
 		rgenCollection = db['rgenCollection']
 
 		return rgenCollection
