@@ -22,16 +22,16 @@ cgitb.enable()
 class GuideAdd:
     def __init__(self, **kwargs):
         """ class for interfacing to the guide collection """
-        # validate input
-        for parameter in ['batchID', 'guideID', 'label', 'notes']:
+        # check required inputs set 
+        for parameter in ['batchID', 'guideID', 'label']:
             if parameter not in kwargs:
                 self.sendErrorHTML("'{parameter}' not set".format(**locals())) 
-        #print(kwargs)
         self.dbConnection = Config()
         self.batchID = kwargs['batchID']
         self.guideID = kwargs['guideID']
         self.label = kwargs['label']
-        self.notes = kwargs['notes']
+        self.notes = kwargs['notes'] if 'notes' in kwargs else ''
+        
         # fetch the stored guide info
         self.metadata, self.guide = self.parseJSON()
         self.rgen = self.getRGEN(str(self.metadata['rgenID']))

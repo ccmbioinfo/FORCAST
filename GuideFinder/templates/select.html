@@ -289,8 +289,13 @@
         // add a given guide to the database
         function modifyDatabase(button){
             let batchID_guideID = $(button).attr('id');
+            let notes = ''; // initialize to blank in case of no input
             let label = encodeURI($('#'+$.escapeSelector('guideLabel_'+batchID_guideID)).val());
-            let notes = encodeURI($('#'+$.escapeSelector('guideNotes_'+batchID_guideID)).val());
+            notes = encodeURI($('#'+$.escapeSelector('guideNotes_'+batchID_guideID)).val());
+            if (! label){
+                alert("Please Enter a Label to Save the Guide to the Database")
+                return
+            }
             // get text from button
             let originalButton = ''
             if ($(button).html().startsWith("Add to Database")){
@@ -314,14 +319,15 @@
                 success: function(html){
                     console.log(html);
                     $(button).html('Update Guide');
-                    if (originalButton == "Add to Database"){
-                        console.log('here');
+                    if (html.toString().trim() == "Successfully Inserted Guide"){
                         // add the green colour to the row
                         let row = $('#'+$.escapeSelector('row_'+batchID_guideID.split("_")[1]));
                         let icon = $('#'+$.escapeSelector(batchID_guideID.split("_")[1]+"_checkbox"));
-                        console.log(row, icon);
                         row.addClass('in-database');
                         icon.attr('class', 'fa fa-pencil fa-fw hover-icon');
+                    }
+                    else if (html.toString().trim() !== "Successfully Updated Guide"){
+                        alert("Error Saving Guide: " + html.toString().trim());
                     }
                 },
                 error: function(xhr, status, error){
