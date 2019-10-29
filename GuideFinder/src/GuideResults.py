@@ -27,7 +27,6 @@ import get_sequence, find_grna, find_offtargets, score_offtargets, categorize_of
 class GuideResults:
     def __init__(self, **kwargs):
         """ class for controlling the guide searching workflow and displaying results """
-
         # track whether web or cli
         self.cli = kwargs['command-line'] 
         if self.cli:
@@ -138,7 +137,7 @@ class GuideResults:
 
         # generate OrderedDict
         if 'MIT' in self.scores:
-            sortedIDs = sorted(self.guideDict.keys(), key=lambda x: (self.guideDict[x]['MIT']), reverse=True)
+            sortedIDs = sorted(self.guideDict.keys(), key=lambda x: (int(self.guideDict[x]['MIT'])), reverse=True)
         elif 'CFD' in self.scores:
             sortedIDs = sorted(self.guideDict.keys(), key=lambda x: (self.guideDict[x]['CFD']), reverse=True)
         else:
@@ -511,17 +510,16 @@ def countLower(string):
 def main():
     # check if running from web or command-line
     if 'REQUEST_METHOD' in os.environ:
-            # running from web
-            print("Content-type: text/html\n")
-            inputForm = cgi.FieldStorage()
-            paramters = {}
-            for arg in ['searchInput', 'genome', 'gene', 'rgenID', 'guideLength', 'offtargetPAMs']:
-                if inputForm.getvalue(arg) is not None:
-                    paramters[arg] = inputForm.getvalue(arg)
+        # running from web
+        print("Content-type: text/html\n")
+        inputForm = cgi.FieldStorage()
+        parameters = {}
+        for arg in ['searchInput', 'genome', 'gene', 'rgenID', 'guideLength', 'offtargetPAMs']:
+            if inputForm.getvalue(arg) is not None:
+                parameters[arg] = inputForm.getvalue(arg)
 
-            parameters['command-line'] = False
-            GuideResults(**paramters)
-    
+        parameters['command-line'] = False        
+        GuideResults(**parameters)
     else:
         if len(sys.argv) != 6:
             print("Please provide the genome of interest, search input coordinates, gene, rgenID, and output file (.csv) in order")
