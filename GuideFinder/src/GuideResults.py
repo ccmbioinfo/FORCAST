@@ -73,8 +73,10 @@ class GuideResults:
             self.guideLength = kwargs['guideLength']
         if 'offtargetPAMS' in kwargs:
             self.offTargetPAMS = kwargs['offtargetPAMS']
-
+        
         self.guideDict, self.batchID = self.performGuideSearch()
+        self.scores = self.setScores()
+
         if len(self.guideDict.keys()) > 0:
             self.writeCsvFiles()
             self.writeJsonFile()
@@ -87,6 +89,18 @@ class GuideResults:
                 self.sendNoResultHTML()
             else:
                 print("No guides found in input region")
+
+    def setScores(self):
+        scores = set({}) # make a set
+        for key, guide in self.guideDict.items():
+            # ensure that if any of the guides has a score it's displayed
+            if 'MIT' in guide:
+                scores.add('MIT')
+            if 'CFD' in guide:
+                scores.add('CFD')
+            if len(scores) == 2:
+                break
+        return scores
 
     def renderTemplate(self, template_name, template_values):
         """ given the name of the template, goes to the templates folder, renders it, and returns the result """
@@ -106,23 +120,12 @@ class GuideResults:
 
     def tableHeadingHTML(self):
         """ determine which info for the guides is available and display the headings for those """
-        scores = set({}) # make a set
-        for key, guide in self.guideDict.items():
-            # ensure that if any of the guides has a score it's displayed
-            if 'MIT' in guide:
-                scores.add('MIT')
-            if 'CFD' in guide:
-                scores.add('CFD')
-            if len(scores) == 2:
-                break
-        # store as class attribute
-        self.scores = scores
-
+       
         scoreHeading = ''
         scoreHeaders = '' 
-        if len(scores) > 0:
-            scoreHeading += "<th colspan='{num_scores}'>Scoring</th>".format(num_scores=len(scores))
-            for score in scores:
+        if len(self.scores) > 0:
+            scoreHeading += "<th colspan='{num_scores}'>Scoring</th>".format(num_scores=len(self.scores))
+            for score in self.scores:
                 scoreHeaders += "<th>{score}</th>".format(score=score)
 
         template_values = {
@@ -430,14 +433,49 @@ class GuideResults:
                 try:
                     with open(csv_path, mode='w') as csv_file:
                         writer = csv.writer(csv_file, delimiter=',')
-                        writer.writerow(['Location', 'Sequence', 'Mismatches', 'Context'])
-                        writer.writerow([self.calculateLocation(guide), self.formatSequence(guide['guide_seq'], guide['pam_seq']), '0', 'guide'])
+                        # build and write heading row 
+                        column_headings = ['chromosome', 'location', 'strand', 'protospacer sequence', 'PAM', 'mismatches', 'context']
+                        if 'MIT' in self.scores:
+                            column_headings.append('MIT')
+                        if 'CFD' in self.scores:
+                            column_headings.append('CFD')
+                        column_headings.append('no mismatches in seed')
+                        writer.writerow(column_headings)
+
+                        # build and write guide row 
+                        guide_row = [guide['pam_chrom']]
+                        guide_row.append(self.calculateLocation(guide).split(":")[1])
+                        guide_row.append(guide['strand'])
+                        guide_row.append(guide['guide_seq'])
+                        guide_row.append(guide['pam_seq'])
+                        guide_row.append('0') # num mismatches
+                        guide_row.append('guide') # context
+                        if 'MIT' in self.scores:
+                            guide_row.append(guide['MIT'])
+                        if 'CFD' in self.scores:
+                            guide_row.append(guide['CFD'])
+                        guide_row.append('')
+                        writer.writerow(guide_row)
+
+                        # initialize variables for determining whether offtarget has mismatch in seed
+                        seedDirection = self.rgenRecord['SeedRegion'][0]
+                        seedLength = int(self.rgenRecord['SeedRegion'][1:])
+                        # build and write row for each of the potential off target sites                        
                         for offtarget in guide['offtargets']:
-                            row = [offtarget['loc']]
-                            row.append(self.formatSequence(offtarget['seq'], offtarget['pam']))
-                            row.append(countLower(offtarget['seq']))
-                            row.append(offtarget['context'])
-                            writer.writerow(row)
+                            offtarget_row = offtarget['loc'].split(':')
+                            offtarget_row.append(offtarget['seq'])
+                            offtarget_row.append(offtarget['pam'])
+                            offtarget_row.append(str(sum(1 for base in offtarget['seq'] if base.islower()))) # num mismatches
+                            offtarget_row.append(offtarget['context'])
+                            if 'MIT' in self.scores:
+                                offtarget_row.append(offtarget['MIT'])
+                            if 'CFD' in self.scores:
+                                offtarget_row.append(offtarget['CFD'])
+                            if self.hasMismatchInSeed(offtarget['seq'], seedDirection, seedLength, len(guide['guide_seq'])):
+                                offtarget_row.append('')
+                            else:
+                                offtarget_row.append('*')
+                            writer.writerow(offtarget_row)
                 except Exception as e:
                     self.sendErrorHTML(str(e))
         
