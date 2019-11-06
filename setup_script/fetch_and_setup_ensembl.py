@@ -47,7 +47,7 @@ def check_crcsum(sumfile, file_to_check):
     '''This function checks the crcsum of the file file_to_check'''
     downloaded_crc_sum_list = subprocess.check_output(["sum",file_to_check]).decode("utf-8").strip().split(" ")
     ensembl_crc_sum_list = subprocess.check_output(["grep",os.path.basename(file_to_check),sumfile]).decode("utf-8").strip().split(" ")
-    if int(downloaded_crc_sum_list[0]) == int(ensembl_crc_sum_list[0]) and int(downloaded_crc_sum_list[1]) == int(ensembl_crc_sum_list[1]) :
+    if downloaded_crc_sum_list[0] == ensembl_crc_sum_list[0] and downloaded_crc_sum_list[1] == ensembl_crc_sum_list[1] :
         return True
     return False
 
