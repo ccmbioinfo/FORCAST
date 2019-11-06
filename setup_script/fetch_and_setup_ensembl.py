@@ -47,7 +47,7 @@ def check_crcsum(sumfile, file_to_check):
     '''This function checks the crcsum of the file file_to_check'''
     downloaded_crc_sum_list = subprocess.check_output(["sum",file_to_check]).decode("utf-8").strip().split(" ")
     ensembl_crc_sum_list = subprocess.check_output(["grep",os.path.basename(file_to_check),sumfile]).decode("utf-8").strip().split(" ")
-    if int(downloaded_crc_sum_list[0]) == int(ensembl_crc_sum_list[0]) and int(downloaded_crc_sum_list[1]) == int(ensembl_crc_sum_list[1]) :
+    if downloaded_crc_sum_list[0] == ensembl_crc_sum_list[0] and downloaded_crc_sum_list[1] == ensembl_crc_sum_list[1] :
         return True
     return False
 
@@ -400,6 +400,8 @@ def load_geneinfo_RGENs_into_Mongo(jbrowse_download_directory, mongo_username, m
                 if tmpArr[2].lower() == 'gene':
                     tmpDict = dict([[val for val in column.split("=")] for column in tmpArr[8].split(";")])
                     tmpDict['ID'] = tmpDict['ID'].replace("gene:","")
+                    if 'Name' not in tmpDict:
+                        tmpDict['Name'] = tmpDict['ID']
                     if tmpDict['ID'] not in geneDict:
                         geneDict[tmpDict['ID']] = {"ENSID":tmpDict['ID'],"Name": tmpDict['Name'], "chr":tmpArr[0], "start":int(tmpArr[3]), "end": int(tmpArr[4]), "strand": tmpArr[6]}    
     try:
