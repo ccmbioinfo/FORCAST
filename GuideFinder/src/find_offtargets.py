@@ -263,11 +263,12 @@ def countOffTargets(batchID, potentialGuides, rgen, tempfile_directory):
 	pamLocation = rgen['PamLocation']
 	rgenSeed = rgen['SeedRegion']
 
-	# initialize the counts and max_exceeded flag
+	# initialize the counts, offtarget list, and max_exceeded flag
 	for guideID, guide in potentialGuides.items():
 		guide['offtarget_counts'] = [0]*5
 		guide['offtargets_seed'] = [0]*5
 		guide['max_exceeded'] = False
+		guide['offtargets'] = []
 
 	# open the extended fasta
 	with open(os.path.join(tempfile_directory, str(batchID)+'_extended.fa'), 'r') as f:

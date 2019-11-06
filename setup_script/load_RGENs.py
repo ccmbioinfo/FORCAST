@@ -9,10 +9,12 @@ Warning: replacing the RGEN database will unlink existing guides in the database
 """
 
 script_desc = """This program will load the rgens from the 'rgens.json' file into the mongo database.
-Please provide either 'update' or 'replace' as a command-line argument to indicate whether the file should be used to 'update' the existing RGEN database or delete and 'replace' it.
-When updating, ensure that the rgenID remains unchanged as this is used along with the PAM as a key for identifying RGENs to update.
+Please provide either 'update' or 'replace' as a command-line argument.
+ update - modify attributes of existing rgens based on their rgenID and PAM, and add new RGENs
+ replace - delete existing RGEN database and replace it with contents of 'rgens.json' file
+N.B. When updating, ensure that the rgenID remains unchanged as this is used along with the PAM as a key for identifying RGENs to update.
 WARNING: if the 'replace' option is selected, existing guides in the database will be unlinked from their RGENs ('update' is the recommended option).
-If the RGEN database has already been deleted or does not yet exist, a new one will be created regardless of the option selected."""
+If the RGEN database does not exist, a new one will be created regardless of the selected option."""
 
 import sys
 import os

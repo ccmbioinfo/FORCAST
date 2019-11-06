@@ -9,10 +9,10 @@ Categorizes the off-targets into intergenic, intronic, and exonic using the segm
 
 import os, sys, re
 from subprocess import Popen, PIPE, DEVNULL
-sys.path.append("/var/www/html/primerDesign/python")
-from Config3 import Config
 from itertools import product
-import cfd_code.cfd_score_calculator3 as cfd
+dir_path = os.path.dirname(os.path.abspath(__file__))
+sys.path.append(os.path.join(dir_path, "../../primerDesign/python"))
+from Config3 import Config
 
 
 def getRgenRecord(rgenID, dbConnection):
@@ -37,8 +37,6 @@ def categorizeOffTargets(guideDict, rgenID, genome, batchID):
 	# connect to database and get the rgen variables from id
 	dbConnection = Config(genome)
 	rgen = getRgenRecord(rgenID, dbConnection)
-	# define how context categories should be mapped
-	context = {"in": "intronic", "ig": "intergenic", "ex": "exonic"}
 	# construct bed intersect command
 	segmentsFile = os.path.join(dbConnection.ROOT_PATH, "jbrowse/data."+genome, "downloads", genome+".segments.bed")
 	extendedBed = os.path.join(dbConnection.ROOT_PATH, "GuideFinder/tempfiles", str(batchID)+"_extended.bed")
@@ -55,14 +53,45 @@ def categorizeOffTargets(guideDict, rgenID, genome, batchID):
 		guideID, location = intersect[3].split("_")
 		for offTarget in guideDict[guideID]['offtargets']:
 			if offTarget['loc'] == location:
-				contextString = intersect[-1]
-				# replace shorthand for full genomic context description 
-				for c in context.keys():
-					contextString = re.sub(c+":", context[c]+":", contextString)	
+				contextString = str(intersect[-1])
 				# start the context string or append to the existing one
-				offTarget['context'] = contextString if 'context' not in offTarget else str(offTarget['context']) + ", " + contextString	
+				offTarget['context'] = formatContext('', contextString) if 'context' not in offTarget else formatContext(offTarget['context'], contextString)
 	
 	return guideDict
+
+
+def formatContext(existingContext, newIntersection):
+	""" given the existing bed intersect results, add the new intersection according to hierarchy/duplicate rules"""
+	if newIntersection == 'exonic':
+		if 'intronic' in existingContext:
+			return existingContext.replace('intronic', newIntersection) # recategorize
+		elif 'exonic' in existingContext:
+			return existingContext
+		else:
+			return newIntersection + " | " + existingContext
+	elif newIntersection == 'intronic':
+		if 'exonic' in existingContext or 'intronic' in existingContext:
+			return existingContext # already categorized
+		else:
+			return newIntersection + " | " + existingContext
+	elif newIntersection == 'intergenic':
+		if existingContext != '':
+			return existingContext
+		else:
+			return newIntersection
+	else:
+		# gene/ncRNA/pseudogene case
+		if existingContext == '':
+			return newIntersection
+		elif '|' in existingContext:
+			if existingContext.split(" | ")[1]:
+				return existingContext + ", " + newIntersection
+			else:
+				return existingContext + newIntersection
+		elif existingContext:
+			return existingContext + ", " + newIntersection
+		else:
+			return existingContext
 
 
 def main():

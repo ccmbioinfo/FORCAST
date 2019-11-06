@@ -218,7 +218,7 @@ def main():
         GuideSearch(**paramters)
 
     else:
-        print("running from command-line")
+        print("running from command-line with pre-set parameters")
         parameters = {
             'action': 'initialize',
             'searchInput': 'chr4:20046057-20046185',
