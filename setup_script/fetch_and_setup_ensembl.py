@@ -400,6 +400,8 @@ def load_geneinfo_RGENs_into_Mongo(jbrowse_download_directory, mongo_username, m
                 if tmpArr[2].lower() == 'gene':
                     tmpDict = dict([[val for val in column.split("=")] for column in tmpArr[8].split(";")])
                     tmpDict['ID'] = tmpDict['ID'].replace("gene:","")
+                    if 'Name' not in tmpDict:
+                        tmpDict['Name'] = tmpDict['ID']
                     if tmpDict['ID'] not in geneDict:
                         geneDict[tmpDict['ID']] = {"ENSID":tmpDict['ID'],"Name": tmpDict['Name'], "chr":tmpArr[0], "start":int(tmpArr[3]), "end": int(tmpArr[4]), "strand": tmpArr[6]}    
     try:
