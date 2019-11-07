@@ -63,15 +63,17 @@ def categorizeOffTargets(guideDict, rgenID, genome, batchID):
 def formatContext(existingContext, newIntersection):
 	""" given the existing bed intersect results, add the new intersection according to hierarchy/duplicate rules"""
 	if newIntersection == 'exonic':
-		if 'intronic' in existingContext:
-			return existingContext.replace('intronic', newIntersection) # recategorize
-		elif 'exonic' in existingContext:
+		if 'exonic' in existingContext:
 			return existingContext
+		elif 'intronic' in existingContext:
+			return existingContext.replace('intronic', 'exonic/intronic') # recategorize
 		else:
 			return newIntersection + " | " + existingContext
 	elif newIntersection == 'intronic':
-		if 'exonic' in existingContext or 'intronic' in existingContext:
-			return existingContext # already categorized
+		if 'intronic' in existingContext:
+			return existingContext
+		elif 'exonic' in existingContext:
+			return existingContext.replace('exonic', 'exonic/intronic') # give more specific categorization 
 		else:
 			return newIntersection + " | " + existingContext
 	elif newIntersection == 'intergenic':
