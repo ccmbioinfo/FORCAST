@@ -3,7 +3,7 @@
 """
 Hillary Elrick, October 1st, 2019
 
-Update Records from the previous version of CasCADe to match the new record format for the MongoDB
+SCRIPT FOR MIGRATING FROM INITIAL BETA RELEASE OF CASCADE TO VERSION 1.0
 """
 
 import os, sys, json, cgi
@@ -16,17 +16,23 @@ from Config3 import fetchInstalledGenomes
 
 def updateGuideRecords(org):
     """ add the rgen ID to all the records """
+    # NOTE: THIS PRESUMES THAT THE DEFAULT RGEN DATABASE IS BEING USED
     dbConnection = Config(org)
-    for guideRecord in dbConnection.guideCollection.find({}): #, {"$snapshot": True}):
+    for guideRecord in dbConnection.guideCollection.find({}): 
         if 'pamSeq' not in guideRecord:
-            print('wtf?')
-            print(guideRecord)
+            sys.exit("Error: invalid guide record " + str(guideRecord))
         if len(guideRecord['pamSeq']) == 3:
-            rgenID = "1"
+            if guideRecord['pamSeq'].endswith('GG'):
+                rgenID = "1"
         elif len(guideRecord['pamSeq']) == 4:
-            rgenID = "3"
+            if guideRecord['pamSeq'].startswith('TTT'):
+                rgenID = "2"
+            elif guideRecord['pamSeq'].endswith('GT'):
+                rgenID = "4"
+        elif len(guideRecord['pamSeq']) == 6:
+            regneID = "5"
         else:
-            sys.exit("Error: unrecognized PAM length ("+str(len(guideRecord['pamSeq'])+")"))
+            sys.exit("Error: unrecognized PAM ("+str(guideRecord['pamSeq'])+")")
 
         dbConnection.guideCollection.update_one({"_id": guideRecord['_id']}, {"$set": {"rgenID": rgenID}}) 
 
