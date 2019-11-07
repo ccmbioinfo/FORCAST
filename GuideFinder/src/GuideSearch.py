@@ -158,12 +158,19 @@ class GuideSearch:
 
     def getRegionLength(self):
         """ calculate and return the length of the input sequence """
-        start, end = re.search(r"chr.+?:(\d+)\-(\d+)", self.searchInput).groups()
-        return abs(int(start)-int(end))
+        try:
+            start, end = re.search(r"chr.+?:(\d+)\-(\d+)", self.searchInput).groups()
+            length = abs(int(start)-int(end))
+        except Exception as e:
+            return "N/A"
+        return length 
 
     def getOverlappingGenes(self):
         """ using Teja's query to find genes in the mongodb that overlap the search input """        
-        chm, start, end = re.search(r"(chr.+?):(\d+)\-(\d+)", self.searchInput).groups()
+        try:
+            chm, start, end = re.search(r"(chr.+?):(\d+)\-(\d+)", self.searchInput).groups()
+        except Exception as e:
+            return ["Invalid Input Sequence"]
         start = int(start)
         end = int(end)
         searchQuery = {
