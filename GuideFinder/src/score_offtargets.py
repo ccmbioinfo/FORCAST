@@ -77,9 +77,11 @@ def mitScore(guideDict, rgenRecod):
 			assert (len(guideSeq) == len(offSeq)), "Guide and Off-target are different lengths"
 			score = 0
 			mismatches = []
+			weight = 1.0
 			for i in range(0, len(guideSeq)):
 				if str(guideSeq[i]) != str(offSeq[i]):
 					mismatches.append(i)
+					weight *= (1-M[i])
 			
 			if len(mismatches) == 0:
 				# no mismatches gets score of 1
@@ -90,15 +92,14 @@ def mitScore(guideDict, rgenRecod):
 					distance = sum([b-a for a,b in zip(mismatches, mismatches[1:])])/(len(mismatches)-1)
 				except ZeroDivisionError:
 					# handle only one mismatch
-					distance = 19
+					distance = 0
 				
-				# calculate term to multiply mismatch score indicies by
-				multiplier = (19 - distance)/float(19)
-				multiplier = (multiplier*4) + 1
-				multiplier = (1/multiplier)
-				multiplier = multiplier * (1/(len(mismatches)**2))
-				for mm in range(0, len(mismatches)):
-					score += (1-M[mm])*multiplier
+				# calculate term to multiply weight by 
+				multiplier = ((19 - distance)/float(19)*4)+1
+				multiplier = (1.0/multiplier)
+				multiplier = multiplier * (1.0/(len(mismatches)**2))
+				
+				score = weight * multiplier * 100
 
 			# reduce scores for alternative PAMS
 			if str(guide['pam_seq'][-2:]).upper() != offPam[-2:].upper():
