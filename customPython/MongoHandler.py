@@ -87,7 +87,13 @@ def writePrimerGFF(dbConnection, org):
 	# create a line in the gff file for every pair of accepted primers in the database
 	for primerRecord in primerCollection.find({'status' : 'Accepted'}):
 		# see if the gene is + or -
-		if Config.fetchStrandofGene(primerRecord['batchName'], org) == '+':
+		try:
+			strand = Config.fetchStrandofGene(primerRecord['ENSID'], org)
+		except ValueError as e:
+			print("Skipping writing primer record associated with "+str(primerRecord['batchName'])+" ("+str(primerRecord['ENSID'])+") as it cannot be found in the database")
+			continue
+		
+		if strand == '+':
 			fwdStart = primerRecord['left_genomicLocation']
 			# subtract 1 from length to account for 'cap' jbrowse puts on exon features
 			fwdEnd = str(int(fwdStart) + (int(primerRecord['leftlen']) - 1))
@@ -95,13 +101,15 @@ def writePrimerGFF(dbConnection, org):
 			revEnd = primerRecord['right_genomicLocation']
 			revStart = str(int(revEnd) - (int(primerRecord['rightlen']) -1))
 			revStrand = '-'
-		else:
+		elif strand == '-':
 			fwdEnd = primerRecord['left_genomicLocation']
 			fwdStart = str(int(fwdEnd) - (int(primerRecord['leftlen'])-1))
 			fwdStrand = '-'
 			revStart = primerRecord['right_genomicLocation']
 			revEnd = str(int(revStart) + (int(primerRecord['rightlen'])-1))
 			revStrand = '+'
+		else:
+			print("Invalid strand property of '"+str(strand)+"' for gene '"+str(primerRecord['ENSID'])+"'")
 			
 		# make the left/fwd primer's line first
 		colNine = 'ID=exon_' + str(idCounter) + ';Name=' + primerRecord['type'] + '_forward ' + primerRecord['leftprimer'] + ';batchName=' + primerRecord['batchName']

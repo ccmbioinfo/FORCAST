@@ -39,9 +39,8 @@ class GuideResults:
         # validate searchInput
         if 'searchInput' not in kwargs:
             self.sendErrorHTML("'searchInput' parameter not set")
-        elif not isValidInput(kwargs['searchInput']):
-            self.sendErrorHTML("'searchInput', "+str(kwargs['searchInput'])+" is not valid")
         else:
+            self.isValidInput(kwargs['searchInput'])
             self.searchInput = kwargs['searchInput']
        
         # validate genome
@@ -54,13 +53,13 @@ class GuideResults:
        
         # check gene sent
         if 'gene' not in kwargs:
-            self.sendErrorHTML("'gene' parameter not set")
+            self.sendErrorHTML("Please select a Target from the dropdown list")
         else:
             self.gene = kwargs['gene']
       
         # validate rgenID
         if 'rgenID' not in kwargs:
-            self.sendErrorHTML("'rgenID' parameter not set")
+            self.sendErrorHTML("Please select an RGEN from the dropdown list")
         else:
             self.rgenID = kwargs['rgenID']
             try:
@@ -92,15 +91,16 @@ class GuideResults:
 
     def setScores(self):
         scores = set({}) # make a set
+        options = ['MIT', 'CFD']
+        available = []
         for key, guide in self.guideDict.items():
-            # ensure that if any of the guides has a score it's displayed
-            if 'MIT' in guide:
-                scores.add('MIT')
-            if 'CFD' in guide:
-                scores.add('CFD')
-            if len(scores) == 2:
+            for s in options:
+                if s in guide and s not in available:
+                    available.append(s)
+            if len(available) == len(options):
                 break
-        return scores
+       
+        return available
 
     def renderTemplate(self, template_name, template_values):
         """ given the name of the template, goes to the templates folder, renders it, and returns the result """
@@ -141,8 +141,6 @@ class GuideResults:
         # generate OrderedDict
         if 'MIT' in self.scores:
             sortedIDs = sorted(self.guideDict.keys(), key=lambda x: (int(self.guideDict[x]['MIT'])), reverse=True)
-        elif 'CFD' in self.scores:
-            sortedIDs = sorted(self.guideDict.keys(), key=lambda x: (self.guideDict[x]['CFD']), reverse=True)
         else:
             # sort by weighted off-target counts
             sortedIDs = sorted(self.guideDict.keys(), key=lambda x: (self.guideDict[x]['Rank']))
@@ -217,7 +215,7 @@ class GuideResults:
         elif self.rgenRecord['PamLocation'] == 'upstream':
             return pam_seq + ", " + guide_seq
         else:
-            sendErrorHMTL("Unrecognized PAM Location for RGEN: " + str(self.rgenRecord['PamLocation']))
+            self.sendErrorHTML("Unrecognized PAM Location for RGEN: " + str(self.rgenRecord['PamLocation']))
     
     def calculateLocation(self, guide):
         """ using the strand of the guide and the genomic start, format the location string """
@@ -226,7 +224,7 @@ class GuideResults:
         elif guide['strand'] == '-':
             return guide['pam_chrom'] + ":" + str(guide['guide_genomic_start']) + "-" + str(int(guide['guide_genomic_start']-len(guide['guide_seq']))+1) + ":-"
         else:
-            sendErrorHTML("Unrecognized strand for guide: " + str(guide['strand']))
+            self.sendErrorHTML("Unrecognized strand for guide: " + str(guide['strand']))
     
     def offtargetHTML(self, guideID, guide):
         """ creates the HTML for the off-target modal of a given guide """
@@ -532,11 +530,20 @@ class GuideResults:
 
         return guideDict, batchID
 
-def isValidInput(inputSeq):
-    #TODO: code this. some validation done on front end but not for the chr number/letter
-    if len(inputSeq) == 0:
-        return False
-    return True
+    def isValidInput(self, inputSeq):
+        #TODO: code this. some validation done on front end but not for the chr number/letter
+        if len(inputSeq) == 0:
+            self.sendErrorHTML("Please enter an input region for the search")
+            return False
+        if inputSeq.count(":") == 1 and inputSeq.count("-") == 1:
+            chrm = inputSeq.split(":")[0]
+            start, end = list(map(int, (inputSeq.split(":")[1]).split("-")))
+            if abs(start-end) > 750:
+                self.sendErrorHTML("Please enter an input sequence with fewer than 750 bases")
+        else:
+            self.sendErrorHTML("Please enter input search sequence in 'chrX:start-end' format")
+
+        return True
 
 def countLower(string):
     """ returns the number of lowercase letters in a string """

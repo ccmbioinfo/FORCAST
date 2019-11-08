@@ -204,20 +204,14 @@
                 searchInput = searchInput.replace("..","-");
                 $('#searchInput').val(searchInput);
             }
-            // check formatted correctly
+            // check input formatted correctly
             let separated = searchInput.split(":");
             if (separated.length == 2){
                 let chr = separated[0];
                 if (! chr.startsWith("chr")){ displaySeqTooltip("Search input must start with 'chr'"); return false; }
                 else if (chr.length < 4){ displaySeqTooltip("Search input must include a chromosome"); return false; }
                 let coordinates = separated[1].split('-');
-                if (coordinates.length == 2){
-                    let start = parseInt(coordinates[0]);
-                    let end = parseInt(coordinates[1]);
-                    if (Math.abs(end-start) > 500){ displaySeqTooltip("Input length must be fewer than 500bp"); return false; }
-                    else if (Math.abs(end-start) == 0){ displaySeqTooltip("Input length must be greater than 0bp"); return false; }
-                }
-                else{ displaySeqTooltip("Must be in 'chrX:start-end' format"); return false; }
+                if (! (coordinates.length == 2)){displaySeqTooltip("Must be in 'chrX:start-end' format"); return false;}
             }
             else{ displaySeqTooltip("Must be in 'chrX:start-end' format"); return false; }
             return true;
@@ -275,15 +269,8 @@
         // toggle row checkbox
         function toggleCheckbox(guideID){
             let checkboxID = '#'+guideID+'_checkbox';
-            if ($(checkboxID).prop('checked') == true){
-                console.log(checkboxID, 'checked');
-
-                $(checkboxID).prop("checked", false);
-            }
-            else{
-                console.log(checkboxID, 'unchecked');
-                $(checkboxID).prop("checked", true); 
-            }
+            if ($(checkboxID).prop('checked') == true){$(checkboxID).prop("checked", false);}
+            else{$(checkboxID).prop("checked", true);}
         }
 
         // add a given guide to the database
@@ -317,7 +304,6 @@
                     notes: notes
                 },
                 success: function(html){
-                    console.log(html);
                     $(button).html('Update Guide');
                     if (html.toString().trim() == "Successfully Inserted Guide"){
                         // add the green colour to the row

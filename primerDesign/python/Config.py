@@ -103,11 +103,13 @@ class Config:
 		
 
 	@staticmethod		
-	def fetchStrandofGene(geneName, genome):
+	def fetchStrandofGene(ensid, genome):
 		curr_geneCollection = getCurrentGeneCollection(genome)
-		record = curr_geneCollection.find_one({'Name': geneName})
-		return record['strand']
-
+		record = curr_geneCollection.find_one({'ENSID': ensid})
+		if record:
+			return record['strand']
+		else:
+			raise ValueError("ENSID:"+str(ensid)+" Does Not Exist in Current Gene Collection")
 
 	# if there's a gene object already made, fetch it. Return None otherwise
 	@staticmethod
