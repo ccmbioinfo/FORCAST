@@ -397,7 +397,7 @@ def load_geneinfo_RGENs_into_Mongo(jbrowse_download_directory, mongo_username, m
         for line in inp_fh:
             if line.startswith('#') is False:
                 tmpArr = line.split("\t")
-                if tmpArr[2].lower() == 'gene':
+                if 'gene' in tmpArr[2].lower():
                     tmpDict = dict([[val for val in column.split("=")] for column in tmpArr[8].split(";")])
                     tmpDict['ID'] = tmpDict['ID'].replace("gene:","")
                     if 'Name' not in tmpDict:
