@@ -42,7 +42,7 @@ again, replace ```/var/www/html/CasCADe``` in the command above with the full pa
 
 Next, the apache server needs to be configured to make the tool web accessible.
 
-Open the file ```/etc/apache2/sites-available/000-default.conf``` and add this section under the line ```DocumentRoot <path to your root folder>```
+Open the file ```/etc/apache2/sites-available/000-default.conf```, modify the DocumentRoot (if it is different) to the location where CasCADe was installed (i.e. ```DocumentRoot <path to your root folder>```), and add this section below:
 ```
      <Directory '/var/www/html/CasCADe'>
         Options +ExecCGI
