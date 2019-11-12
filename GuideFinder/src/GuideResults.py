@@ -538,8 +538,8 @@ class GuideResults:
         if inputSeq.count(":") == 1 and inputSeq.count("-") == 1:
             chrm = inputSeq.split(":")[0]
             start, end = list(map(int, (inputSeq.split(":")[1]).split("-")))
-            if abs(start-end) > 750:
-                self.sendErrorHTML("Please enter an input sequence with fewer than 750 bases")
+            if abs(start-end) > 500:
+                self.sendErrorHTML("Please enter an input sequence with fewer than 500 bases")
         else:
             self.sendErrorHTML("Please enter input search sequence in 'chrX:start-end' format")
 
