@@ -155,7 +155,7 @@ def countMismatches(guideDict, seedRegion, offTargetGuide):
 	seedIndex = (len(guideSequence) - seedIndex) if seedDirection == "-" else seedIndex
 	
 	for i in range(0, len(offTargetGuide)):
-		if guideSequence[i].lower() != offTargetGuide[i].lower():
+		if guideSequence[i].upper() != offTargetGuide[i].upper() and offTargetGuide[i].upper() != 'N':
 			mismatches += 1
 			if seedDirection == "+" and i < seedIndex:
 				exactMatchSeed = False
@@ -219,10 +219,6 @@ def processOffTarget(guideDict, rgen, offTargetLoc, offTargetSeq):
 	# first count the number of mismatches to the off target (in seed region too)
 	mismatches, noneInSeed = countMismatches(guideDict, rgen['SeedRegion'], offTargetGuide)
 
-	if mismatches > 4 or 'N' in offTargetGuide.upper():
-		# don't return offtargets with N
-		return guideDict
-	
 	# update the guideDict to reflect the new off target		
 	try:
 		guideDict['offtarget_counts'] =  initializeMismatchCount(mismatches) if 'offtarget_counts' not in guideDict else incrementMismatchCount(guideDict['offtarget_counts'], mismatches)
@@ -257,7 +253,10 @@ def changeCase(guide, offtarget_guide):
 	assert (len(guide) == len(offtarget_guide)), "Guide and Off-Target must be of same length"
 	resultGuide = ''
 	for b in range(0, len(guide)):
-		resultGuide = resultGuide+guide[b] if guide[b].lower() == offtarget_guide[b].lower() else resultGuide+(offtarget_guide[b].lower())
+		if (guide[b].upper() == offtarget_guide[b].upper() or offtarget_guide[b].upper() == "N"):
+			resultGuide += offtarget_guide[b].upper()
+		else:
+			resultGuide += offtarget_guide[b].lower()
 
 	return resultGuide
 

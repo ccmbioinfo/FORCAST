@@ -42,6 +42,9 @@ def cfdScore(guideDict):
 		guideSeq = str(guide['guide_seq'])
 		cumulative_score = []
 		for offtarget in guide['offtargets']:
+			if 'N' in offtarget['seq'].upper():
+				offtarget['CFD'] = None
+				continue # cfd scores can't be calculated for offtargets with Ns
 			offSeq = offtarget['seq'].upper()
 			offPam = offtarget['pam'][-2:].upper() # only requires last 2 bases of pam
 			sub_score = cfd.calc_cfd(guideSeq, offSeq, offPam)
