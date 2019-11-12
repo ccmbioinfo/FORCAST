@@ -36,8 +36,8 @@ class Dicey:
 	
 	def constructDiceyCommand(self):
 		"""
-		Returns BLAST command for mm10 optimized for primer sequences that will only return
-		hits below the class' evalue threshold. Uses the evalue and identity class attributes		
+		Returns the Dicey command with reference to the locally installed Primer3 in addition
+		to the genome of interest and minimum temperature to consider for binding
 		"""
 		# base shell command 
 		diceyCommand = [self.Config.DICEY]
@@ -87,7 +87,12 @@ class Dicey:
 	
 		# return the json result	
 		jsonResult = json.loads(diceyOut)
-		data = jsonResult['data']
+		try:
+			data = jsonResult['data']
+		except Exception, e:
+			print("Error reading Dicey results: "+str(e))
+			return
+		
 		return data
 
 	
