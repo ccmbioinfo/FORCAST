@@ -11,7 +11,8 @@ import sys
 import os
 import binascii
 from subprocess import Popen, PIPE, DEVNULL
-sys.path.append("/var/www/html/primerDesign/python")
+dir_path = os.path.dirname(os.path.abspath(__file__))
+sys.path.append(os.path.join(dir_path, "../../primerDesign/python"))
 from Config3 import Config
 from itertools import product
 import score_offtargets
@@ -176,7 +177,9 @@ def incrementMismatchCount(counts, mismatches):
 	"""
 	Increment the list that tracks the count of mismatches
 	"""
-	counts[mismatches] += 1
+	if mismatches <= 4:
+		counts[mismatches] += 1
+	
 	return counts
 
 def processOffTarget(guideDict, rgen, offTargetLoc, offTargetSeq):
@@ -215,6 +218,10 @@ def processOffTarget(guideDict, rgen, offTargetLoc, offTargetSeq):
 
 	# first count the number of mismatches to the off target (in seed region too)
 	mismatches, noneInSeed = countMismatches(guideDict, rgen['SeedRegion'], offTargetGuide)
+
+	if mismatches > 4 or 'N' in offTargetGuide.upper():
+		# don't return offtargets with N
+		return guideDict
 	
 	# update the guideDict to reflect the new off target		
 	try:
@@ -423,17 +430,17 @@ def main():
 	 tempfile directory (to write intermediate files)
 	"""
 	if len(sys.argv) != 6:
+
 		print("Requires a dictionary of potentialGuides, rgenID, genome, bwa_index, and tempfile directory")
 		batchID = binascii.b2a_hex(os.urandom(9)).decode('utf-8')
-		#guides, rgenID, genome, genome_fa, tempfile_directory = sys.argv[1:]
-		
+		guides, rgenID, genome, genome_fa, tempfile_directory = sys.argv[1:]
+		"""	
 		guides = {'26+': {'strand': '+', 'pam_seq': 'TTTG', 'guide_genomic_start': 74646138, 'pam_location': 'upstream', 'pam_chrom': 'chr13', 'guide_seq': 'CTTTTCTATATTTTGTTTTT', 'pam_genomic_start': 74646134}} 
 		rgenID = '3'
 		genome = 'mm10'
 		genome_fa = '/var/www/html/genomes/mm10/mm10.fa'
 		tempfile_directory = '/var/www/html/GuideFinder/tempfiles'
-		
-		#TODO: fix this to work on command-line
+		"""	
 		result = findOffTargets(guides, rgenID, genome, batchID, genome_fa, tempfile_directory)
 		print(result)	
 	
