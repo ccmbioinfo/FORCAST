@@ -525,7 +525,7 @@ class Guide(Gene):
 		htmlResult = ''
 		for primerType in ["WT", "EM"]:
 			primerResult, retryString = primer3Connection.attemptDesign(self, primerType)
-			if primerResult:	
+			if primerResult:
 				htmlResult += retryString
 				if primerType == 'WT':
 					wtPrimers = primerResult
@@ -549,7 +549,10 @@ class Guide(Gene):
 					# add the results table
 					htmlResult += printPrimers(primerResult, primerType)	
 			else:
-				emPrimers = {}
+				htmlResult += retryString
+				if primerType == 'WT': wtPrimers = {}
+				elif primerType == 'EM':
+					emPrimers = {}
 
 		htmlResult += ("</div>")
 		return wtPrimers, emPrimers, htmlResult
@@ -679,6 +682,7 @@ def printPrimers(primerDict, primer):
 	htmlTable += """
 	</tbody>
 	</table>
+	<br>
 	"""
 	return htmlTable
 

@@ -11,6 +11,7 @@
 
 import cgi
 import os
+import sys
 import cPickle as pickle
 from classes.Gene import Gene
 from classes.Guide import Guide
@@ -18,21 +19,25 @@ from classes.Gene import returnError
 from Config import Config
 from Config import saveGeneObject
 
-PKL_PATH = "classes/geneStorage"
-
-
 def main():
 
-	print "Content-Type: text/html\n"
-	
-	args = cgi.FieldStorage()
-	try:
-		geneName = args.getvalue('gene')
-		genome = args.getvalue('genome')
-	except Exception, e:
-		returnError(str(e))
-		return
-
+	if 'REQUEST_METHOD' in os.environ:
+		print "Content-Type: text/html\n"	
+		args = cgi.FieldStorage()
+		try:
+			geneName = args.getvalue('gene')
+			genome = args.getvalue('genome')
+		except Exception, e:
+			returnError(str(e))
+			return
+	else:
+		if len(sys.argv) != 3:
+			print("Please provide the genome of interest and a gene to design guides for.")
+			print("The program will attempt a design for all accepted guides for the gene")
+			sys.exit()
+		else:
+			genome = sys.argv[1]
+			geneName = sys.argv[2]
 
 	if not geneName or not genome:
 		returnError("Required parameters not passed to script")	

@@ -213,7 +213,7 @@ class Primer3:
 					# nothing defined, set to blank string
 					retryDesc = ''
 				
-				htmlResult += ('<br><p id="retryText" class="text-danger">'+primerType+' Retry '+str(attemptNumber)+': '+retryDesc+'</p>')
+				htmlResult += ('<p id="retryText" class="text-danger">'+primerType+' Retry '+str(attemptNumber)+': '+retryDesc+'</p>')
 			else:
 				foundPrimers = True
 
