@@ -39,6 +39,11 @@ def cfdScore(guideDict):
 	"""
 	mm_scores, pam_scores = cfd.get_mm_pam_scores()
 	for guideID, guide in guideDict.items():
+		if guide['max_exceeded']:
+			# don't report aggregated CFD score if off target list was truncated
+			guide['CFD'] = '0'
+			continue
+		
 		guideSeq = str(guide['guide_seq'])
 		cumulative_score = []
 		for offtarget in guide['offtargets']:
@@ -54,9 +59,7 @@ def cfdScore(guideDict):
 		aggregate_score = 100 / (100+sum(cumulative_score))
 		aggregate_score = int(round(aggregate_score*100))
 		guide['CFD'] = str(aggregate_score)
-		if guide['max_exceeded']:
-			# don't report aggregated CFD score if off target list was truncated
-			guide['CFD'] = '0'
+		
 
 
 def mitScore(guideDict, rgenRecod):
@@ -71,7 +74,12 @@ def mitScore(guideDict, rgenRecod):
 	"""
 	M=[0,0,0.014,0,0,0.395,0.317,0,0.389,0.079,0.445,0.508,0.613,0.851,0.732,0.828,0.615,0.804,0.685,0.583]
 	
-	for guideID, guide in guideDict.items():	
+	for guideID, guide in guideDict.items():
+		if guide['max_exceeded']:
+			# don't calculate MIT score if off target list was truncated
+			guide['MIT'] = '0'
+			continue
+		
 		guideSeq = str(guide['guide_seq'])
 		cumulative_score = []
 		for offtarget in guide['offtargets']:
@@ -122,11 +130,6 @@ def mitScore(guideDict, rgenRecod):
 		aggregate_score = 100 / (100+sum(cumulative_score))
 		aggregate_score = int(round(aggregate_score*100))
 		guide['MIT'] = str(aggregate_score)
-		if guide['max_exceeded']:
-			# don't report aggregated CFD score if off target list was truncated
-			guide['MIT'] = '0'
-
-
 
 
 def defaultRank(guideDict):

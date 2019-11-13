@@ -51,6 +51,9 @@ def categorizeOffTargets(guideDict, rgenID, genome, batchID):
 		# assign every intersection to its off-target
 		intersect = line.decode("utf-8").split("\t")
 		guideID, location = intersect[3].split("_")
+		if guideDict[guideID]['max_exceeded']:
+			# don't care about categorizing these
+			continue
 		for offTarget in guideDict[guideID]['offtargets']:
 			if offTarget['loc'] == location:
 				contextString = str(intersect[-1])

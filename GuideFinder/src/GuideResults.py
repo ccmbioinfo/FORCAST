@@ -301,9 +301,9 @@ class GuideResults:
         for offtarget in offtarget_list:
             offtarget.update({'formatted_seq': self.colourLowercaseRed(self.formatSequence(offtarget['seq'], offtarget['pam']))})
         # sort by score if available
-        if 'MIT' in self.scores:
+        if 'MIT' in self.scores and 'MIT' in offtarget_list[0]: # in case max_exceeded
             offtarget_list = sorted(offtarget_list, key=lambda x: x['MIT'], reverse=True)
-        elif 'CFD' in self.scores:
+        elif 'CFD' in self.scores and 'CFD' in offtarget_list[0]:
             offtarget_list = sorted(offtarget_list, key=lambda x: x['CFD'], reverse=True)
 
         total_count = ''
@@ -422,7 +422,10 @@ class GuideResults:
                         row = [offtarget['loc']]
                         row.append(self.formatSequence(offtarget['seq'], offtarget['pam']))
                         row.append(countLower(offtarget['seq']))
-                        row.append(offtarget['context'])
+                        try:
+                            row.append(offtarget['context'])
+                        except Exception as e:
+                            row.append('-')
                         writer.writerow(row)
                     writer.writerow(['TOTAL PROCESSED: ', str(total_offtargets_processed)])
         else:    
@@ -433,9 +436,9 @@ class GuideResults:
                         writer = csv.writer(csv_file, delimiter=',')
                         # build and write heading row 
                         column_headings = ['chromosome', 'location', 'strand', 'protospacer sequence', 'PAM', 'mismatches', 'context']
-                        if 'MIT' in self.scores:
+                        if 'MIT' in self.scores and not guide['max_exceeded']:
                             column_headings.append('MIT')
-                        if 'CFD' in self.scores:
+                        if 'CFD' in self.scores and not guide['max_exceeded']:
                             column_headings.append('CFD')
                         column_headings.append('no mismatches in seed')
                         writer.writerow(column_headings)
@@ -448,9 +451,9 @@ class GuideResults:
                         guide_row.append(guide['pam_seq'])
                         guide_row.append('0') # num mismatches
                         guide_row.append('guide') # context
-                        if 'MIT' in self.scores:
+                        if 'MIT' in self.scores and not guide['max_exceeded']:
                             guide_row.append(guide['MIT'])
-                        if 'CFD' in self.scores:
+                        if 'CFD' in self.scores and not guide['max_exceeded']:
                             guide_row.append(guide['CFD'])
                         guide_row.append('')
                         writer.writerow(guide_row)
@@ -464,10 +467,13 @@ class GuideResults:
                             offtarget_row.append(offtarget['seq'])
                             offtarget_row.append(offtarget['pam'])
                             offtarget_row.append(str(sum(1 for base in offtarget['seq'] if base.islower()))) # num mismatches
-                            offtarget_row.append(offtarget['context'])
-                            if 'MIT' in self.scores:
+                            try:
+                                offtarget_row.append(offtarget['context'])
+                            except Exception as e:
+                                offtarget_row.append('-')
+                            if 'MIT' in self.scores and not guide['max_exceeded']:
                                 offtarget_row.append(offtarget['MIT'])
-                            if 'CFD' in self.scores:
+                            if 'CFD' in self.scores and not guide['max_exceeded']:
                                 offtarget_row.append(offtarget['CFD'])
                             if self.hasMismatchInSeed(offtarget['seq'], seedDirection, seedLength, len(guide['guide_seq'])):
                                 offtarget_row.append('')
@@ -475,7 +481,7 @@ class GuideResults:
                                 offtarget_row.append('*')
                             writer.writerow(offtarget_row)
                 except Exception as e:
-                    self.sendErrorHTML(str(e))
+                    self.sendErrorHTML("Error writing off target CSV file, "+str(e))
         
     def getENSID(self):
         """ given the gene symbol, return the ENSEMBL ID from the stored gene collection """
@@ -517,16 +523,35 @@ class GuideResults:
         twoBitToFa_path = os.path.join(self.dbConnection.ROOT_PATH,'bin/twoBitToFa')
         genome_2bit = os.path.join(self.dbConnection.ROOT_PATH,'jbrowse', 'data.'+self.genome,"downloads",self.genome+'.2bit')
         tempfiles_path = os.path.join(self.dbConnection.ROOT_PATH,'GuideFinder/tempfiles')
-
-        get_sequence.fetch_sequence(twoBitToFa_path, self.searchInput, genome_2bit, os.path.join(tempfiles_path,batchID+'_out.fa'))
-        if self.cli: print("Determining guides in search region...")
+        if self.cli:
+            import time
+            time_0 = time.time()
+            print("Fetching sequence...")
+        get_sequence.fetch_sequence(twoBitToFa_path, self.searchInput, genome_2bit, os.path.join(tempfiles_path,batchID+'_out.fa')) 
+        if self.cli: 
+            time_1 = time.time()
+            print("Finished fetching sequence. " + str(round(time_1-time_0,4)))
+            print("Determining guides in search region...")
         guideDict = find_grna.find_grna(self.rgenID, 0, os.path.join(tempfiles_path, batchID+'_out.fa'))
-        if self.cli: print("Searching for potential off target sites...")
+        if self.cli: 
+            time_2 = time.time()
+            print("Finished finding gRNAs. " + str(round(time_2-time_1,4)))
+            print("Searching for potential off target sites...")
         guideDict = find_offtargets.findOffTargets(guideDict, self.rgenID, self.genome, batchID, genome_fa, tempfiles_path)
-        if self.cli: print("Scoring potential off target sites and guides...")
+        if self.cli: 
+            time_3 = time.time()
+            print("Finished finding offtargets. " + str(round(time_3-time_2,4)))
+            print("Scoring potential off target sites and guides...")
         guideDict = score_offtargets.scoreOffTargets(guideDict, self.rgenID)
-        if self.cli: print("Categorizing potential off target sites...")
+        if self.cli: 
+            time_4 = time.time()
+            print("Finished scoring. " + str(round(time_4-time_3,4)))
+            print("Categorizing potential off target sites...")
         guideDict = categorize_offtargets.categorizeOffTargets(guideDict, self.rgenID, self.genome, batchID)
+        if self.cli:
+            time_5 = time.time()
+            print("Finished categorizing. " + str(round(time_5-time_4,4)))
+            print("TOTAL TIME ELAPSED: " + str(round(time_5-time_0,4)))
 
         return guideDict, batchID
 
@@ -538,8 +563,8 @@ class GuideResults:
         if inputSeq.count(":") == 1 and inputSeq.count("-") == 1:
             chrm = inputSeq.split(":")[0]
             start, end = list(map(int, (inputSeq.split(":")[1]).split("-")))
-            if abs(start-end) > 500:
-                self.sendErrorHTML("Please enter an input sequence with fewer than 500 bases")
+            if abs(start-end) > 750:
+                self.sendErrorHTML("Please enter an input sequence with fewer than 750 bases")
         else:
             self.sendErrorHTML("Please enter input search sequence in 'chrX:start-end' format")
 
