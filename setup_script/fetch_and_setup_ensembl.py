@@ -115,11 +115,31 @@ def download_files_from_ensembl(jbrowse_path, jbrowse_data_directory, jbrowse_do
             ens_ftp.login() and print("Connected to Ensembl ftp directory")
            
             if genome_file_path is None:
-                if download_and_check(ens_ftp,os.path.join("pub","release-"+str(ensembl_version), "fasta", genome, "dna"),"crcsum.fa.txt","Genome fasta file",".dna.toplevel.fa.gz", "*.dna.toplevel.fa.gz",jbrowse_download_directory,check_crcsum) == True: 
-                    print("Genome fasta file successfully downloaded.")
+                
+                ens_ftp.cwd(os.path.join("pub","release-"+str(ensembl_version), "fasta", genome, "dna"))
+                chr_files = [file_name for file_name in ens_ftp.nlst() if '.dna.chromosome' in file_name]
+                ens_ftp.cwd("../../../../../")
+                
+                for chr_file in chr_files:
+                    if download_and_check(ens_ftp,os.path.join("pub","release-"+str(ensembl_version), "fasta", genome, "dna"),"crcsum.fa.txt","Genome fasta file",chr_file,chr_file,jbrowse_download_directory,check_crcsum) == True: 
+                        print(chr_file+" successfully downloaded.")
+                        ens_ftp.cwd("../../../../../")
+                    else:
+                        raise Exception("Error downloading "+ chr_file+". Please retry.")
+                
+                try:
+                    chr_file_string = " ".join([os.path.join(jbrowse_download_directory,file_name) for file_name in chr_files])
+                    subprocess.run("cat " + chr_file_string+ ">"+os.path.join(jbrowse_download_directory,genome+"."+ensembl_version+"."+"full_genome"+".fa.gz"), shell=True, check=True)
+                except:
+                    raise Exception("Error creating full_genome.fa.gz file. Aborting")
+                
+                if os.path.exists(os.path.join(jbrowse_download_directory,genome+"."+ensembl_version+"."+"full_genome"+".fa.gz")):
+                    print("full genome file created successfully! Removing chromosome fasta files")
+                    subprocess.run("rm "+chr_file_string,shell=True)
                 else:
                     raise Exception("Error downloading Genome file. Please retry.")
 
+            ens_ftp.cwd(os.path.join("pub","release-"+str(ensembl_version), "fasta", genome, "dna"))
             #Downloading gff file for gene annotations.
             if download_and_check(ens_ftp,os.path.join("../../../gff3", genome),"crcsum.gff3.txt","Annotation gff file",ensembl_version + ".gff3.gz","*." + ensembl_version + ".gff3.gz",jbrowse_download_directory,check_crcsum) == True:
                 print("Annotation gff file successfully downloaded.")
