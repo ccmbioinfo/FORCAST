@@ -28,8 +28,7 @@ class Dicey:
 		assert len(sequences) == 2, "Exactly two primers required"
 		self.sequences = sequences
 		self.temp = temp # temperature
-		self.genomePath = self.Config.DICEY_PATH + "/indexes/" + genome + ".fa.gz"
-				
+		self.genomePath = self.Config.DICEY_PATH+"/indexes/"+genome+"/"+genome+".fa.gz"
 		self.tempfile = self.createTempFile()	
 		self.diceyCommand = self.constructDiceyCommand()	
 

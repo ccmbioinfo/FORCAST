@@ -1,5 +1,7 @@
 config
-dependencies
+dependencies/dicey
+dependencies/ncbi-blast-2.7.1+
+dependencies/primer3
 genomes/mm10
 genomes/Rnor_6
 jbrowse/data.*
