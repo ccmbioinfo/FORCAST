@@ -41,6 +41,7 @@ def updateDbs():
     available_genomes = fetchInstalledGenomes()
     for genome in available_genomes:
         updateGuideRecords(genome[0])
+        print("Finished converting files for "+str(genome[0]))
 
 def main():
     updateDbs()
