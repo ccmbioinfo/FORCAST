@@ -57,8 +57,12 @@ class Primer3:
 			#desc_match = re.match(r"(^[^_]+)_ATTEMPT_([0-9]*)_DESC=", line)
 			file_match = re.match(r"^ATTEMPT_([0-9]*)_FILE=", line)
 			desc_match = re.match(r"^ATTEMPT_([0-9]*)_DESC=", line)
-			# get the info after the '=' sign
-			value = line.split('=')[1].strip("\"'\n")	
+
+			# get the info after the '=' sign (if there is one)
+			if '=' in line:
+				value = line.split('=')[1].strip("\"'\n")
+			else:
+				continue
 			if file_match:
 				attemptNum = file_match.group(1)
 				if attemptNum in settingsDict:
