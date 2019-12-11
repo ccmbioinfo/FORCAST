@@ -38,14 +38,14 @@ class GuideResults:
 
         # validate searchInput
         if 'searchInput' not in kwargs:
-            self.sendErrorHTML("'searchInput' parameter not set")
+            self.sendError("'searchInput' parameter not set")
         else:
             self.isValidInput(kwargs['searchInput'])
             self.searchInput = kwargs['searchInput']
        
         # validate genome
         if 'genome' not in kwargs:
-            self.sendErrorHTML("'genome' parameter not set")
+            self.sendError("'genome' parameter not set")
         else:
             # attempt connection to genome's db before storing
             self.dbConnection = Config(kwargs['genome'])
@@ -53,19 +53,19 @@ class GuideResults:
        
         # check gene sent
         if 'gene' not in kwargs:
-            self.sendErrorHTML("Please select a Target from the dropdown list")
+            self.sendError("Please select a Target from the dropdown list")
         else:
             self.gene = kwargs['gene']
       
         # validate rgenID
         if 'rgenID' not in kwargs:
-            self.sendErrorHTML("Please select an RGEN from the dropdown list")
+            self.sendError("Please select an RGEN from the dropdown list")
         else:
             self.rgenID = kwargs['rgenID']
             try:
                 self.rgenRecord = self.getRGEN()
             except ValueError as e:
-                self.sendErrorHTML("Invalid RGEN ID, " + str(self.rgenID))
+                self.sendError("Invalid RGEN ID, " + str(self.rgenID))
 
         # set optional parameters
         if 'guideLength' in kwargs:
@@ -78,11 +78,9 @@ class GuideResults:
 
         if len(self.guideDict.keys()) > 0:
             self.writeCsvFiles()
-            self.writeJsonFile()
             if not self.cli:
+                self.writeJsonFile()
                 self.sendResultHTML()
-            else:
-                print("Completed.")
         else:
             if not self.cli:
                 self.sendNoResultHTML()
@@ -215,7 +213,7 @@ class GuideResults:
         elif self.rgenRecord['PamLocation'] == 'upstream':
             return pam_seq + ", " + guide_seq
         else:
-            self.sendErrorHTML("Unrecognized PAM Location for RGEN: " + str(self.rgenRecord['PamLocation']))
+            self.sendError("Unrecognized PAM Location for RGEN: " + str(self.rgenRecord['PamLocation']))
     
     def calculateLocation(self, guide):
         """ using the strand of the guide and the genomic start, format the location string """
@@ -224,7 +222,7 @@ class GuideResults:
         elif guide['strand'] == '-':
             return guide['pam_chrom'] + ":" + str(guide['guide_genomic_start']) + "-" + str(int(guide['guide_genomic_start']-len(guide['guide_seq']))+1) + ":-"
         else:
-            self.sendErrorHTML("Unrecognized strand for guide: " + str(guide['strand']))
+            self.sendError("Unrecognized strand for guide: " + str(guide['strand']))
     
     def offtargetHTML(self, guideID, guide):
         """ creates the HTML for the off-target modal of a given guide """
@@ -376,13 +374,16 @@ class GuideResults:
         print(self.renderTemplate('no_results.html', template_values))
         return
 
-    def sendErrorHTML(self, errorString):
+    def sendError(self, errorString):
         """ format exceptions in HTML to prevent page from crashing """ 
         if not hasattr(self, 'dbConnection'):
             self.dbConnection = Config()
         
-        print(self.renderTemplate('error.html', {'errorString': str(errorString)}))
-        sys.exit()
+        if self.cli:
+            raise Exception(errorString)
+        else:
+            print(self.renderTemplate('error.html', {'errorString': str(errorString)}))
+            sys.exit()
 
     def getRGEN(self):
         # fetch the correct rgen record using the rgenID attribute
@@ -399,35 +400,36 @@ class GuideResults:
         """ for each guide, write a csv file of its off-targets to the tempfiles directory """
         if self.cli:
             # if cli, put all guides into same csv
-            total_offtargets_processed = 0
-            with open(self.output_file, mode='w') as csv_file:
-                writer = csv.writer(csv_file, delimiter=",")
-                for guideID, guide in self.guideDict.items():
-                    writer.writerow([str(guideID)+":"])
-                    if guide['max_exceeded']:
-                        writer.writerow(['Max off target sites exceeded ('+str(sum(guide['offtarget_counts']))+" shown)"])
-                        total_offtargets_processed += 1000
-                    else:
-                        writer.writerow(['Total number of potential off-target sites:' + str(sum(guide['offtarget_counts']))])
-                        total_offtargets_processed += sum(guide['offtarget_counts']) 
-                    writer.writerow(['Off-target Counts: ' + "-".join(map(str,guide['offtarget_counts']))])
-                    writer.writerow(['No mismatches in Seed: ' +  "-".join(map(str,guide['offtargets_seed']))])
-                    if guide['MIT'] and not guide['max_exceeded']:
-                        writer.writerow(['MIT Score: ' + str(guide['MIT'])])
-                    if guide['CFD'] and not guide['max_exceeded']:
-                        writer.writerow(['CFD Score: ' + str(guide['CFD'])])
-                    writer.writerow(['Location', 'Sequence', 'Mismatches', 'Context'])
-                    writer.writerow([self.calculateLocation(guide), self.formatSequence(guide['guide_seq'], guide['pam_seq']), '0', 'guide'])
-                    for offtarget in guide['offtargets']:
-                        row = [offtarget['loc']]
-                        row.append(self.formatSequence(offtarget['seq'], offtarget['pam']))
-                        row.append(countLower(offtarget['seq']))
-                        try:
-                            row.append(offtarget['context'])
-                        except Exception as e:
-                            row.append('-')
-                        writer.writerow(row)
-                    writer.writerow(['TOTAL PROCESSED: ', str(total_offtargets_processed)])
+            if self.output_file: # skip if none
+                total_offtargets_processed = 0
+                with open(self.output_file, mode='w') as csv_file:
+                    writer = csv.writer(csv_file, delimiter=",")
+                    for guideID, guide in self.guideDict.items():
+                        writer.writerow([str(guideID)+":"])
+                        if guide['max_exceeded']:
+                            writer.writerow(['Max off target sites exceeded ('+str(sum(guide['offtarget_counts']))+" shown)"])
+                            total_offtargets_processed += 1000
+                        else:
+                            writer.writerow(['Total number of potential off-target sites:' + str(sum(guide['offtarget_counts']))])
+                            total_offtargets_processed += sum(guide['offtarget_counts']) 
+                        writer.writerow(['Off-target Counts: ' + "-".join(map(str,guide['offtarget_counts']))])
+                        writer.writerow(['No mismatches in Seed: ' +  "-".join(map(str,guide['offtargets_seed']))])
+                        if guide['MIT'] and not guide['max_exceeded']:
+                            writer.writerow(['MIT Score: ' + str(guide['MIT'])])
+                        if guide['CFD'] and not guide['max_exceeded']:
+                            writer.writerow(['CFD Score: ' + str(guide['CFD'])])
+                        writer.writerow(['Location', 'Sequence', 'Mismatches', 'Context'])
+                        writer.writerow([self.calculateLocation(guide), self.formatSequence(guide['guide_seq'], guide['pam_seq']), '0', 'guide'])
+                        for offtarget in guide['offtargets']:
+                            row = [offtarget['loc']]
+                            row.append(self.formatSequence(offtarget['seq'], offtarget['pam']))
+                            row.append(countLower(offtarget['seq']))
+                            try:
+                                row.append(offtarget['context'])
+                            except Exception as e:
+                                row.append('-')
+                            writer.writerow(row)
+                        writer.writerow(['TOTAL PROCESSED: ', str(total_offtargets_processed)])
         else:    
             for guideID, guide in self.guideDict.items():            
                 csv_path = os.path.join(self.dbConnection.ROOT_PATH,'GuideFinder/tempfiles', self.batchID+"_"+guideID+".csv")
@@ -481,14 +483,14 @@ class GuideResults:
                                 offtarget_row.append('*')
                             writer.writerow(offtarget_row)
                 except Exception as e:
-                    self.sendErrorHTML("Error writing off target CSV file, "+str(e))
+                    self.sendError("Error writing off target CSV file, "+str(e))
         
     def getENSID(self):
         """ given the gene symbol, return the ENSEMBL ID from the stored gene collection """
         geneCollection = self.dbConnection.curr_geneCollection
         result = geneCollection.find({"Name": self.gene}) 
         if result.count() > 1:
-            self.sendErrorHTML("More than one result in the database for gene symbol: " + self.gene)
+            self.sendError("More than one result in the database for gene symbol: " + self.gene)
         elif result.count() < 1:
             # TODO: need to deal with tracking regions of interest that aren't in a gene region
             # for now, just use a blank ensembl id
@@ -527,12 +529,20 @@ class GuideResults:
             import time
             time_0 = time.time()
             print("Fetching sequence...")
+
         get_sequence.fetch_sequence(twoBitToFa_path, self.searchInput, genome_2bit, os.path.join(tempfiles_path,batchID+'_out.fa')) 
         if self.cli: 
             time_1 = time.time()
             print("Finished fetching sequence. " + str(round(time_1-time_0,4)))
             print("Determining guides in search region...")
-        guideDict = find_grna.find_grna(self.rgenID, 0, os.path.join(tempfiles_path, batchID+'_out.fa'))
+
+        if self.guideLength:
+            guideDict = find_grna.find_grna(self.rgenID, self.guideLength, os.path.join(tempfiles_path, batchID+'_out.fa'))
+        else:
+            guideDict = find_grna.find_grna(self.rgenID, 0, os.path.join(tempfiles_path, batchID+'_out.fa'))
+
+
+
         if self.cli: 
             time_2 = time.time()
             print("Finished finding gRNAs. " + str(round(time_2-time_1,4)))
@@ -558,15 +568,15 @@ class GuideResults:
     def isValidInput(self, inputSeq):
         #TODO: code this. some validation done on front end but not for the chr number/letter
         if len(inputSeq) == 0:
-            self.sendErrorHTML("Please enter an input region for the search")
+            self.sendError("Please enter an input region for the search")
             return False
         if inputSeq.count(":") == 1 and inputSeq.count("-") == 1:
             chrm = inputSeq.split(":")[0]
             start, end = list(map(int, (inputSeq.split(":")[1]).split("-")))
             if abs(start-end) > 750:
-                self.sendErrorHTML("Please enter an input sequence with fewer than 750 bases")
+                self.sendError("Please enter an input sequence with fewer than 750 bases")
         else:
-            self.sendErrorHTML("Please enter input search sequence in 'chrX:start-end' format")
+            self.sendError("Please enter input search sequence in 'chrX:start-end' format")
 
         return True
 

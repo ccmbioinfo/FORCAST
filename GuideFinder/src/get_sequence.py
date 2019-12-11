@@ -23,6 +23,8 @@ def fetch_sequence(twobit_to_fa, chrom_coord, genome_twobit, output_fasta):
         sys.exit("Chromosomal coordinate must be in the format chrom:start-end")
     
     chrom, start, end = chrom_match.group(1), chrom_match.group(2), chrom_match.group(3)
+    # end for twoBitToFa is non-inclusive, add extra base
+    start = str(int(start)-1)
     seq_param, start_param, end_param = '-seq={0}'.format(chrom), '-start={0}'.format(start), '-end={0}'.format(end)
     tmp_fasta = os.path.join(dir_path,"tmp.fa")
 
