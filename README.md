@@ -57,9 +57,17 @@ Also, start mongodb process using ```systemctl start mongodb```
 
 CasCADe should now be accessible from your browser at ```http://<your servers address>``` for example if your VM's IP address is ```172.20.20.20```, you can type : ```http://172.20.20.20``` in your browser to access CasCADe.
 
+To enable In Silico PCR tool [Dicey](https://github.com/gear-genomics/dicey) (a.k.a. [Silica](https://www.gear-genomics.com/silica/)), run the ```enable_dicey.sh``` script, providing your organism of interest and genome version: 
+```
+ cd /var/www/html/CasCADe
+ ./enable_dicey Saccharomyces_cerevisiae R64-1-1
+```
+Which will fetch and rename the index files if they're available.
+
 If you want your installation of CasCADe to be secured by https, please refer to apache2's documentation on how to enable https module.
 
 Please email us at hillary.elrick at sickkids dot ca  or viswateja.nelakuditi at sickkids dot ca if you encounter any issues with the installation, setup or the program itself.
+
 
 ### Customizing primer design settings
 First, go to to [the primer3 website](http://bioinfo.ut.ee/primer3/) and enter the custom settings that you would like to use for the first attempt of primer design and click 'Download Settings' to save the file. Additionally, you may also specify and download 'retry attempt' settings to be used if no primers are found with the default settings. There is no limit to the number of retry attempts you can define.
