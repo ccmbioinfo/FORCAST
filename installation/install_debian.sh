@@ -131,10 +131,11 @@ else
         sudo apt-get install -y build-essential g++ cmake zlib1g-dev libbz2-dev liblzma-dev libboost-all-dev
         git clone --recursive https://github.com/gear-genomics/dicey.git
         cd dicey/
+        git checkout 64fe04b4991a02da32f8fa5c875db859d5480d25 . # freezing version
         make all
         make install
         diceyexec=$(pwd)"/bin/dicey"
-        mkdir dicey_tempfiles # directory required for dicey program to run
+        mkdir dicey_tempfiles # used to store temp files for dicey execution
         diceypath=$(pwd)
         echo "\nSuccessfully installed Dicey"
         cd ..
