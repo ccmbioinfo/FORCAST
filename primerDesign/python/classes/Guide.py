@@ -549,7 +549,8 @@ class Guide(Gene):
 					# add the results table
 					htmlResult += printPrimers(primerResult, primerType)	
 			else:
-				htmlResult += retryString
+				if retryString:
+					htmlResult += retryString
 				if primerType == 'WT': wtPrimers = {}
 				elif primerType == 'EM':
 					emPrimers = {}
