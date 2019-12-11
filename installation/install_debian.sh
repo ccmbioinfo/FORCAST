@@ -45,7 +45,7 @@ done
 #now install dependencies for Jbrowse and GuideFinder.
 
 echo "Installing dependencies for Jbrowse and GuideFinder"
-Jbrowse_crispr_dependencies=(git wget apache2 bwa bedtools krb5-user python2.7 python3 python-pip python3-pip samtools zlib1g-dev)
+Jbrowse_crispr_dependencies=(git wget apache2 bwa bedtools krb5-user python2.7 python3 python-pip python3-pip samtools zlib1g-dev tabix)
 
 for i in "${Jbrowse_crispr_dependencies[@]}";
 do
