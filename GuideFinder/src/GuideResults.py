@@ -536,12 +536,8 @@ class GuideResults:
             print("Finished fetching sequence. " + str(round(time_1-time_0,4)))
             print("Determining guides in search region...")
 
-        if self.guideLength:
-            guideDict = find_grna.find_grna(self.rgenID, self.guideLength, os.path.join(tempfiles_path, batchID+'_out.fa'))
-        else:
-            guideDict = find_grna.find_grna(self.rgenID, 0, os.path.join(tempfiles_path, batchID+'_out.fa'))
-
-
+        protospacer_length = getattr(self, 'guideLength', 0) # passing 0 indicates default should be used
+        guideDict = find_grna.find_grna(self.rgenID, protospacer_length, os.path.join(tempfiles_path, batchID+'_out.fa'))
 
         if self.cli: 
             time_2 = time.time()
