@@ -12,7 +12,8 @@ import pymongo
 from pymongo import MongoClient
 from subprocess import call
 #cgitb.enable()
-sys.path.append('../primerDesign/python/')
+dir_path = os.path.dirname(os.path.abspath(__file__))
+sys.path.append(os.path.join(dir_path, "../primerDesign/python"))
 from Config import Config
 from classes.BlastDB import BlastDB
 
@@ -175,6 +176,8 @@ def writeGuideGFF(dbConnection, org):
 		otHits = re.findall(r'\d+',gRNARecord['otDesc'])
 		gRNARecord['otDesc'] = "-".join(otHits) 
 		mRNAcolumn9 = "ID="+mRNAID+";Name="+mRNAName+";guideScore="+gRNARecord['guideScore']+";otDesc="+gRNARecord['otDesc']
+		if 'label' in gRNARecord:
+			mRNAcolumn9 += ";label="+gRNARecord['label']
 		if 'Notes' in gRNARecord:			
 			mRNAcolumn9 += ";Notes="+gRNARecord['Notes']
 		if 'batchName' in gRNARecord:
