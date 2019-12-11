@@ -8,7 +8,7 @@ Requires: batch id, guideID, label, and notes
 
 """
 
-import os, sys, json, cgi
+import os, sys, json, cgi, git
 from subprocess import Popen, PIPE, DEVNULL
 
 dir_path = os.path.dirname(os.path.abspath(__file__))
@@ -86,9 +86,10 @@ class GuideAdd:
                 'batchName': guideRecord['batchName'] if 'batchName' in guideRecord else '',
                 'ENSID': guideRecord['ENSID'] if 'ENSID' in guideRecord else '',
                 'status': guideRecord['status'] if 'status' in guideRecord else '',
-                'notes': guideRecord['Notes'] if 'Notes' in guideRecord else ''
+                'notes': guideRecord['Notes'] if 'Notes' in guideRecord else '',
+                'label': guideRecord['label'] if 'label' in guideRecord else ''
             }
-            featureCol9 = "ID={featureID};Name={featureName};guideScore={score};otDesc={otDesc};batchName={batchName};ENSID={ENSID};status={status};Notes={notes}".format(**gffDict)
+            featureCol9 = "ID={featureID};Name={featureName};guideScore={score};otDesc={otDesc};batchName={batchName};ENSID={ENSID};status={status};Notes={notes};label={label}".format(**gffDict)
             featureStr += "\t".join([chrom,'.','mRNA',str(sortedCoordinates[0]), str(sortedCoordinates[-1]),'.',strand,'.',featureCol9])
             featureStr += '\n'
 
@@ -138,6 +139,14 @@ class GuideAdd:
     
     def insertGuide(self):
         """ create a new record in the database for the guide """
+
+        # get the current git commit hash
+        try:
+            repo = git.Repo(search_parent_directories=True)
+            git_hash = repo.head.object.hexsha
+        except Exception as e:
+            # don't prevent guide from being added
+            git_hash = ''
         # build the dict
         newGuideRecord = {
             'batchName': self.metadata['gene'],
@@ -145,22 +154,17 @@ class GuideAdd:
             'guideScore': self.guide['MIT'] if 'MIT' in self.guide else '', 
             'guideSeq': self.guide['guide_seq'],
             'Notes': self.notes,
-            'inputSearchCoordiantes': self.metadata['inputSearchCoordinates'],
+            'inputSearchCoordinates': self.metadata['inputSearchCoordinates'],
             'pamGenomicStart': self.guide['pam_genomic_start'],
             'pamSeq': self.guide['pam_seq'],
             'guideGenomicStart': self.guide['guide_genomic_start'],
-            'guideStart': '', #TODO what does this mean?
             'pamId': '', # this should probably be replaced by guideID
             'otDesc': '-'.join(str(count) for count in self.guide['offtarget_counts']),
-            'chromSearchStart': '', # does this matter anymore??
-            'crisprScan': '', # we don't have this
-            'pamStart': '', # idk what this is
-            'fusi': '', # we don't have this
             'label': self.label,
             'ENSID': self.metadata['ENSID'],
             'guideLocation': self.guide['guideLocation'],
             'rgenID': self.metadata['rgenID'],
-            'offtargets': self.guide['offtargets']
+            'commitHash': git_hash
         }
         # TODO: think about how best to display the scores -> on primer end need to allow for possibility of no score
         # store the off-targets as well
