@@ -8,7 +8,7 @@ Requires: batch id, guideID, label, and notes
 
 """
 
-import os, sys, json, cgi, git
+import os, sys, json, cgi, git, datetime
 from subprocess import Popen, PIPE, DEVNULL
 
 dir_path = os.path.dirname(os.path.abspath(__file__))
@@ -164,7 +164,8 @@ class GuideAdd:
             'ENSID': self.metadata['ENSID'],
             'guideLocation': self.guide['guideLocation'],
             'rgenID': self.metadata['rgenID'],
-            'commitHash': git_hash
+            'commitHash': git_hash,
+            'dateAdded': datetime.datetime.utcnow()
         }
         # TODO: think about how best to display the scores -> on primer end need to allow for possibility of no score
         # store the off-targets as well
