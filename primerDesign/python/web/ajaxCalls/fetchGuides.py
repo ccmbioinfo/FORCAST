@@ -23,6 +23,7 @@ def printGuides(guides, geneName):
 			<tr>
 			<th class="centreCell" scope="col">Label <sup><i style="font-size: 13px;" class="fa fa-lock" onclick="unlockLabel(this)"></i></sup></th>
 			<th scope="col">Sequence</th>
+			<th scope="col">Location</th>
 			<th class="centreCell" scope="col">Score</th>
 			<th class="centreCell" scope="col">Off-Targets</th>
 			<th class="centreCell" scope="col">Notes <sup><i style="font-size: 13px;" class="fa fa-lock" onclick="unlockNotes(this)"></i></sup></th>
@@ -35,12 +36,13 @@ def printGuides(guides, geneName):
 			try:
 				decodedNotes = urllib.unquote(guideResult['Notes']).decode("utf-8")
 				decodedLabel = urllib.unquote(guideResult['label']).decode("utf-8")
-				guideID, guideSeq, guideScore = str(guideResult['_id']), str(guideResult['guideSeq']), str(guideResult['guideScore'])
+				guideID, guideSeq, guideLocation, guideScore = str(guideResult['_id']), str(guideResult['guideSeq']), str(guideResult['guideLocation']), str(guideResult['guideScore'])
 				encodedOffTarget = guideResult['otDesc'].encode("utf=8")
 				print '''
 				<tr id={guideID}>
 				<td contenteditable="false" class="guideLabels" spellcheck="false" onblur="updateGuideLabel(this, '{guideID}')">{decodedLabel}</td>
 				<td>{guideSeq}</td>
+				<td style="white-space:nowrap;">{guideLocation}</td>
 				<td class="centreCell">{guideScore}</td>
 				<td class="centreCell">{encodedOffTarget}</td>
 				<td style="padding: 0px;">
