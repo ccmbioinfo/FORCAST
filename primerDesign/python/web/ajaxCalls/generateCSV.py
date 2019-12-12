@@ -48,9 +48,9 @@ def writeCSV(genome, geneName, ROOT_PATH, guideResults, primerResults):
 		with open(filepath, mode='w') as csv_file:
 			writer = csv.writer(csv_file, delimiter=",")
 			writer.writerow(['Guides:'])
-			writer.writerow(['Sequence','PAM'])
+			writer.writerow(['Location','Sequence','PAM'])
 			for g in guideResults:
-				writer.writerow([str(g['guideSeq']),str(g['pamSeq'])])
+				writer.writerow([str(g['guideLocation']), str(g['guideSeq']),str(g['pamSeq'])])
 			writer.writerow([])	
 			writer.writerow(['Primers:'])
 			writer.writerow(['Primer Name', 'Sequence', 'Tm'])
