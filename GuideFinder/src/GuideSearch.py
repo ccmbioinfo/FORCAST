@@ -37,20 +37,20 @@ class GuideSearch:
         # validate action parameter
         if 'action' not in kwargs:
             self.sendErrorHTML("'action' not in URL parameters")
-        elif kwargs['action'] not in ['initialize', 'update_input', 'update_rgen']:
+        elif kwargs['action'] not in ['initialize', 'update_input','get_lengths']:
             self.sendErrorHTML("Invalid action string sent: " + str(kwargs['action']))
         else:
             self.action = kwargs['action']
         
-        # validate searchInput
-        if 'searchInput' not in kwargs:
-            self.sendErrorHTML("'searchInput' not in URL paramters")
-        elif not isValidInput(kwargs['searchInput']):
-            self.sendErrorHTML("'searchInput', "+str(kwargs['searchInput'])+" is not valid")
-        else:
-            self.searchInput = kwargs['searchInput']
-
         if self.action in ['initialize', 'update_input']:
+            # validate searchInput
+            if 'searchInput' not in kwargs:
+                self.sendErrorHTML("'searchInput' not in URL paramters")
+            elif not isValidInput(kwargs['searchInput']):
+                self.sendErrorHTML("'searchInput', "+str(kwargs['searchInput'])+" is not valid")
+            else:
+                self.searchInput = kwargs['searchInput']
+
             # validate genome
             if 'genome' not in kwargs:
                 self.sendErrorHTML("'genome' not in URL parameters")
@@ -68,15 +68,17 @@ class GuideSearch:
                 print(self.initialHTML())
             else:
                 print(self.inputRowHTML())
-        else:
-            # action is to display the different possible PAMS to consider when searching for off-targets           
-            #TODO code this
+        elif self.action == 'get_lengths':
+            # action is to get the list of guide lengths allowed for selected rgen
             self.rgenID = kwargs['rgenID']
+            self.dbConnection = Config() # genome agnostic
             try:
                 # attempt to get the rgen record
                 self.rgenRecord = self.getRGEN()
             except ValueError as e:
                 self.sendErrorHTML("Invalid RGEN ID, " + str(self.rgenID))
+
+            print(self.getLengthsHTML())
 
 
     def inputRowHTML(self):
@@ -96,6 +98,7 @@ class GuideSearch:
             'input_row': self.inputRowHTML(),
             'organism': self.getOrganismHTML(),
             'RGENS': self.getRgenHTML(),
+            'guideLengths': self.getLengthsHTML(),
             'available_genes': self.getOverlappingGenesHTML()
         }
         template_path = os.path.join(self.dbConnection.ROOT_PATH, "GuideFinder/templates/select.html")
@@ -141,11 +144,37 @@ class GuideSearch:
        
     def getRgenHTML(self):
         """ returns the available rgens in a preformmatted HTML select tag """
-        HTML = "<select class='form-control' id='RGENS'>"
-        for rgen in self.dbConnection.rgenCollection.find():
+        HTML = '<select class="form-control" id="RGENS" onchange="getProtospacerLengths()">'
+        for rgen in self.dbConnection.rgenCollection.find().sort([("rgenID",1)]):
             HTML += '<option value="{rgenID}">{Longform}: {Shortform}</option>'.format_map(rgen)
         HTML += "</select>"
         
+        return HTML
+
+    def getLengthsHTML(self):
+        """ given the current rgenID, return the allowable lengths"""
+        if getattr(self,'rgenID',False):
+            # if we have an rgen selected, get the min, max, and default
+            minLength = self.rgenRecord['MinGuideLength']
+            maxLength = self.rgenRecord['MaxGuideLength']
+            default = self.rgenRecord['DefaultGuideLength'] if 'DefaultGuideLength' in self.rgenRecord else minLength
+        else:
+            # get the first rgen record
+            rgen = next(self.dbConnection.rgenCollection.find().sort([("rgenID",1)]).limit(1))
+            # may need to do a next() call here
+            minLength = rgen['MinGuideLength']
+            maxLength = rgen['MaxGuideLength']
+            default = rgen['DefaultGuideLength'] if 'DefaultGuideLength' in rgen else minLength
+
+        HTML = '<select class="form-control" id="protospacerLength">'
+        for i in range(int(minLength),int(maxLength)+1):
+            if str(i) == str(default):
+                HTML+= '<option value="{i}" selected>{i} (Default)</option>'.format(i=str(i))
+            else:
+                HTML+= '<option value="{i}">{i}</option>'.format(i=str(i))
+
+        HTML += "</select>"
+
         return HTML
 
     def getInputHTML(self):

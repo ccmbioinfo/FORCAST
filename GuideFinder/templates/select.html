@@ -129,9 +129,15 @@
                         </div>
                         <div class="form-row">
                             <div class="form-group col-md-3"></div>
-                            <div class="form-group col-md-6">
+                            <div class="form-group col-md-4">
                                 <label for='RGENS'>RNA-guided Endonuclease:</label>
                                 {{RGENS|safe}}
+                            </div>
+                            <div class="form-group col-md-2">
+                                <label for='guideLength'>Protospacer Length:</label>
+                                <div id="lengthOptions">
+                                    {{guideLengths|safe}}
+                                </div>
                             </div>
                             <div class="form-group col-md-3"></div>
                         </div>
@@ -185,7 +191,7 @@
                     'data' : {
                         action: 'update_input',
                         searchInput: $('#searchInput').val(),
-                        genome: getUrlVars()['genome'],
+                        genome: getUrlVars()['genome']
                     },
                     success: function(html){
                         $('#inputRow').html(html);
@@ -194,16 +200,33 @@
             }
         }
 
+        function getProtospacerLengths() {
+            $.ajax({
+                'type': "POST",
+                'url': "GuideSearch.py",
+                'dataType': "html",
+                'data': {
+                    action: 'get_lengths',
+                    rgenID: $('#RGENS').val()
+                },
+                success: function(html){
+                    $('#lengthOptions').html(html);
+                }
+            })
+        }
+
         function validateRegion() {
-            // reset tooltip
-            $('#searchInput').tooltip('hide');
-            let searchInput = $('#searchInput').val();
-            if (searchInput.length == 0) {return false;}
             // auto-format jbrowse's location
             if (searchInput.split("..").length == 2){
                 searchInput = searchInput.replace("..","-");
                 $('#searchInput').val(searchInput);
             }
+            // skipping frontend validation for now, it's annoying
+            return true
+            // reset tooltip
+            $('#searchInput').tooltip('hide');
+            let searchInput = $('#searchInput').val();
+            if (searchInput.length == 0) {return false;}
             // check input formatted correctly
             let separated = searchInput.split(":");
             if (separated.length == 2){
@@ -241,7 +264,8 @@
                     searchInput: $('#searchInput').val(),
                     genome: getUrlVars()['genome'],
                     gene: $('#gene').val(),
-                    rgenID: $('#RGENS').val()
+                    rgenID: $('#RGENS').val(),
+                    guideLength: $('#protospacerLength').val()
                 },
                 success: function(html){
                     $("#loadingIcon").hide();

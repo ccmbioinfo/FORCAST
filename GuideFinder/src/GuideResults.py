@@ -67,9 +67,13 @@ class GuideResults:
             except ValueError as e:
                 self.sendError("Invalid RGEN ID, " + str(self.rgenID))
 
-        # set optional parameters
-        if 'guideLength' in kwargs:
+        # check guideLength sent
+        if 'guideLength' not in kwargs:
+            self.sendError("Please select a Protospacer Length from the dropdown list")
+        else:
             self.guideLength = kwargs['guideLength']
+
+        #TODO: implement
         if 'offtargetPAMS' in kwargs:
             self.offTargetPAMS = kwargs['offtargetPAMS']
         
@@ -360,7 +364,8 @@ class GuideResults:
             'guideTable': self.guideTableHTML(),
             'searchInput': self.searchInput,
             'rgen': self.rgenRecord,
-            'gene': self.gene
+            'gene': self.gene,
+            'length': self.guideLength
         }
         print(self.renderTemplate("guide_results.html", template_values))
         return
