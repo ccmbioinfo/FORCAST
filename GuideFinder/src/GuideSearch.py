@@ -146,7 +146,7 @@ class GuideSearch:
         """ returns the available rgens in a preformmatted HTML select tag """
         HTML = '<select class="form-control" id="RGENS" onchange="getProtospacerLengths()">'
         for rgen in self.dbConnection.rgenCollection.find().sort([("rgenID",1)]):
-            HTML += '<option value="{rgenID}">{Longform}: {Shortform}</option>'.format_map(rgen)
+            HTML += '<option value="{rgenID}">{Shortform}</option>'.format_map(rgen)
         HTML += "</select>"
         
         return HTML
