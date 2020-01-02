@@ -23,3 +23,4 @@ temp/*.tab
 jbrowse/sample_data
 GuideFinder/tempfiles/*
 GuideFinder/src/cfd_code
+mongodb/*
