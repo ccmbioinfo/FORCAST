@@ -11,6 +11,8 @@ from pymongo import MongoClient
 from urllib.parse import quote_plus
 import json
 
+dir_path = os.path.dirname(os.path.abspath(__file__))
+
 ENSEMBL_FTP = "ftp.ensembl.org"
 
 def get_latest_ensembl_version():
@@ -396,7 +398,7 @@ def load_geneinfo_RGENs_into_Mongo(jbrowse_download_directory, mongo_username, m
     if 'RGEN' not in pyMongoClient.list_database_names():
         rgenDB = pyMongoClient['RGEN']
         try:
-            with open('rgens.json') as json_file:
+            with open(os.path.join(dir_path,'rgens.json')) as json_file:
                 rgenJSON = json.load(json_file)
                 collection = rgenDB['rgenCollection']
                 collection.insert(rgenJSON)

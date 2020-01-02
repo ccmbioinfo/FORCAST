@@ -128,7 +128,7 @@ then
         fi
         diceypath=$(pwd)"/dicey"
 else
-        sudo apt-get install -y build-essential g++ cmake zlib1g-dev libbz2-dev liblzma-dev libboost-all-dev
+        sudo apt-get install -y build-essential g++ cmake zlib1g-dev libbz2-dev liblzma-dev libboost-all-dev vim
         git clone --recursive https://github.com/gear-genomics/dicey.git
         cd dicey/
         git checkout 64fe04b4991a02da32f8fa5c875db859d5480d25 . # freezing version

@@ -49,7 +49,7 @@ def load_RGENs_into_Mongo(action):
         print("Building RGEN database from scratch")
         rgenDB = dbConnection.client['RGEN']
         try:
-            with open('rgens.json') as json_file:
+            with open(os.path.join(dir_path,'rgens.json')) as json_file:
                 collection = rgenDB['rgenCollection']
                 collection.insert(rgenJSON)
                 return True
