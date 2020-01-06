@@ -12,7 +12,7 @@ define( ["dojo/_base/declare", 'dojo/_base/array','dojo/_base/lang','dojo/aspect
 	  var genome_regex = /data\=data\.(.+?)\&/;
 	  var genome_regex_matches = current_url.match(genome_regex);
 	  var coordStr = "searchInput=" + visibleRegion.ref+":"+startCoord+"-"+endCoord;
-	  console.log(genome_regex_matches[1]); 
+	  //console.log(genome_regex_matches[1]); 
 	  if (genome_regex_matches!== null && genome_regex_matches[1].length >0){
 
 	  	coordStr +="&genome="+genome_regex_matches[1];
