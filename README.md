@@ -1,9 +1,20 @@
 # CasCADe: a fully integrated and open source pipeline to design CRISPR mutagenesis experiments
 
-### Hardware requirements
- - CasCADe requires a debian based Linux system with a minimum 8GB of RAM and 100GB of hard disk space. 
- - Alternately, CasCADe can be run on any Docker-compatible system (instructions to come)
-### Installation instructions
+## Contents  
+[Hardware Requirements](#hardware-requirements)  
+[Installing With Docker](#installing-with-docker)
+[Installing Natively](#installing-natively)
+[Customization](#customization)
+[Migration](#migration)
+[Troubleshooting](#troubleshooting)
+
+## Hardware Requirements
+ To run CasCADe natively, please use a machine runnning Ubuntu 16.04. Alternately, you can install CasCADe on any machine running a [docker-compatible operating system](https://docs.docker.com/install/). In either case, a minimum of 8GB of RAM and 100GB of hard disk space is recommended.
+
+## Installing with Docker
+
+
+## Installing Natively
   Make sure that your user account has ```sudo``` privilege before installing CasCADe.
   Run the following commands to install git.
   ```
@@ -68,8 +79,9 @@ If you want your installation of CasCADe to be secured by https, please refer to
 
 Please email us at hillary.elrick at sickkids dot ca  or viswateja.nelakuditi at sickkids dot ca if you encounter any issues with the installation, setup or the program itself.
 
+## Customization
 
-### Customizing primer design settings
+### Custom Primer Design Settings
 First, go to to [the primer3 website](http://bioinfo.ut.ee/primer3/) and enter the custom settings that you would like to use for the first attempt of primer design and click 'Download Settings' to save the file. Additionally, you may also specify and download 'retry attempt' settings to be used if no primers are found with the default settings. There is no limit to the number of retry attempts you can define.
 
 Once all the settings files have been generated, ssh into the server hosting CasCADe and navigate to where the application is rooted (e.g. ```/var/www/html/CasCADe```). Within the ```config``` directory there should be a ```primer3settings.conf``` file and a directory, ```primer3settings```, where the default primer3 settings are stored. Replace these with your custom settings and edit the ```primer3settings.conf``` file to point to the new files like so:
@@ -80,6 +92,53 @@ ATTEMPT_1_DESC="Description of changes in ATTEMPT_1 file"
 ATTEMPT_2_FILE=primer3settings/filename2.txt
 ATTEMPT_2_DESC="Description of changes in ATTEMPT_2 file"
 ```
-The descriptions are optional but will be displayed to users if a design failure occurs as in the screenshot below:
+The descriptions are optional but will be displayed to users if a design failure occurs.
 
-![Example of what will be displayed to users after a design failure occurs. The text entered for the description in the primer3settings.conf file will be displayed in red text.](DesignFailureExample.png)
+### Custom RNA-guided Endonuclease (RGEN) Settings
+The `src/setup/rgens.json` defines the default RGEN settings:
+| Shortform | PAM | PamLocation | MinGuideLength | MaxGuideLength | DefaultGuideLength | SeedRegion | Cleaves | OffTargetPAMs | Scores |
+| --------- | --- | ----------- | -------------- | -------------- | ------------------ | ---------- | ------- | ------------- | ------ |
+| SpCas9 (NGG) | NGG | downstream | 17 | 20 | 20 | -12 | -3 | NGG, NAG | MIT, CFD |
+| AsCpf1/Cas12a | TTTV | upstream | 20 | 23 | - | +6 | +19,+23 | TTTV, TTTT, CTTA, TTCA | - |
+| ScCas9 (NNG) | NNG | downstream | 20 | 20 | - | -12 | -3 | NNG | - |
+| ScCas9 (NNGT) | NNGT | downstream | 20 | 20 | - | -12 | -3 | NNGT | - |
+| SaCas9 | NNGRRT | downstream | 21 | 23 | - | -8 | -3 | NNGRRT, NNGRR | - |
+
+However, we recognize that these settings and defaults may not be applicable to all users. New RGENs can be added by specifying the RGEN parameters in the template below and appending to the `rgens.json` file.
+
+```
+{"rgenID" : "6", "Shortform" : "<shortform>", "Longform" : "<optional>", "PAM" : "<nucleotide sequence>", "PamLocation" : "<downstream or upstream>", "MinGuideLength" : "<required>", "MaxGuideLength" : "<required>", "DefaultGuideLength": "<optional>", "SeedRegion" : "<direction and length of seed>", "Cleaves" : [ "<cleavage site>" ], "OffTargetPAMS" : [ "<actual PAM>", "<optional off-targets>" ], "Scores" : []}
+```
+
+Existing RGENs can have their settings and defaults modified in the file as well. In order to keep existing guides associated to their RGENs, it's recommended that the rgenIDs remain unchanged for existing entries.
+
+After modifying the `rgens.json` file, you can run the `load_RGENs.py` script in the same directory (`python3 load_RGENS.py`) and provide the desired command-line argument:
+- `update`: modifies existing records based on the rgenID and adds new RGENs to the database (recommended)
+- `replace`: wipes and replaces RGEN database with new entries, potentially unlinking existing gRNA records from their RGEN.
+
+### Migration from previous versions of CasCADe
+If using a previous version of CasCADe, existing Primers and Guides can be migrated to the new version by performing the following steps:
+
+1) Navigate to the _existing_ CasCADe installation and make copies of the collections to migrate. Replace mm10 with your genome version, if it is different, and define a directory where the database files should be output. 
+```
+ mongodump --db=mm10 --collection=gRNAResultCollection -o <output_directory>
+ mongodump --db=mm10 --collection=primerCollection -o <output_directory>
+```
+This will place the .bson and .json files into a folder in your specified output directory. Transfer this folder to the new CasCADe installation if it is on a different machine.
+
+2) On the server hosting the new CasCADe, run:
+```
+ mongorestore --db=mm10 --collection gRNAResultCollection <path_to_transferred_folder>/gRNAResultCollection.bson
+ mongorestore --db=mm10 --collection primerCollection <path_to_transferred_folder>/primerCollection.bson
+```
+3) After restoring the database, the database documents need to be converted to the new format via a Python script:
+```
+cd /var/www/html/CasCADe
+sudo python3 customPython/MongoConverter.py
+```
+4) Finally, the GFF files need to be re-written for the JBrowse tracks by a python script:
+```
+sudo python customPython/MongoHandler.py mm10
+```
+
+Your existing Primer and Guide designs should now be accessible in the new CasCADe installation!

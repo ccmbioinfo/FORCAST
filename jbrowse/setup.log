@@ -1,0 +1,252 @@
+
+============== System information ====
++ lsb_release -a
+No LSB modules are available.
+Distributor ID:	Ubuntu
+Description:	Ubuntu 16.04.1 LTS
+Release:	16.04
+Codename:	xenial
++ uname -a
+Linux cascade-test 4.4.0-53-generic #74-Ubuntu SMP Fri Dec 2 15:59:10 UTC 2016 x86_64 x86_64 x86_64 GNU/Linux
++ sw_vers
+./setup.sh: line 84: sw_vers: command not found
++ system_profiler
+./setup.sh: line 85: system_profiler: command not found
++ grep MemTotal /proc/meminfo
+MemTotal:       16432832 kB
++ echo
+
++ echo
+
++ bin/cpanm -v --notest -l extlib/ --installdeps .
+cpanm (App::cpanminus) 1.7039 on perl 5.022001 built for x86_64-linux-gnu-thread-multi
+Work directory is /home/helrick/.cpanm/work/1571162241.28976
+You have make /usr/bin/make
+You have /usr/bin/wget
+You have /bin/tar: tar (GNU tar) 1.28
+Copyright (C) 2014 Free Software Foundation, Inc.
+License GPLv3+: GNU GPL version 3 or later <http://gnu.org/licenses/gpl.html>.
+This is free software: you are free to change and redistribute it.
+There is NO WARRANTY, to the extent permitted by law.
+
+Written by John Gilmore and Jay Fenlason.
+Entering /var/www/html/jbrowse
+Running Makefile.PL
+--> Working on .
+Configuring /var/www/html/jbrowse ... Can't parse version 'dev'
+Can't parse version 'dev'
+Generating a Unix-style Makefile
+Writing Makefile for JBrowse
+Writing MYMETA.yml and MYMETA.json
+Checking dependencies from MYMETA.json ...
+Checking if you have File::Copy::Recursive 0 ... Yes (0.39)
+Checking if you have Heap::Simple 0 ... Yes (0.13)
+Checking if you have Bio::FeatureIO 0 ... Yes (1.6.905)
+Checking if you have DBD::SQLite 0 ... Yes (1.54)
+Checking if you have Parse::RecDescent 0 ... Yes (1.967015)
+Checking if you have IO::Uncompress::Gunzip 0 ... Yes (2.068)
+Checking if you have File::Basename 0 ... Yes (2.85)
+Checking if you have File::Path 2 ... Yes (2.09)
+Checking if you have constant 0 ... Yes (1.33)
+Checking if you have Digest::Crc32 0 ... Yes (0.01)
+Checking if you have Test::Warn 0 ... Yes (0.32)
+Checking if you have Heap::Simple::XS 0 ... Yes (0.10)
+Checking if you have Hash::Merge 0 ... Yes (0.299)
+Checking if you have vars 0 ... Yes (1.03)
+Checking if you have IO::File 0 ... Yes (1.16)
+Checking if you have Capture::Tiny 0 ... Yes (0.46)
+Checking if you have Data::Dumper 0 ... Yes (2.158)
+Checking if you have File::Spec 0 ... Yes (3.56)
+Checking if you have Getopt::Long 0 ... Yes (2.45)
+Checking if you have Test::More 0 ... Yes (1.302120)
+Checking if you have Bio::Index::Fasta 0 ... Yes (undef)
+Checking if you have JSON::XS 0 ... Yes (3.04)
+Checking if you have Cwd 0 ... Yes (3.56)
+Checking if you have File::Temp 0 ... Yes (0.2304)
+Checking if you have Carp 0 ... Yes (1.36)
+Checking if you have FindBin 0 ... Yes (1.51)
+Checking if you have POSIX 0 ... Yes (1.53_01)
+Checking if you have warnings 0 ... Yes (1.34)
+Checking if you have Bio::OntologyIO 0 ... Yes (undef)
+Checking if you have DBI 0 ... Yes (1.639)
+Checking if you have Devel::Size 0 ... Yes (0.81)
+Checking if you have Bio::Root::Version 1.006000 ... Yes (1.007002)
+Checking if you have Pod::Usage 0 ... Yes (1.64)
+Checking if you have File::Next 0 ... Yes (1.16)
+Checking if you have local::lib 0 ... Yes (2.000024)
+Checking if you have JSON 2 ... Yes (2.97001)
+Checking if you have File::Spec::Functions 0 ... Yes (3.56)
+Checking if you have strict 0 ... Yes (1.09)
+Checking if you have Exporter 0 ... Yes (5.72)
+Checking if you have Bio::GFF3::LowLevel::Parser 1.8 ... Yes (2.0)
+Checking if you have Bio::SeqFeature::Lite 0 ... Yes (undef)
+Checking if you have Bio::Annotation::SimpleValue 0 ... Yes (undef)
+Checking if you have Storable 0 ... Yes (2.53_01)
+Checking if you have List::Util 0 ... Yes (1.41)
+Checking if you have PerlIO::gzip 0 ... Yes (0.20)
+Checking if you have Fcntl 0 ... Yes (1.13)
+Checking if you have DB_File 0 ... Yes (1.835)
+Checking if you have URI::Escape 0 ... Yes (3.31)
+Checking if you have Scalar::Util 0 ... Yes (1.41)
+Checking if you have base 0 ... Yes (2.22)
+Checking if you have List::MoreUtils 0.28 ... Yes (0.428)
+Checking if you have Bio::SeqFeature::Annotated 0 ... Yes (1.6.905)
+OK
+<== Installed dependencies for .. Finishing.
++ bin/cpanm -v --notest -l extlib/ --installdeps .
+cpanm (App::cpanminus) 1.7039 on perl 5.022001 built for x86_64-linux-gnu-thread-multi
+Work directory is /home/helrick/.cpanm/work/1571162241.28986
+You have make /usr/bin/make
+You have /usr/bin/wget
+You have /bin/tar: tar (GNU tar) 1.28
+Copyright (C) 2014 Free Software Foundation, Inc.
+License GPLv3+: GNU GPL version 3 or later <http://gnu.org/licenses/gpl.html>.
+This is free software: you are free to change and redistribute it.
+There is NO WARRANTY, to the extent permitted by law.
+
+Written by John Gilmore and Jay Fenlason.
+Entering /var/www/html/jbrowse
+Running Makefile.PL
+--> Working on .
+Configuring /var/www/html/jbrowse ... Can't parse version 'dev'
+Can't parse version 'dev'
+Generating a Unix-style Makefile
+Writing Makefile for JBrowse
+Writing MYMETA.yml and MYMETA.json
+Checking dependencies from MYMETA.json ...
+Checking if you have IO::File 0 ... Yes (1.16)
+Checking if you have List::MoreUtils 0.28 ... Yes (0.428)
+Checking if you have Data::Dumper 0 ... Yes (2.158)
+Checking if you have Test::Warn 0 ... Yes (0.32)
+Checking if you have File::Spec 0 ... Yes (3.56)
+Checking if you have FindBin 0 ... Yes (1.51)
+Checking if you have File::Temp 0 ... Yes (0.2304)
+Checking if you have Bio::Annotation::SimpleValue 0 ... Yes (undef)
+Checking if you have Test::More 0 ... Yes (1.302120)
+Checking if you have Cwd 0 ... Yes (3.56)
+Checking if you have Digest::Crc32 0 ... Yes (0.01)
+Checking if you have Scalar::Util 0 ... Yes (1.41)
+Checking if you have base 0 ... Yes (2.22)
+Checking if you have PerlIO::gzip 0 ... Yes (0.20)
+Checking if you have Bio::OntologyIO 0 ... Yes (undef)
+Checking if you have File::Next 0 ... Yes (1.16)
+Checking if you have strict 0 ... Yes (1.09)
+Checking if you have Hash::Merge 0 ... Yes (0.299)
+Checking if you have Fcntl 0 ... Yes (1.13)
+Checking if you have Heap::Simple::XS 0 ... Yes (0.10)
+Checking if you have DB_File 0 ... Yes (1.835)
+Checking if you have constant 0 ... Yes (1.33)
+Checking if you have Capture::Tiny 0 ... Yes (0.46)
+Checking if you have warnings 0 ... Yes (1.34)
+Checking if you have JSON::XS 0 ... Yes (3.04)
+Checking if you have URI::Escape 0 ... Yes (3.31)
+Checking if you have DBD::SQLite 0 ... Yes (1.54)
+Checking if you have Getopt::Long 0 ... Yes (2.45)
+Checking if you have Bio::Index::Fasta 0 ... Yes (undef)
+Checking if you have local::lib 0 ... Yes (2.000024)
+Checking if you have Devel::Size 0 ... Yes (0.81)
+Checking if you have vars 0 ... Yes (1.03)
+Checking if you have Exporter 0 ... Yes (5.72)
+Checking if you have Carp 0 ... Yes (1.36)
+Checking if you have File::Copy::Recursive 0 ... Yes (0.39)
+Checking if you have List::Util 0 ... Yes (1.41)
+Checking if you have Bio::SeqFeature::Annotated 0 ... Yes (1.6.905)
+Checking if you have File::Basename 0 ... Yes (2.85)
+Checking if you have Storable 0 ... Yes (2.53_01)
+Checking if you have Parse::RecDescent 0 ... Yes (1.967015)
+Checking if you have POSIX 0 ... Yes (1.53_01)
+Checking if you have IO::Uncompress::Gunzip 0 ... Yes (2.068)
+Checking if you have File::Path 2 ... Yes (2.09)
+Checking if you have Bio::FeatureIO 0 ... Yes (1.6.905)
+Checking if you have Pod::Usage 0 ... Yes (1.64)
+Checking if you have DBI 0 ... Yes (1.639)
+Checking if you have Heap::Simple 0 ... Yes (0.13)
+Checking if you have Bio::Root::Version 1.006000 ... Yes (1.007002)
+Checking if you have JSON 2 ... Yes (2.97001)
+Checking if you have File::Spec::Functions 0 ... Yes (3.56)
+Checking if you have Bio::GFF3::LowLevel::Parser 1.8 ... Yes (2.0)
+Checking if you have Bio::SeqFeature::Lite 0 ... Yes (undef)
+OK
+<== Installed dependencies for .. Finishing.
++ set -e
++ bin/cpanm -v --notest -l extlib/ --installdeps .
+cpanm (App::cpanminus) 1.7039 on perl 5.022001 built for x86_64-linux-gnu-thread-multi
+Work directory is /home/helrick/.cpanm/work/1571162242.28996
+You have make /usr/bin/make
+You have /usr/bin/wget
+You have /bin/tar: tar (GNU tar) 1.28
+Copyright (C) 2014 Free Software Foundation, Inc.
+License GPLv3+: GNU GPL version 3 or later <http://gnu.org/licenses/gpl.html>.
+This is free software: you are free to change and redistribute it.
+There is NO WARRANTY, to the extent permitted by law.
+
+Written by John Gilmore and Jay Fenlason.
+Entering /var/www/html/jbrowse
+Running Makefile.PL
+--> Working on .
+Configuring /var/www/html/jbrowse ... Can't parse version 'dev'
+Can't parse version 'dev'
+Generating a Unix-style Makefile
+Writing Makefile for JBrowse
+Writing MYMETA.yml and MYMETA.json
+Checking dependencies from MYMETA.json ...
+Checking if you have Data::Dumper 0 ... Yes (2.158)
+Checking if you have File::Spec::Functions 0 ... Yes (3.56)
+Checking if you have JSON::XS 0 ... Yes (3.04)
+Checking if you have JSON 2 ... Yes (2.97001)
+Checking if you have IO::File 0 ... Yes (1.16)
+Checking if you have POSIX 0 ... Yes (1.53_01)
+Checking if you have Pod::Usage 0 ... Yes (1.64)
+Checking if you have Bio::Root::Version 1.006000 ... Yes (1.007002)
+Checking if you have File::Basename 0 ... Yes (2.85)
+Checking if you have File::Temp 0 ... Yes (0.2304)
+Checking if you have File::Copy::Recursive 0 ... Yes (0.39)
+Checking if you have Bio::SeqFeature::Annotated 0 ... Yes (1.6.905)
+Checking if you have Bio::OntologyIO 0 ... Yes (undef)
+Checking if you have Scalar::Util 0 ... Yes (1.41)
+Checking if you have Capture::Tiny 0 ... Yes (0.46)
+Checking if you have Bio::Index::Fasta 0 ... Yes (undef)
+Checking if you have constant 0 ... Yes (1.33)
+Checking if you have List::MoreUtils 0.28 ... Yes (0.428)
+Checking if you have Bio::GFF3::LowLevel::Parser 1.8 ... Yes (2.0)
+Checking if you have URI::Escape 0 ... Yes (3.31)
+Checking if you have File::Spec 0 ... Yes (3.56)
+Checking if you have Test::Warn 0 ... Yes (0.32)
+Checking if you have Bio::FeatureIO 0 ... Yes (1.6.905)
+Checking if you have Cwd 0 ... Yes (3.56)
+Checking if you have Exporter 0 ... Yes (5.72)
+Checking if you have vars 0 ... Yes (1.03)
+Checking if you have Heap::Simple 0 ... Yes (0.13)
+Checking if you have Parse::RecDescent 0 ... Yes (1.967015)
+Checking if you have DBI 0 ... Yes (1.639)
+Checking if you have PerlIO::gzip 0 ... Yes (0.20)
+Checking if you have Hash::Merge 0 ... Yes (0.299)
+Checking if you have DBD::SQLite 0 ... Yes (1.54)
+Checking if you have warnings 0 ... Yes (1.34)
+Checking if you have Digest::Crc32 0 ... Yes (0.01)
+Checking if you have File::Path 2 ... Yes (2.09)
+Checking if you have strict 0 ... Yes (1.09)
+Checking if you have Heap::Simple::XS 0 ... Yes (0.10)
+Checking if you have local::lib 0 ... Yes (2.000024)
+Checking if you have Carp 0 ... Yes (1.36)
+Checking if you have FindBin 0 ... Yes (1.51)
+Checking if you have Bio::SeqFeature::Lite 0 ... Yes (undef)
+Checking if you have List::Util 0 ... Yes (1.41)
+Checking if you have Devel::Size 0 ... Yes (0.81)
+Checking if you have Getopt::Long 0 ... Yes (2.45)
+Checking if you have Fcntl 0 ... Yes (1.13)
+Checking if you have Bio::Annotation::SimpleValue 0 ... Yes (undef)
+Checking if you have Test::More 0 ... Yes (1.302120)
+Checking if you have base 0 ... Yes (2.22)
+Checking if you have Storable 0 ... Yes (2.53_01)
+Checking if you have IO::Uncompress::Gunzip 0 ... Yes (2.068)
+Checking if you have DB_File 0 ... Yes (1.835)
+Checking if you have File::Next 0 ... Yes (1.16)
+OK
+<== Installed dependencies for .. Finishing.
++ rm -rf sample_data/json/volvox
++ bin/prepare-refseqs.pl --fasta docs/tutorial/data_files/volvox.fa --out sample_data/json/volvox
+No such file or directory reading docs/tutorial/data_files/volvox.fa at /var/www/html/jbrowse/bin/../src/perl5/Bio/JBrowse/Cmd/FormatSequences.pm line 247.
++ rm -rf sample_data/json/yeast/
++ bin/prepare-refseqs.pl --fasta sample_data/raw/yeast_scaffolds/chr1.fa.gz --fasta sample_data/raw/yeast_scaffolds/chr2.fa.gzip --out sample_data/json/yeast/
+No such file or directory reading sample_data/raw/yeast_scaffolds/chr1.fa.gz at /var/www/html/jbrowse/bin/../src/perl5/Bio/JBrowse/Cmd/FormatSequences.pm line 247.

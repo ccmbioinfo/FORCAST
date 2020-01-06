@@ -1,26 +1,21 @@
-config
-dependencies/dicey
-dependencies/ncbi-blast-2.7.1+
-dependencies/primer3
-genomes/mm10
-genomes/Rnor_6
+# program/data folders
+bin/dicey
+bin/ncbi-blast-2.7.1+
+bin/primer3
 jbrowse/data.*
+config
+
+# filetypes
 *.pyc
-primerDesign/python/files/**/*.csv
-primerDesign/python/files/**/*.ape
-primerDesign/python/files/**/*.json
-primerDesign/python/files/**/*_input
-primerDesign/python/files/**/*.doc
 *.swp
 *.swo
 *.ape
 *.P3OUT
-temp/*.json
-temp/*.log
-temp/*.fa
-temp/*.bed
-temp/*.tab
-jbrowse/sample_data
-GuideFinder/tempfiles/*
-GuideFinder/src/cfd_code
-mongodb/*
+
+# temporary files
+src/guide-finder/tempfiles/*
+src/primer-design/files/**/*.csv
+src/primer-design/files/**/*.ape
+src/primer-design/files/**/*.json
+src/primer-design/files/**/*_input
+src/primer-design/files/**/*.doc
