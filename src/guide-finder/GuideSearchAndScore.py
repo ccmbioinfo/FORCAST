@@ -13,18 +13,19 @@ Steps:
 4) Scores the off-targets and calculates an aggregate score for each guide (score_offtargets.py)
 5) Categorizes each off-target into 'intergenic', 'intronic', and 'exonic'
 6) Puts the results into a jinja2 template and prints the html
-
 """
 
-import sys, os, cgi, binascii, re, csv, json, urllib.parse
+import sys, os, cgi, binascii, re, csv, json, urllib.parse, argparse
 from collections import OrderedDict
 from jinja2 import Template
+# import external classes based on relative file location
 dir_path = os.path.dirname(os.path.abspath(__file__))
-sys.path.append(os.path.join(dir_path, "../../primerDesign/python"))
+sys.path.append(os.path.join(dir_path, "../helpers"))
 from Config3 import Config
+sys.path.append(os.path.join(dir_path, 'core'))
 import get_sequence, find_grna, find_offtargets, score_offtargets, categorize_offtargets
 
-class GuideResults:
+class GuideSearchAndScore:
     def __init__(self, **kwargs):
         """ class for controlling the guide searching workflow and displaying results """
         # track whether web or cli
@@ -106,7 +107,7 @@ class GuideResults:
 
     def renderTemplate(self, template_name, template_values):
         """ given the name of the template, goes to the templates folder, renders it, and returns the result """
-        template_path = os.path.join(self.dbConnection.ROOT_PATH, "GuideFinder/templates/{template_name}".format(template_name=template_name))
+        template_path = os.path.join(self.dbConnection.ROOT_PATH, "src/guide-finder/jinja2-templates/{template_name}".format(template_name=template_name))
         template = Template(open(template_path, "rb").read().decode("utf-8"))
         html_result = template.render(template_values)
         return html_result
@@ -235,7 +236,7 @@ class GuideResults:
             'guide': guide,
             'offtargetCounts': self.offtargetCountsHTML(guideID, guide),
             'offtargetModals': self.offtargetModalHTML(guideID, guide),
-            'csvFile': os.path.join('../tempfiles', self.batchID+"_"+guideID+".csv"),
+            'csvFile': os.path.join('../guide-finder/tempfiles', self.batchID+"_"+guideID+".csv"),
             'totalCount': str(sum(guide['offtarget_counts']))
         }
         return self.renderTemplate("offtarget_cell.html", template_values)
@@ -434,10 +435,10 @@ class GuideResults:
                             except Exception as e:
                                 row.append('-')
                             writer.writerow(row)
-                        writer.writerow(['TOTAL PROCESSED: ', str(total_offtargets_processed)])
+                        writer.writerow(['TOTAL OFF TARGETS PROCESSED: ', str(total_offtargets_processed)])
         else:    
             for guideID, guide in self.guideDict.items():            
-                csv_path = os.path.join(self.dbConnection.ROOT_PATH,'GuideFinder/tempfiles', self.batchID+"_"+guideID+".csv")
+                csv_path = os.path.join(self.dbConnection.ROOT_PATH,'src/guide-finder/tempfiles', self.batchID+"_"+guideID+".csv")
                 try:
                     with open(csv_path, mode='w') as csv_file:
                         writer = csv.writer(csv_file, delimiter=',')
@@ -518,7 +519,7 @@ class GuideResults:
             'rgenID': self.rgenID,
             'inputSearchCoordinates': self.searchInput
         }
-        with open(os.path.join(self.dbConnection.ROOT_PATH, 'GuideFinder/tempfiles', self.batchID+'.json'), 'w') as json_file:
+        with open(os.path.join(self.dbConnection.ROOT_PATH, 'src/guide-finder/tempfiles', self.batchID+'.json'), 'w') as json_file:
             json.dump(databaseDict, json_file)
 
     def performGuideSearch(self):
@@ -529,7 +530,7 @@ class GuideResults:
         genome_fa = os.path.join(self.dbConnection.ROOT_PATH,'jbrowse', 'data.'+self.genome,"downloads",self.genome+".fa")
         twoBitToFa_path = os.path.join(self.dbConnection.ROOT_PATH,'bin/twoBitToFa')
         genome_2bit = os.path.join(self.dbConnection.ROOT_PATH,'jbrowse', 'data.'+self.genome,"downloads",self.genome+'.2bit')
-        tempfiles_path = os.path.join(self.dbConnection.ROOT_PATH,'GuideFinder/tempfiles')
+        tempfiles_path = os.path.join(self.dbConnection.ROOT_PATH,'src/guide-finder/tempfiles')
         if self.cli:
             import time
             time_0 = time.time()
@@ -601,22 +602,37 @@ def main():
                 parameters[arg] = inputForm.getvalue(arg)
 
         parameters['command-line'] = False        
-        GuideResults(**parameters)
+        GuideSearchAndScore(**parameters)
     else:
-        if len(sys.argv) != 6:
-            print("Please provide the genome of interest, search input coordinates, gene, rgenID, and output file (.csv) in order")
-            print("Optionally, provide the off-target PAMs to consider")
-            sys.exit()
-		
+        desc = """ The command-line version of GuideSearchAndScore.py will return potential guides along with their scores and off-targets.
+        It requires:
+          genome of interest (--genome)
+          chromosomal search input in chrX:start-end format (--input)
+          gene of interest (--gene)
+          rgenID of RGEN to use (--rgenID)
+          length of protospacers (--spacer)
+          output file (--output)
+         """
+        
+        parser = argparse.ArgumentParser(prog='GuideSearchAndScore',description=desc)
+        parser.add_argument('--genome', help='Genome database (e.g. mm10)', required=True)
+        parser.add_argument('--input', help='Chromosomal coordinates for region of interest', required=True)
+        parser.add_argument('--gene', help='Gene of interest', required=True)
+        parser.add_argument('--rgenID', nargs='?', default=1, help='id of desired RGEN') # default to 1
+        parser.add_argument('--spacer', nargs='?', default=20, type=int, help='Length of protospacer (e.g. 20)') # default to 20
+        parser.add_argument('--output', help='Location of output csv file', required=True)
+        args = parser.parse_args()
+
         parameters = {
-            'genome': sys.argv[1],
-            'searchInput': sys.argv[2],
-            'gene': sys.argv[3],
-            'rgenID': sys.argv[4],
-            'output': sys.argv[5],
+            'genome': args.genome,
+            'searchInput': args.input,
+            'gene': args.gene,
+            'rgenID': args.rgenID,
+            'guideLength': args.spacer,
+            'output': args.output,
             'command-line': True
         }
-        GuideResults(**parameters)
+        GuideSearchAndScore(**parameters)
 
 if __name__ == "__main__":
     main()

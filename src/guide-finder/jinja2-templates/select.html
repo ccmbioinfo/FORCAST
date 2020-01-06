@@ -163,7 +163,7 @@
 				<div id="collapseTwo" class="collapse">
 				<div class="card-body">
                     <div class="center top-padding" id="loadingIcon">
-                        <img src="../templates/img/loading.gif" alt="loading icon" title="Searching for Guides"> 
+                        <img src="jinja2-templates/img/loading.gif" alt="loading icon" title="Searching for Guides"> 
                     </div>
                     <div id="guideResults"></div>
 				</div>
@@ -186,7 +186,7 @@
             if (validateRegion()){
                 $.ajax({
                     'type': "POST",
-                    'url': "GuideSearch.py",
+                    'url': "GuideInitialize.py",
                     'dataType': "html",
                     'data' : {
                         action: 'update_input',
@@ -203,7 +203,7 @@
         function getProtospacerLengths() {
             $.ajax({
                 'type': "POST",
-                'url': "GuideSearch.py",
+                'url': "GuideInitialize.py",
                 'dataType': "html",
                 'data': {
                     action: 'get_lengths',
@@ -257,7 +257,7 @@
             $('#loadingIcon').show()
             $.ajax({
                 'type': "POST",
-                'url': "GuideResults.py",
+                'url': "GuideSearchAndScore.py",
                 'dataType': "html",
                 'data' : {
                     action: 'submit',

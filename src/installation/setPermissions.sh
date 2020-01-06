@@ -22,8 +22,8 @@ sudo chmod -R 774 primerDesign/python/files
 sudo chmod -R a+x customPython
 
 # grant www-data write permissions to the GuideFinder directory
-sudo chgrp -R www-data GuideFinder
-sudo chmod -R 775 GuideFinder
+sudo chgrp -R www-data src/guide-finder
+sudo chmod -R 775 src/guide-finder
 
 # give www-data full access to the gff track files
 sudo find jbrowse -type f -name "*.gff" | sudo xargs chgrp www-data

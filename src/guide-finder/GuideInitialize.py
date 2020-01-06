@@ -4,7 +4,7 @@
 Hillary Elrick, September 9th, 2019
 
 Class for getting user input to perform a guide search. Given URL variables, returns appropriate HTML page results.
-Prints template for guide searching as well as AJAX calls to the GuideResults.py program which is displayed the 
+Prints template for guide searching as well as AJAX calls to the GuideSearchAndScore.py program which is displayed the 
 results section of the HTML template.
 
 Requires: initial searchLocation and genome
@@ -23,7 +23,7 @@ Steps:
 import sys, os, cgi, binascii, re
 from jinja2 import Template
 dir_path = os.path.dirname(os.path.abspath(__file__))
-sys.path.append(os.path.join(dir_path, "../../primerDesign/python"))
+sys.path.append(os.path.join(dir_path, "../helpers"))
 from Config3 import Config
 
 # cgi debug module
@@ -87,7 +87,7 @@ class GuideSearch:
             'search_location': self.getInputHTML(), 
             'available_genes': self.getOverlappingGenesHTML()    
         }
-        template_path = os.path.join(self.dbConnection.ROOT_PATH, "GuideFinder/templates/input_region.html")
+        template_path = os.path.join(self.dbConnection.ROOT_PATH, "src/guide-finder/jinja2-templates/input_region.html")
         region_template = Template(open(template_path, 'rb').read().decode('utf-8'))
         html_result = region_template.render(template_values)
         return html_result
@@ -101,7 +101,7 @@ class GuideSearch:
             'guideLengths': self.getLengthsHTML(),
             'available_genes': self.getOverlappingGenesHTML()
         }
-        template_path = os.path.join(self.dbConnection.ROOT_PATH, "GuideFinder/templates/select.html")
+        template_path = os.path.join(self.dbConnection.ROOT_PATH, "src/guide-finder/jinja2-templates/select.html")
         initial_template = Template(open(template_path, 'rb').read().decode('utf-8'))
         html_result = initial_template.render(template_values)
         return html_result
