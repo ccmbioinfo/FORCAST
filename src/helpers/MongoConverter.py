@@ -10,7 +10,7 @@ import os, sys, json, cgi
 from subprocess import Popen, PIPE, DEVNULL
 
 dir_path = os.path.dirname(os.path.abspath(__file__))
-sys.path.append(os.path.join(dir_path, "../primerDesign/python"))
+sys.path.append(dir_path)
 from Config3 import Config
 from Config3 import fetchInstalledGenomes
 

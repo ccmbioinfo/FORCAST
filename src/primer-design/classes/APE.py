@@ -12,8 +12,9 @@ import os
 import sys
 import urllib
 
-sys.path.append("..")
-APE_DIR = "files/apeFiles"
+dir_path = os.path.dirname(os.path.abspath(__file__))
+sys.path.append(os.path.join(dir_path, ".."))
+APE_DIR = os.path.join(dir_path, "../files/apeFiles")
 
 class APE(object):
 	# all three must be passed, but only one should have a value (other parameters should be explicitly set to None)
@@ -52,7 +53,7 @@ class APE(object):
 		try:
 			filename = str(self.geneObject.geneName + "_" + str(self.geneObject.release) + "-automated" + ".ape")
 			filepath = os.path.join(APE_DIR, self.geneObject.genome, 'features', filename)
-			apeFile = open(os.path.join(self.geneObject.Config.ROOT_PATH,'primerDesign/python', filepath), 'w')
+			apeFile = open(os.path.join(self.geneObject.Config.ROOT_PATH,'src/primer-design', filepath), 'w')
 			apeFile.write(APEString)
 			apeFile.close()
 		except Exception, e:

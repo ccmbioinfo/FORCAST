@@ -13,11 +13,15 @@ import cgi
 import os
 import sys
 import cPickle as pickle
+
+# import external classes based on relative file location
+dir_path = os.path.dirname(os.path.abspath(__file__))
+sys.path.append(os.path.join(dir_path, '../helpers'))
+from Config import Config
+
 from classes.Gene import Gene
 from classes.Guide import Guide
 from classes.Gene import returnError
-from Config import Config
-from Config import saveGeneObject
 
 def main():
 
@@ -44,7 +48,6 @@ def main():
 
 	# create a gene object based on the current gene name and genome
 	geneObj = Gene(geneName, genome)
-
 	geneObj.writeAPE(False)  # creates the blank APE for the gene (False for no download link)
 
 	# guide object designs primers for accepted guides stored in the database for a given gene

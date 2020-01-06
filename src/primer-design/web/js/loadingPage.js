@@ -21,7 +21,7 @@ var RELEASE = function (){
 		'dataType' : "html",
 		'data' : {genome: GENOME},
 		'async' : false,
-		'url' : "/primerDesign/python/web/ajaxCalls/fetchRelease.py",
+		'url' : "./ajaxCalls/fetchRelease.py",
 		success : function (html) {
 			tempRelease = html.toString().trim();
 		}
@@ -36,7 +36,7 @@ var ENSMBL_RELEASE = function(){
 		'type' : "POST",
 		'dataType' : "html",
 		'async' : false,
-		'url' : "/primerDesign/python/web/ajaxCalls/fetchEnsemblRelease.py",
+		'url' : "./ajaxCalls/fetchEnsemblRelease.py",
 		success : function(html) {
 			ensRelease = html.toString().trim();
 			//console.log(ensRelease);
@@ -94,7 +94,7 @@ function updateGuideLabel(e, guideID){
 	$.ajax(
 		{
 			type: "POST",
-			url: "/primerDesign/python/web/ajaxCalls/updateGuideLabel.py",
+			url: "./ajaxCalls/updateGuideLabel.py",
 			data: {
 				recordID : guideID,
 				newValue : newLabel,
@@ -119,7 +119,7 @@ function updateGuideNote(e, guideID){
 	$.ajax(
 		{
 			type: "POST",
-			url: "/primerDesign/python/web/ajaxCalls/updateGuideNote.py",
+			url: "./ajaxCalls/updateGuideNote.py",
 			data: {
 				recordID: guideID,
 				newValue: newNote,
@@ -143,7 +143,7 @@ function getGuides(geneName){
 	$.ajax(
 		{
 			type: "POST",
-			url: "/primerDesign/python/web/ajaxCalls/fetchGuides.py",
+			url: "./ajaxCalls/fetchGuides.py",
 			data: {
 				geneName: geneName,
 				ensid: ENSID,
@@ -167,7 +167,7 @@ function getPrimers(geneName){
 	$.ajax(
 		{
 			type: "POST",
-			url: "/primerDesign/python/web/ajaxCalls/fetchPrimers.py",
+			url: "./ajaxCalls/fetchPrimers.py",
 			data: {
 				gene: geneName,
 				ensid: ENSID,
@@ -222,7 +222,7 @@ function updatePrimerStatus(e){
 	$.ajax(
 		{
 			type: "POST",
-			url: "/primerDesign/python/web/ajaxCalls/updatePrimerStatus.py",
+			url: "./ajaxCalls/updatePrimerStatus.py",
 			data: {
 				record : primerID,
 				newstatus : new_status,
@@ -264,7 +264,7 @@ function updatePrimerNotes(){
 			$.ajax(
 			{
 				type: "POST",
-				url: "/primerDesign/python/web/ajaxCalls/updatePrimerNotes.py",
+				url: "./ajaxCalls/updatePrimerNotes.py",
 				data: {
 					record : primerID,
 					newNotes : primerNotes,
@@ -288,11 +288,9 @@ function updatePrimerNotes(){
 }
 
 function manuallyEnterPrimers(){
-	url = location.protocol + "//" + location.hostname + "/primerDesign/python/manualPrimerEntry.html?";
+	url = location.protocol + "//" + location.hostname + "/src/primer-design/web/manualPrimerEntry.html?";
 	url += "gene="+geneName+"&ensid="+ENSID+"&org="+GENOME;
-	//window.open("/primerDesign/python/manualPrimerEntry.html?gene="+geneName+"&ensid="+ENSID+"&org="+GENOME, 'ManualPrimerEntry');
 	PopupCenter(url, "ManualPrimerEntry", 1200, 350);	
-	//PopupCenter("/primerDesign/python/manualPrimerEntry.html?gene="+geneName+"&ensid="+ENSID+"&org="+GENOME, "ManualPrimerEntry", 1200, 350);
 }
 
 // credit to user 'Tony M' on stackoverflow (https://stackoverflow.com/questions/4068373/center-a-popup-window-on-screen)
@@ -326,7 +324,7 @@ function addPrimersToDatabase(){
 	$.ajax
 		({
 			method: "GET",
-			url: "/primerDesign/python/web/ajaxCalls/addPrimers.py",
+			url: "./ajaxCalls/addPrimers.py",
 			dataType: "html",
 			data: data, 
 			success: function(html) {
@@ -352,7 +350,7 @@ function backendUpdateStatus(element, recordID){
 	}
         $.ajax({
                 method: "POST",
-                url: "/primerDesign/python/web/ajaxCalls/updateGuides.py",
+                url: "./ajaxCalls/updateGuides.py",
 		dataType: "html",
                 data: {
                         record: recordID,
@@ -383,7 +381,7 @@ function RunPrimerDesignScript(){
 	$.ajax(
 		{
 			type: "POST",
-			url: "/primerDesign/python/designPrimers.py",
+			url: "../designPrimers.py",
 			cache: false,
 			data: {
 				gene : geneName,
@@ -433,7 +431,7 @@ function inSilica(){
 	//check if dicey installed
 	$.ajax({
 		dataType: "html",
-		url: "/primerDesign/python/web/ajaxCalls/diceyInstalled.py",
+		url: "./ajaxCalls/diceyInstalled.py",
 		data: { genome: GENOME},
 		success: function(html){
 			if (Number(html.toString().trim()) == 1){
@@ -471,7 +469,7 @@ function diceyCall(primers, productCell){
 	productCell.append('<span id="diceyLoader"><br><i class="fa fa-spinner fa-spin"></i></span>');
 	$.ajax({
 		dataType: "json",
-		url: "/primerDesign/python/web/ajaxCalls/primerQA.py",
+		url: "./ajaxCalls/primerQA.py",
 		data: { primers: JSON.stringify(primers), genome: GENOME},
 		success: function(json){		
 			// remove spinner
@@ -699,7 +697,7 @@ function blastCall(primerSeq, locationElement){
 	// call to the python script that runs blast
 	$.ajax({
 		dataType: "json",
-		url: "/primerDesign/python/web/ajaxCalls/blastPrimers.py",
+		url: "./ajaxCalls/blastPrimers.py",
 		data: { 
 			primer: primerSeq, 
 			genome: GENOME
@@ -830,7 +828,7 @@ function updateGuideAPE(ids) {
 		type : "POST",
 		dataType : "html",
 		data: ids,
-		url: "/primerDesign/python/web/ajaxCalls/generateAPE.py",
+		url: "./ajaxCalls/generateAPE.py",
 		success: function(html) {
 			link = html.toString().trim();
 			$('#DownloadGuideAPE').attr('href',link);
@@ -846,7 +844,7 @@ function updateGuideCSV(ids){
 		type : "POST",
 		dataType : "html",
 		data: ids,
-		url: "/primerDesign/python/web/ajaxCalls/generateCSV.py",
+		url: "./ajaxCalls/generateCSV.py",
 		success: function(html) {
 			link = html.toString().trim();
 			$('#DownloadGuideCSV').attr('href',link);
@@ -864,7 +862,7 @@ function updateGuideDOC(ids){
 		type: "POST",
 		dataType : "html",
 		data: ids,
-		url: "/primerDesign/python/web/ajaxCalls/generateDOC.py",
+		url: "./ajaxCalls/generateDOC.py",
 		success : function(html) {
 			link = html.toString().trim();
 			$('#DownloadGuideDOC').attr('href',link);

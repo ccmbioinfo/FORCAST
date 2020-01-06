@@ -2,7 +2,7 @@
 '''
 Hillary Elrick
 
-Used by AJAX call in /primerDesign/python/web/js/loadingPage.js which is attached to the
+Used by AJAX call in src/primer-design/web/js/loadingPage.js which is attached to the
 primer design popup. When a user changes the status of a guide (either 'Accepted' or 'Rejected'),
 this updates the record in the database and rewrites the Primer GFF.
 '''

@@ -8,7 +8,6 @@ from bson.objectid import ObjectId
 dir_path = os.path.dirname(os.path.abspath(__file__))
 sys.path.append(os.path.join(dir_path, '../../../helpers'))
 from Config import Config
-from Config import saveGeneObject
 sys.path.append(os.path.join(dir_path,'../..'))
 from classes.Gene import Gene
 from classes.APE import APE
@@ -73,19 +72,6 @@ def main():
 	if geneName and genome and found_all:
 		# get a connection to the right db
 		dbConnection = Config(genome)
-		
-		"""		
-		# checks if there's a Gene object already created
-		geneObj = Config.getGeneObject(geneName, genome)
-		if not geneObj:
-			''' this is for the cases where the saved gene object
-			was deleted, or it was generated on a different server, 
-			or the official gene symbol has been changed '''
-			# don't want warnings because we need a url even if no protein-coding exons
-			geneObj = Gene(geneName, genome, suppressWarnings=True)
-			saveGeneObject(geneObj)
-		"""
-		
 		geneObj = Gene(geneName, genome, suppressWarnings=True)
 		
 		# get all the guides passed in

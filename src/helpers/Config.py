@@ -24,7 +24,7 @@ class Config:
 		self.setPaths()	
 		self.PRIMER3_SETTINGS = os.path.join(self.ROOT_PATH, 'config/primer3settings.conf')
 		# where the primer3 in and output files are written
-		self.PRIMER3_DIR = os.path.join(self.ROOT_PATH, 'primerDesign/python/files/primer3Files')
+		self.PRIMER3_DIR = os.path.join(self.ROOT_PATH, 'src/primer-design/files/primer3Files')
 			
 		if genome:
 			# connect to the mongoDB
@@ -111,19 +111,6 @@ class Config:
 		else:
 			raise ValueError("ENSID:"+str(ensid)+" Does Not Exist in Current Gene Collection")
 
-	# if there's a gene object already made, fetch it. Return None otherwise
-	@staticmethod
-	def getGeneObject(geneName, genome):
-		global ROOT_PATH
-		PKL_PATH = os.path.join(ROOT_PATH, "primerDesign/python/classes/geneStorage/"+genome+"/")
-		filename = str(geneName) + "_" + str(fetchCurrentRelease(genome)) + ".pkl"
-		if os.path.isfile(os.path.join(PKL_PATH, filename)):
-			pkl_file = open(os.path.join(PKL_PATH, filename), 'rb')
-			geneObj = pickle.load(pkl_file)
-			return geneObj
-		
-		return None	
-
 
 def getCredentials():
 	config = {}
@@ -141,13 +128,6 @@ def getCredentials():
 			config[var] = value
 	
 	return config		
-
-
-def saveGeneObject(obj):
-	global ROOT_PATH
-	PKL_PATH = os.path.join(ROOT_PATH, "primerDesign/python/classes/geneStorage/"+str(obj.genome)+"/")
-	filename = str(obj.symbol) + "_" + str(obj.release) + ".pkl"
-	pickle.dump(obj, open(os.path.join(PKL_PATH, filename), 'wb'))
 
 
 def getCurrentGeneCollection(genome):

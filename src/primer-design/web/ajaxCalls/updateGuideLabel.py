@@ -2,7 +2,7 @@
 '''
 Hillary Elrick
 
-Used by AJAX call in /primerDesign/python/web/js/loadingPage.js which is attached to the
+Used by AJAX call in /primer-design/web/js/loadingPage.js which is attached to the
 primer design popup. When user clicks the lock button on the Label column to edit the guide
 notes and then re-clicks it to lock the fields again, this script is triggered for every
 guide that had its label changed. It updates the database and rewrites the Guide GFF

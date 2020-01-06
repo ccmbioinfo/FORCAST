@@ -9,7 +9,7 @@ var RELEASE = function (){
                 'dataType' : "html",
 		'data' : {genome: 'mm10'},
                 'async' : false,
-                'url' : "/primerDesign/python/web/ajaxCalls/fetchRelease.py",
+                'url' : "./ajaxCalls/fetchRelease.py",
                 success : function (html) {
                         tempRelease = html.toString().trim();
                 }
@@ -76,7 +76,7 @@ function setLocation(primerSeq, locationElement, spinner, forward){
 				
 	$.ajax({
 		dataType: "json",
-		url: "/primerDesign/python/web/ajaxCalls/placePrimers.py",
+		url: "./ajaxCalls/placePrimers.py",
 		data: { primer : primerSeq,
 			genome : GENOME},
 		success: function(json){
@@ -186,7 +186,7 @@ function submitForm(){
 	
 	$.ajax({
 		type: "POST",
-		url: "/primerDesign/python/web/ajaxCalls/manuallyAddPrimer.py",
+		url: "./ajaxCalls/manuallyAddPrimer.py",
 		data: form,
 		dataType: "html",
 		success: function(html)

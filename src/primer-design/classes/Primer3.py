@@ -17,7 +17,6 @@ from Gene import returnError
 sys.path.append("..")
 from Config import Config
 
-
 class Primer3:
 	"""
 	Primer3 is used to design primers
@@ -172,19 +171,17 @@ class Primer3:
                 except Exception, e:
                         returnError("Problem creating Primer3 input file: " + str(e))
 
-                return filepath	
+                return filepath
 
-
-        def attemptDesign(self, guideObject, primerType):
+	def attemptDesign(self, guideObject, primerType):
 		"""
 		Using primer3 and the predefined settings files, attempt to design primers and parse the results
 		"""
 		if not guideObject.emTarget and primerType == 'EM':
 			# handling the single guide case
 			return None, None
-                
 		htmlResult = ''
-                foundPrimers = False
+		foundPrimers = False
 		attemptNumber = 0
 		sequence = guideObject.super.sequence	
 		numRetrys = len(self.settingsDict)
@@ -197,6 +194,8 @@ class Primer3:
 			# construct the command
 			p = Popen(self.Config.PRIMER3 + ' --p3_settings_file="' + settingsFile + '" < ' + primer3Input, shell=True, stdout=PIPE, stderr=PIPE)
 			stdout, stderr = p.communicate()
+			if stderr:
+				returnError(stderr)
 			# parse the result	
 			primerDict = self.parsePrimers(stdout, primerType, guideObject)
 			foundCount = len(primerDict)

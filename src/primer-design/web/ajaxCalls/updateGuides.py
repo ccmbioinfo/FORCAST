@@ -2,7 +2,7 @@
 '''
 Hillary Elrick
 
-Used by AJAX call in /primerDesign/python/web/js/loadingPage.js which is attached to the primer design popup.
+Used by AJAX call in /src/primer-design/web/js/loadingPage.js which is attached to the primer design popup.
 When a user changes the status of a Guide, this script updates the database and rewrites the Guide GFF
 '''
 

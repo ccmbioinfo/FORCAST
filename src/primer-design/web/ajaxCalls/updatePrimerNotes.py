@@ -2,7 +2,7 @@
 '''
 Hillary Elrick
 
-Used by AJAX call in /primerDesign/python/web/js/loadingPage.js which is attached to the
+Used by AJAX call in src/primer-design/web/js/loadingPage.js which is attached to the
 primer design popup. This function is called when clicking the 'Update Notes' button
 and accepts the primer record id and the new notes field. It updates the database and rewrites
 the Primer GFF file

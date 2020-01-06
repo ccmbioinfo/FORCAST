@@ -2,7 +2,7 @@
 '''
 Hillary Elrick
 
-Used by AJAX call in /primerDesign/python/web/js/loadingPage.js which is attached to the
+Used by AJAX call in /primer-design/web/js/loadingPage.js which is attached to the
 primer design popup. This function is called when clicking the 'Add Primers to Database' button.
 When the designPrimers.py script is initially run, it creates json files for the primers in the
 jsonDir labelled with the gene symbol, rank, release, and type (i.e. WT or EM). Then, when a user selects

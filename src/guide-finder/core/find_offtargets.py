@@ -12,7 +12,7 @@ import os
 import binascii
 from subprocess import Popen, PIPE, DEVNULL
 dir_path = os.path.dirname(os.path.abspath(__file__))
-sys.path.append(os.path.join(dir_path, "../../primerDesign/python"))
+sys.path.append(os.path.join(dir_path, "../../helpers/python"))
 from Config3 import Config
 from itertools import product
 import score_offtargets
