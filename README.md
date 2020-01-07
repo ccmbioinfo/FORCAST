@@ -12,7 +12,11 @@
 To run CasCADe natively, please use a machine runnning Ubuntu 16.04. Alternately, you can install CasCADe on any machine running a [docker-compatible operating system](https://docs.docker.com/install/). In either case, a minimum of 8GB of RAM and 100GB of hard disk space is recommended.
 
 ## Installing with Docker
-Install the [docker engine](https://docs.docker.com/install/). If using Linux, install [docker compose](https://docs.docker.com/compose/install/) (this is included by default in Mac and Windows installations of docker). Then, clone or download this repository and navigate to it. The default organism in the .env file is yeast (Saccharomyces_cerevisiae, R64-1-1), change this to your organism and genome assembly of interest if it is different. A full list of available genomes can be found on [Ensembl](ftp://ftp.ensembl.org/pub/release-98/fasta/). After modifying the .env file, type `docker-compose up` on the command line. Depending on the size of your organism, it may take several hours to build the index files. Once the setup is complete, CasCADe should be available via web browser at your server's domain address (or localhost if running locally).  
+Install the [docker engine](https://docs.docker.com/install/). If using Linux, install [docker compose](https://docs.docker.com/compose/install/) (this is included by default in Mac and Windows installations of docker). 
+
+Then, clone or download the CasCADe repository. The default organism in the .env file is yeast (Saccharomyces_cerevisiae, R64-1-1), change this to your organism and genome assembly of interest if it is different. A full list of available genomes can be found on [Ensembl](ftp://ftp.ensembl.org/pub/release-98/fasta/).
+
+After modifying the .env file, type `docker-compose up` on the command line from within the CasCADe directory. Depending on the size of your organism, it may take several hours to build the index files. Once the setup is complete, CasCADe should be available via web browser at your server's domain address (or localhost if running locally).
 
 ## Installing Natively
   Make sure that your user account has ```sudo``` privilege before installing CasCADe.
