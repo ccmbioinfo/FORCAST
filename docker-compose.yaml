@@ -9,6 +9,7 @@ services:
             - ${SERVER_ADDRESS}:${APACHE2_PORT}:${APACHE2_PORT}
         volumes:
             - ./mongodb:/data/db
+            - ./src:/var/www/html/src
         command: >
             bash -c "sudo mongod --fork --logpath /var/log/mongodb.log
             && python3 /var/www/html/setup_script/setup.py -r /var/www/html -g ${ORGANISM} -v ${ASSEMBLY} -fa2bit /var/www/html/tools/usrLocalBin/faToTwoBit -b /var/www/html/dependencies/ncbi-blast-2.7.1+/bin

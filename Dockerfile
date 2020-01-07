@@ -17,6 +17,6 @@ COPY . /var/www/html/
 WORKDIR /var/www/html/
 
 # INSTALL DEPENDENCIES
-RUN cd installation && \
-    ./install_debian.sh /var/www/html && \
+RUN cd src/installation && \
+    ./install.sh /var/www/html && \
     ./setPermissions.sh
