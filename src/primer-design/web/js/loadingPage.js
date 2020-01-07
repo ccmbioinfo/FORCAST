@@ -517,9 +517,6 @@ function diceyCall(primers, productCell){
 			// remove spinner
 			productCell.children('#diceyLoader').remove();
 			console.log("Problem performing primer QA with locally installed dicey program");
-			console.log(xhr);
-			console.log(err);
-			console.log(status);
 		}
 		});		
 }

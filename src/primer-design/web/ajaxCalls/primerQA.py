@@ -37,12 +37,6 @@ def main():
 		#pass
 		sys.exit("Problem with variables passed to function")
 
-	#genome = 'mm10'
-	#primers = ['GAAGACTTGGTTAGGGTTTGTGGAG', 'ACACACTCCCATTATGACAGGATC']	
-	# non specific primers for Ifit3
-	#primers = ['CAGTCCTCTCTACTCTTTGGTCATG','AACCATTCAGCCACTCCTTTATCC']
-	#primers = ['TCTACCTTCCAAGTCAGTCCTG','CATCTCCCTCCTCACCTTAGTC']
-
 	if primers:
 		primerQA = Dicey(primers, '50', genome)
 		result = primerQA.runSequences()

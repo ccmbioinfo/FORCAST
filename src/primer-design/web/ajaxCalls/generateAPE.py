@@ -57,16 +57,12 @@ def main():
 				found_all = True
 	except Exception, e:
 		print("Problem with calls to script " + str(e))
-		 
+
 	'''	
 	geneName = 'Jak1'
 	genome = 'Rnor_6'
 	found_all = True
 	ids = ['5cc06dc12e18ca425a4fe11f', '5cc06e0c2e18ca42d8dfd9a9']
-	geneName = 'Gt(ROSA)26Sor'
-	genome = 'mm10'
-	found_all = True
-	ids = ['5c950f2669670c602fe90d34', '5c950fbd69670c61168b1c7c', '5c95146969670c63c8fe7b0d', '5cbe080a2e18ca0c501b29cd']
 	'''
 	
 	if geneName and genome and found_all:

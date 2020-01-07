@@ -7,12 +7,6 @@ functions for generating APE files from the APE class, and attributes to
 access the Mongo Database via the static Config class.
 """
 
-from Gene import Gene
-from Gene import returnError
-from Config import Config
-from APE import APE
-from Primer3 import Primer3
-
 import os
 import sys
 import re
@@ -23,14 +17,23 @@ import requests
 from collections import OrderedDict
 from subprocess import Popen, PIPE
 
+# import classes based on relative file location
+dir_path = os.path.dirname(os.path.abspath(__file__))
+sys.path.append(dir_path)
+from Gene import Gene
+from Gene import returnError
+from Config import Config
+from APE import APE
+from Primer3 import Primer3
+
 server = "https://rest.ensembl.org"
 
 class Guide(Gene):
-	primer3Dir = "files/primer3Files"
-	primer3SettingsDir = "files/primer3Files/SETTINGS"
-	apeDir = "files/apeFiles"
-	csvDir = "files/csvFiles/"
-	jsonDir = "files/jsonFiles/"
+	primer3Dir = os.path.join(dir_path, "../files/primer3Files")
+	primer3SettingsDir = os.path.join(dir_path, "../files/primer3Files/SETTINGS")
+	apeDir = os.path.join(dir_path,"../files/apeFiles")
+	csvDir = os.path.join(dir_path,"../files/csvFiles")
+	jsonDir = os.path.join(dir_path,"../files/jsonFiles")
 
 	def __init__(self, geneObj):
 		self.success = [False, False]
@@ -156,7 +159,14 @@ class Guide(Gene):
 		for key, apeString in self.fileDictionary.iteritems():
 			try:
 				# name file based on wt/em pair chosen
-				filename = str(self.super.geneName+"_"+str(self.super.release)+"-automated_"+ str(key[0])+"_"+str(key[1])+".ape")
+				if len(self.wtPrimers) > 0 and len(self.emPrimers) > 0:
+					filename = str(self.super.geneName+"_"+str(self.super.release)+"-automated_"+ str(key[0])+"_"+str(key[1])+".ape")
+				elif len(self.wtPrimers) > 0:
+					filename = str(self.super.geneName+"_"+str(self.super.release)+"-automated_"+ str(key[0])+"_0.ape")
+				elif len(self.emPrimers) > 0:
+					filename = str(self.super.geneName+"_"+str(self.super.release)+"-automated_0_"+ str(key[0])+".ape")
+				else:
+					returnError("No EM or WT primers")
 				apeFile = open(os.path.join(self.apeDir, self.super.genome, 'features', filename), 'w')
 				apeFile.write(apeString)
 				apeFile.close()
@@ -181,8 +191,35 @@ class Guide(Gene):
 			os.makedirs(csvDir_genome)
 		# write a csv for every pair of wt and em primers
 		for w, wPrimer in self.wtPrimers.iteritems():
-			for e, ePrimer in self.emPrimers.iteritems():
-				filename = str(self.super.geneName+"_"+str(self.super.release)+"-primers_"+str(w)+"_"+str(e)+".csv")
+			if len(self.emPrimers) > 0:
+				for e, ePrimer in self.emPrimers.iteritems():
+					filename = str(self.super.geneName+"_"+str(self.super.release)+"-primers_"+str(w)+"_"+str(e)+".csv")
+					filepath = os.path.join(csvDir_genome, filename)
+					try:
+						with open(filepath, mode='w') as csv_file:
+							# write Guide Header
+							writer = csv.writer(csv_file, delimiter=",")
+							writer.writerow(["Guides:"])
+							writer.writerow(["Sequence", "PAM"])
+							# print guides from dictionary
+							guideFields = ['sequence', 'PAM']
+							writer = csv.DictWriter(csv_file, fieldnames=guideFields)
+							for g, guide in guideDict.iteritems():
+								writer.writerow(guide)
+							writer = csv.writer(csv_file, delimiter=",")
+							writer.writerow([])
+							writer.writerow(["Primers:"])
+							writer.writerow(["Primer Name", "Sequence", "Tm"])
+							primerName = str(self.super.geneName + "_")
+							writer.writerow([(primerName + "wt_F1"), wPrimer['leftprimer'], str(wPrimer['leftTM'])])
+							writer.writerow([(primerName + "wt_R1"), wPrimer['rightprimer'], str(wPrimer['rightTM'])])
+							writer.writerow([(primerName + "em_F1"), ePrimer['leftprimer'], str(ePrimer['leftTM'])])
+							writer.writerow([(primerName + "em_R1"), ePrimer['rightprimer'], str(ePrimer['rightTM'])])
+						emCounter += 1
+					except Exception, e:
+						returnError("Problem writing csv file : " + str(e))
+			else:
+				filename = str(self.super.geneName+"_"+str(self.super.release)+"-primers_"+str(w)+"_0.csv")
 				filepath = os.path.join(csvDir_genome, filename)
 				try:
 					with open(filepath, mode='w') as csv_file:
@@ -190,13 +227,11 @@ class Guide(Gene):
 						writer = csv.writer(csv_file, delimiter=",")
 						writer.writerow(["Guides:"])
 						writer.writerow(["Sequence", "PAM"])
-
 						# print guides from dictionary	
 						guideFields = ['sequence', 'PAM']
 						writer = csv.DictWriter(csv_file, fieldnames=guideFields)
 						for g, guide in guideDict.iteritems():
 							writer.writerow(guide)
-
 						writer = csv.writer(csv_file, delimiter=",")
 						writer.writerow([])
 						writer.writerow(["Primers:"])
@@ -204,11 +239,8 @@ class Guide(Gene):
 						primerName = str(self.super.geneName + "_")
 						writer.writerow([(primerName + "wt_F1"), wPrimer['leftprimer'], str(wPrimer['leftTM'])])
 						writer.writerow([(primerName + "wt_R1"), wPrimer['rightprimer'], str(wPrimer['rightTM'])])
-						writer.writerow([(primerName + "em_F1"), ePrimer['leftprimer'], str(ePrimer['leftTM'])])
-						writer.writerow([(primerName + "em_R1"), ePrimer['rightprimer'], str(ePrimer['rightTM'])])
 				except Exception, e:
 					returnError("Problem writing csv file : " + str(e))
-				emCounter += 1
 			wtCounter += 1
 		return
 
@@ -278,8 +310,8 @@ class Guide(Gene):
 		self.writePrimerJSON()
 		defaultAPE = str(self.super.geneName + "_" + str(self.super.release) + "-automated_0_0.ape")
 		defaultCSV = str(self.super.geneName + "_" + str(self.super.release) + "-primers_0_0.csv")
-		genomeAPE_features = os.path.join(self.apeDir, self.super.genome, 'features')
-		genomeCSV = os.path.join(self.csvDir, self.super.genome)
+		genomeAPE_features = os.path.join("../files/apeFiles", self.super.genome, 'features')
+		genomeCSV = os.path.join("../files/csvFiles", self.super.genome)
 
 		print '''
 			</br>

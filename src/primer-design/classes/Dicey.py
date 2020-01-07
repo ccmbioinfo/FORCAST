@@ -83,10 +83,10 @@ class Dicey:
 	def runSequences(self):		
 		diceyProcess = subprocess.Popen(self.diceyCommand, stdout=subprocess.PIPE, stdin=subprocess.PIPE)
 		(diceyOut, diceyErr) = diceyProcess.communicate()	
-	
-		# return the json result	
-		jsonResult = json.loads(diceyOut)
+
 		try:
+			# decode json
+			jsonResult = json.loads(diceyOut)
 			data = jsonResult['data']
 		except Exception, e:
 			print("Error reading Dicey results: "+str(e))

@@ -85,9 +85,13 @@ def writeGuideTable(guideResults):
 	'''
 	
 	for guide in guideResults:
-		# terrible consequence of combining python 2.7, and url encoding...
+		# this isn't great... (older versions stored url encoded string of offtargets)
 		offTargets = str(guide['otDesc'].encode('utf8')).split("\xe2\x80\x89-\xe2\x80\x89")
-		sumOffTargets = sum([int(x) for x in offTargets])
+		if len(offTargets) > 1:
+			sumOffTargets = sum([int(x) for x in offTargets])
+		else:
+			# not url encoded
+			sumOffTargets = sum([int(x) for x in str(guide['otDesc']).split("-")])
 		formatOffTargets = str(sumOffTargets) + " {" + (" - ").join(offTargets)  + "}"
 		tableHTML += '''
 		<tr>
@@ -172,7 +176,7 @@ def writeDOC(geneName, genome, ROOT_PATH, guideResults, primerResults):
 	filepath = os.path.join(doc_genomeDir, filename)
 	try:
 		fileString = setupDocument()
-		fileString += writeGuideTable(guideResults) 
+		fileString += writeGuideTable(guideResults)
 		fileString += writePrimerTable(primerResults)
 		fileString += "</body></html>" # closing tags
 	except Exception, e:
@@ -213,7 +217,7 @@ def main():
 			guideResults = getGuides(ids, dbConnection)
 			primerResults = findPrimers(ids, dbConnection)
 			filename = writeDOC(geneName, genome, dbConnection.ROOT_PATH,  guideResults, primerResults)
-			print os.path.join(fileDir, genome, filename)
+			print os.path.join("../files/docFiles", genome, filename)
 		except Exception, e:
 			print str(e)
 	else:

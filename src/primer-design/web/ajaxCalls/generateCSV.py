@@ -92,7 +92,7 @@ def main():
 		guideResults = getGuides(ids, dbConnection)
 		primerResults = findPrimers(ids, dbConnection)
 		filename = writeCSV(genome, geneName, dbConnection.ROOT_PATH, guideResults, primerResults)
-		print(os.path.join(fileDir, genome, filename))
+		print(os.path.join("../files/csvFiles", genome, filename))
 	else:
 		print("No genome passed to script")
 
