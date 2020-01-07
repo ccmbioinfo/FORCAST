@@ -99,7 +99,9 @@ ATTEMPT_2_DESC="Description of changes in ATTEMPT_2 file"
 The descriptions are optional but will be displayed to users if a design failure occurs.
 
 ### Custom RNA-guided Endonuclease (RGEN) Settings
+
 The `src/setup/rgens.json` defines the default RGEN settings:
+
 | Shortform | PAM | PamLocation | MinGuideLength | MaxGuideLength | DefaultGuideLength | SeedRegion | Cleaves | OffTargetPAMs | Scores |
 | --------- | --- | ----------- | -------------- | -------------- | ------------------ | ---------- | ------- | ------------- | ------ |
 | SpCas9 (NGG) | NGG | downstream | 17 | 20 | 20 | -12 | -3 | NGG, NAG | MIT, CFD |
