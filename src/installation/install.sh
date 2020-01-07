@@ -31,8 +31,7 @@ then
 fi
 
 #create necessary directories. /data/db is for MongoDB
-
-req_dirs=($root_dir/dependencies /data/db  $root_dir/config)
+req_dirs=($root_dir/bin /data/db  $root_dir/config)
 
 for i in "${req_dirs[@]}";
 do
@@ -79,7 +78,7 @@ cd $root_dir/jbrowse
 ./setup.sh
 
 #### Hillary's primer design section begins 
-cd $root_dir/dependencies
+cd $root_dir/bin
 
 # check if primer3 already installed and if not, install it
 if [ -n "$(command -v primer3/src/primer3_core)" ]
@@ -94,13 +93,12 @@ else
         cd primer3/src
         make
         echo "\nPrimer3 successfully installed. Will now run test to ensure there were no issues with the installation"
-        #make test
         # store location to the primer3 executable
         primer3exec=$(pwd)"/primer3_core"
         cd ..
         # store the config file
         primer3config=$(pwd)"/src/primer3_config/"
-        cd .. # navigate back to dependencies/
+        cd .. # navigate back to bin
 fi
 
 # check if blast already installed and if not, install it
@@ -141,7 +139,6 @@ else
         cd ..
 fi
 
-#enable apache2 cgi module 
 sudo a2enmod cgi
 
 cd ..
@@ -151,9 +148,9 @@ echo -e "PRIMER3_EXEC=$primer3exec\nPRIMER3_CONFIG=$primer3config\nBLAST_EXEC=$b
 
 if [ ! -d $root_dir/config/primer3settings ]
 then
-    cp -r $root_dir/templates/primer3settings $root_dir/config/primer3settings
+    cp -r $root_dir/config-template/primer3settings $root_dir/config/primer3settings
 fi
-if [ ! -f $root_dir/config/primer3settings.conf ]
+if [ ! -f $root_dir/config-template/primer3settings.conf ]
 then
-    cp $root_dir/templates/primer3settings.conf $root_dir/config/primer3settings.conf
+    cp $root_dir/config-template/primer3settings.conf $root_dir/config/primer3settings.conf
 fi

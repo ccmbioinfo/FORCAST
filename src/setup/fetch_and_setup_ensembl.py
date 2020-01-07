@@ -285,7 +285,7 @@ def process_files_for_upload(root_path, jbrowse_download_directory, genome_versi
 
 def create_segments_bed(root_path, jbrowse_download_directory, genome_version):
 
-    segments_script = os.path.join(root_path,"setup_script","create_segments.sh")
+    segments_script = os.path.join(root_path,"src/setup","create_segments.sh")
     fai_file = None
     annotation_gff3 = None
     for glob_file in glob.glob(os.path.join(jbrowse_download_directory,"*fa.fai")):
@@ -323,12 +323,12 @@ def load_gff_into_JBrowse(root_dir,jbrowse_path, jbrowse_data_directory, jbrowse
 
     ''' This function loads genes, transcripts and regulatoary regions from gff files into JBrowse and copies the trackList.json template to the JBrowse data folder '''
     print("Loading annotations in JBrowse")
-    to_copy_json = os.path.join(root_dir,"setup_script","trackList_no_regulatory.json") 
+    to_copy_json = os.path.join(root_dir,"src/setup","trackList_no_regulatory.json") 
     gff_files = glob.glob(os.path.join(jbrowse_download_directory,"*processed*gff*"))
     try:
         for gff_file in gff_files:
             if 'Regulatory_Build' in gff_file:
-                to_copy_json = os.path.join(root_dir,"setup_script","trackList.json")
+                to_copy_json = os.path.join(root_dir,"src/setup","trackList.json")
                 subprocess.run([os.path.join(jbrowse_path,"bin","flatfile-to-json.pl"), "--gff", gff_file, "--trackLabel", "Regulatory_build", '--out', jbrowse_data_directory])
             else:
                 subprocess.run([os.path.join(jbrowse_path,"bin","flatfile-to-json.pl"), "--gff", gff_file, "--trackLabel", "Genes", "--type", "gene,ncRNA_gene,pseudogene", "--noSubfeatures", '--out', jbrowse_data_directory])

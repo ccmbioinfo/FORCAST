@@ -1,25 +1,14 @@
 # need to make sure these files and directories can be run from the web
-cd ..
+cd ../..
 
 sudo chgrp -R www-data config
 sudo chmod -R 755 config
-sudo chgrp -R www-data dependencies
-sudo chmod -R 775 dependencies
+sudo chgrp -R www-data bin
+sudo chmod -R 775 bin
 
 # landing page
-sudo chgrp -R www-data landing-page
-sudo chmod -R 755 landing-page
-
-# allow www-data to execute all python and cgi scripts in primerDesign
-sudo find primerDesign -type f \( -name "*.py" -o -name "*.cgi" \) | sudo xargs chgrp www-data
-sudo find primerDesign -type f \( -name "*.py" -o -name "*.cgi" \) | sudo xargs chmod g+x
-
-# grant full permissions to web user for file generation
-sudo chgrp -R www-data primerDesign/python/files
-sudo chmod -R 774 primerDesign/python/files
-
-# grant all users execute permissions to customPython
-sudo chmod -R a+x customPython
+sudo chgrp -R www-data src/landing-page
+sudo chmod -R 755 src/landing-page
 
 # grant www-data write permissions to the GuideFinder directory
 sudo chgrp -R www-data src/guide-finder
