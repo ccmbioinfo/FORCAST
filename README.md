@@ -81,8 +81,6 @@ Which will fetch and rename the index files if they're available.
 
 If you want your installation of CasCADe to be secured by https, please refer to apache2's documentation on how to enable https module.
 
-Please email us at hillary.elrick at sickkids dot ca  or viswateja.nelakuditi at sickkids dot ca if you encounter any issues with the installation, setup or the program itself.
-
 ## Customization
 
 ### Custom Primer Design Settings
@@ -122,7 +120,7 @@ After modifying the `rgens.json` file, you can run the `load_RGENs.py` script in
 - `update`: modifies existing records based on the rgenID and adds new RGENs to the database (recommended)
 - `replace`: wipes and replaces RGEN database with new entries, potentially unlinking existing gRNA records from their RGEN.
 
-### Migration from previous versions of CasCADe
+## Migration
 If using a previous version of CasCADe, existing Primers and Guides can be migrated to the new version by performing the following steps:
 
 1) Navigate to the _existing_ CasCADe installation and make copies of the collections to migrate. Replace mm10 with your genome version, if it is different, and define a directory where the database files should be output. 
@@ -148,3 +146,7 @@ sudo python customPython/MongoHandler.py mm10
 ```
 
 Your existing Primer and Guide designs should now be accessible in the new CasCADe installation!
+
+## Troubleshooting
+
+If you encounter issues installing or using CasCADe, raise a GitHub Issue or send an email to hillary(dot)elrick(at)sickkids(dot)ca
