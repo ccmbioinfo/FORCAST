@@ -5,6 +5,9 @@
 org_name=$1
 genome=$2
 
+# get dir of script
+DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
+
 delete_on_failure=false # flag for whether genome directory existed before
 
 if [ -z $org_name ] || [ -z $genome ]
@@ -13,7 +16,7 @@ then
   exit
 fi
 
-cd ../../bin/dicey
+cd $DIR/../../bin/dicey
 
 if [ ! -d ./indexes ]
 then
