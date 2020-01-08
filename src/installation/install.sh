@@ -150,7 +150,7 @@ if [ ! -d $root_dir/config/primer3settings ]
 then
     cp -r $root_dir/config-template/primer3settings $root_dir/config/primer3settings
 fi
-if [ ! -f $root_dir/config-template/primer3settings.conf ]
+if [ ! -f $root_dir/config/primer3settings.conf ]
 then
     cp $root_dir/config-template/primer3settings.conf $root_dir/config/primer3settings.conf
 fi
