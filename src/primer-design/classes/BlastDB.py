@@ -187,7 +187,7 @@ class BlastDB:
 		#hitCount = -1
 		hitDict = {}
 		locationCount = 0
-		hit = re.compile("^primerBLAST[\s]+(chr[0-9|X|Y|M]*)[\s]+([A|G|T|C|a|g|t|c|N]*)[\s]*([0-9|.|e|\-|+]*)[\s]*([0-9]*)[\s]*(minus|plus)[\s]*([0-9]*)[\s]*([0-9]*)")
+		hit = re.compile("^primerBLAST[\s]+(chr[\S]*)[\s]+([A|G|T|C|a|g|t|c|N]*)[\s]*([0-9|.|e|\-|+]*)[\s]*([0-9]*)[\s]*(minus|plus)[\s]*([0-9]*)[\s]*([0-9]*)")
 	
 		# iterate through every line in output
 		for line in blastLines:
