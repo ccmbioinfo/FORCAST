@@ -34,7 +34,6 @@ def main():
 		# get the genome we're using
 		genome = args.getvalue('genome')
 	except Exception, e:
-		#pass
 		sys.exit("Problem with variables passed to function")
 
 	if primers:

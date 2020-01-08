@@ -31,16 +31,6 @@ def main():
 		primers = [args.getvalue('primer')]
 	except Exception, e:
 		sys.exit("Problem with variables passed to function")
-
-	#for testing
-	#primers = ['CACACCGTCGGACCCTtg']
-	#genome = 'mm10'
-	#primers = ['GAAGACTTGGTTAGGGTTTGTGGAG', 'ACACACTCCCATTATGACAGGATC']	
-	#primers = ['GGAGGGAGTTTCTCTGAGAGATTT']	
-	#genome = 'mm10'
-	#primers = ['CGTCTTCTTGAAGCTCCTCATT']
-	#primers = ['CTGACTGCTTTGTTAGTGTGCA']
-	
 	
 	if genome and primers:
 		# create blast search object with e-value of 0.01 (do not return identities)
