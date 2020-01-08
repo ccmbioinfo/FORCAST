@@ -1,0 +1,18 @@
+version: '2'
+
+services:
+    webserver:
+        image: helrick/forcast
+        expose:
+            - ${APACHE2_PORT}
+        ports:
+            - ${APACHE2_PORT}:${APACHE2_PORT}
+        volumes:
+            - ./mongodb:/data/db
+            - ./src:/var/www/html/src
+        command: >
+            bash -c "sudo mongod --fork --logpath /var/log/mongodb.log
+            && python3 /var/www/html/src/setup/setup.py -r /var/www/html -g ${ORGANISM} -v ${ASSEMBLY} -fa2bit /var/www/html/bin/faToTwoBit -b /var/www/html/bin/ncbi-blast-2.7.1+/bin
+            && /var/www/html/src/setup/enable_dicey.sh ${ORGANISM} ${ASSEMBLY}
+            && sudo service apache2 start
+            && tail -f /dev/null"

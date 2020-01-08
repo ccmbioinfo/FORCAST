@@ -8,7 +8,7 @@ function (
 ) {
     return declare(JBrowsePlugin, {
         constructor: function (/* args*/) {
-            console.log('ColorByCDS plugin starting');
+            //console.log('ColorByCDS plugin starting');
         }
     });
 });
