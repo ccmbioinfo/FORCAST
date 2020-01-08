@@ -13,7 +13,7 @@ then
   exit
 fi
 
-cd dicey
+cd ../../bin/dicey
 
 if [ ! -d ./indexes ]
 then
