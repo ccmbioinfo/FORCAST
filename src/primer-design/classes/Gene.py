@@ -108,7 +108,15 @@ class Gene(object):
 		except (KeyError, IndexError) as err:
 			returnError("No features found for this gene")
 
-		symbol = geneInfo['external_name']
+		if 'external_name' in geneInfo:
+			symbol = geneInfo['external_name']
+		elif 'gene_id' in geneInfo:
+			symbol = geneInfo['gene_id']
+		elif 'id' in geneInfo:
+			symbol = geneInfo['id']
+		else:
+			returnError("Unable to determine gene symbol from Ensembl API Response")
+
 		chromosome = geneInfo['seq_region_name']
 		gene_start = geneInfo['start']
 		gene_end = geneInfo['end']
