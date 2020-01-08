@@ -9,55 +9,78 @@
 [Troubleshooting](#troubleshooting)<br>
 
 ## Hardware Requirements
-To run CasCADe natively, please use a machine runnning Ubuntu 16.04. Alternately, you can install CasCADe on any machine running a [docker-compatible operating system](https://docs.docker.com/install/). In either case, a minimum of 8GB of RAM and 100GB of hard disk space is recommended.
+CasCADe can be installed on any machine running a [docker-compatible operating system](https://docs.docker.com/install/). Alternately, to run CasCADe natively, Ubuntu 16.04 is required.
+
+In either case, a minimum of 8GB of RAM and 100GB of hard disk space is recommended.
 
 ## Installing with Docker
-Install the [docker engine](https://docs.docker.com/install/). If using Linux, install [docker compose](https://docs.docker.com/compose/install/) (this is included by default in Mac and Windows installations of docker). 
+First, install the [docker engine](https://docs.docker.com/install/). If using Linux, also install [docker compose](https://docs.docker.com/compose/install/) (this is included by default in Mac and Windows installations of docker).
 
-Then, clone or download the CasCADe repository. The default organism in the .env file is yeast (Saccharomyces_cerevisiae, R64-1-1), change this to your organism and genome assembly of interest if it is different. A full list of available genomes can be found on [Ensembl](ftp://ftp.ensembl.org/pub/release-98/fasta/).
+Clone the CasCADe repository:
+```
+    git clone https://github.com/ccmbioinfo/CasCADe.git
+```
 
-After modifying the .env file, type `docker-compose up` on the command line from within the CasCADe directory. Depending on the size of your organism, it may take several hours to build the index files. Once the setup is complete, CasCADe should be available via web browser at your server's domain address (or localhost if running locally).
+Navigate to the `CasCADe` directory. By default, the `.env` file defines yeast (*Saccharomyces_cerevisiae*) as the organism of interest with genome assembly R64-1-1:
+```
+    ORGANISM=Saccharomyces_cerevisiae
+    ASSEMBLY=R64-1-1
+```
+
+Change these defaults to your desired organism/genome build if they are different. A full list of available genomes can be found at [ftp://ftp.ensembl.org/pub/release-98/fasta](ftp://ftp.ensembl.org/pub/release-98/fasta/).
+
+From within the `CasCADe` directory, build the docker container:
+
+```docker-compose up```
+
+Depending on the size of your organism, it may take several hours to download the genome and build the index files. Once the setup is complete, CasCADe should be available via web browser at your server's domain address (or at localhost if running locally).
 
 ## Installing Natively
-  Make sure that your user account has ```sudo``` privilege before installing CasCADe.
-  Run the following commands to install git.
+(Requires `sudo` privileges and a machine running Ubuntu 16.04)
+
+Install git and apache2:
   ```
     sudo apt-get update
     sudo apt-get install -y git apache2
   ```
-  Navigate to a folder where you would like to install CasCADe (must be a folder that can be served by apache2, e.g. ```/var/www/html```, remove the index.html file if it exists, and type
+ 
+Navigate to a folder where you would like to install CasCADe. It must be a folder that can be served by apache2 (i.e. `var/www/html`) and remove the index.html file if it exists
+```
+cd /var/www/html
+rm index.html
+```
+
+Clone the CasCADe repo:
   ```
     git clone https://github.com/ccmbioinfo/CasCADe.git
   ```    
-  to clone the CasCADe repo.
+
  Then, run the installation script using the command below
  ```
-    cd installation
-    ./install_debian.sh <path to the folder where you cloned CasCADe to>
+    cd CasCADe/src/installation
+    ./install.sh /var/www/html/CasCADe
  ```
-for example if you cloned CasCADe to  the folder /var/www/html/CasCADe then you would run
- ```
-    ./install_debian.sh /var/www/html/CasCADe
- ```
+
 If the installation process halts with a message ```Default Kerberos version 5 realm:```, press Enter
 
-After the installation step is completed, start the mongodb server by running ```systemctl start mongod```. Then, navigate to the ```setup_script``` folder under the root directory for example: ``` /var/www/html/CasCADe/setup_script``` and run the following command to setup Jbrowse, the BLAST database and mongodb for the organism of your choice (-g flag requires the Ensembl name of the organism and -v flag requries the assembly version). Command below uses saccharomyces_cerevisiae and R64-1-1 as an example. You can find the list of Ensembl genomes at this link: ``` ftp://ftp.ensembl.org/pub/release-98/fasta/```
-```
-    python3 setup.py -r /var/www/html/CasCADe -g saccharomyces_cerevisiae -v R64-1-1 -fa2bit /var/www/html/CasCADe/tools/usrLocalBin/faToTwoBit -b /var/www/html/CasCADe/dependencies/ncbi-blast-2.7.1+/bin
-```
-replace ```/var/www/html/CasCADe``` in the command above with the full path to your root directory, if it's different. 
+After the installation step is completed, start the mongodb server: `systemctl start mongod`
 
-Now run the script ```setPermissions.sh``` found in CasCADe's ```installation``` folder to grant apache the correct file permissions.
+Then, navigate to the `src/setup` folder under the root directory (e.g.`/var/www/html/CasCADe/src/setup`), and run the following command to setup Jbrowse, the BLAST database and mongodb.
 ```
-    cd /var/www/html/CasCADe/installation
+    python3 setup.py -r /var/www/html/CasCADe -g Saccharomyces_cerevisiae -v R64-1-1 -fa2bit /var/www/html/CasCADe/bin/faToTwoBit -b /var/www/html/CasCADe/bin/ncbi-blast-2.7.1+/bin
+```
+
+Replace the default organism (*Saccharomyces_cerevisiae*) and its genome build (**R64-1-1**) with your organism and build of interest. A full list of available genomes can be found at [ftp://ftp.ensembl.org/pub/release-98/fasta](ftp://ftp.ensembl.org/pub/release-98/fasta/). 
+
+Now, run the script to grant apache the correct file permissions.
+```
+    cd /var/www/html/CasCADe/src/installation
     ./setPermissions.sh
-    
 ```
-again, replace ```/var/www/html/CasCADe``` in the command above with the full path to your root directory, if it's different. 
 
 Next, the apache server needs to be configured to make the tool web accessible.
 
-Open the file ```/etc/apache2/sites-available/000-default.conf```, modify the DocumentRoot (if it is different) to the location where CasCADe was installed (i.e. ```DocumentRoot <path to your root folder>```), and add this section below:
+Open the file ```/etc/apache2/sites-available/000-default.conf```, and modify the DocumentRoot to the location where CasCADe was installed, and add this section below:
 ```
      <Directory '/var/www/html/CasCADe'>
         Options +ExecCGI
@@ -65,19 +88,21 @@ Open the file ```/etc/apache2/sites-available/000-default.conf```, modify the Do
         Allow from all
      </Directory>
 ```
-again, replace ```/var/www/html/CasCADe``` in the command above with the full path to your root directory, if it's different. 
 
-Then, restart apache2 using ```systemctl restart apache2```
-Also, start mongodb process using ```systemctl start mongodb```
-
-CasCADe should now be accessible from your browser at ```http://<your servers address>``` for example if your VM's IP address is ```172.20.20.20```, you can type : ```http://172.20.20.20``` in your browser to access CasCADe.
-
-To enable In Silico PCR tool [Dicey](https://github.com/gear-genomics/dicey) (a.k.a. [Silica](https://www.gear-genomics.com/silica/)), run the ```enable_dicey.sh``` script, providing your organism of interest and genome version: 
+Then, restart apache2 and start mongo
 ```
- cd /var/www/html/CasCADe
+    systemctl restart apache2
+    systemctl start mongodb
+```
+
+CasCADe should now be accessible from your browser at ```http://<your servers address>```. For example if your VM's IP address is ```172.20.20.20```, you can type : ```http://172.20.20.20``` in your browser to access CasCADe.
+
+To enable In Silico PCR tool [Dicey](https://github.com/gear-genomics/dicey) (a.k.a. [Silica](https://www.gear-genomics.com/silica/)), run the ```enable_dicey.sh``` script. Again provide your organism of interest and genome assembly in place of *Saccharomyces_cerevisiae* and R64-1-1:
+```
+ cd /var/www/html/CasCADe/src/setup
  ./enable_dicey Saccharomyces_cerevisiae R64-1-1
 ```
-Which will fetch and rename the index files if they're available.
+Which will fetch and name the index files if they're available.
 
 If you want your installation of CasCADe to be secured by https, please refer to apache2's documentation on how to enable https module.
 
