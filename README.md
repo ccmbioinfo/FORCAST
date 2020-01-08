@@ -33,7 +33,7 @@ From within the `CasCADe` directory, build the docker container:
 
 ```docker-compose up```
 
-Depending on the size of your organism, it may take several hours to download the genome and build the index files. Once the setup is complete, CasCADe should be available via web browser at your server's domain address (or at localhost if running locally).
+Depending on the size of your organism, it may take several hours to download the genome and build the index files. Once the setup is complete, the message: ` * Starting Apache httpd web server apache2 * ` will be displayed. CasCADe should be available via web browser at your server's domain address (or at localhost if running locally).
 
 ## Installing Natively
 (Requires `sudo` privileges and a machine running Ubuntu 16.04)
