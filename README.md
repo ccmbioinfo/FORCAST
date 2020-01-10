@@ -83,20 +83,19 @@ Next, the apache server needs to be configured to make the tool web accessible.
 Open the file ```/etc/apache2/sites-available/000-default.conf```, modify the DocumentRoot to the location where CasCADe was installed, and add this section below:
 ```
     DocumentRoot /var/www/html/CasCADe
-     <Directory '/var/www/html/CasCADe'>
+    <Directory '/var/www/html/CasCADe'>
         Options +ExecCGI
         AddHandler cgi-script .py
         Allow from all
-     </Directory>
+    </Directory>
 ```
 
-Then, restart apache2 and start mongo
+Then, restart apache2
 ```
     systemctl restart apache2
-    systemctl start mongodb
 ```
 
-CasCADe should now be accessible from your browser at ```http://<your servers address>```. For example if your VM's IP address is ```172.20.20.20```, you can type : ```http://172.20.20.20``` in your browser to access CasCADe.
+CasCADe should now be accessible from your browser at ```http://<your servers address>```. For example, if your VM's IP address is ```172.20.20.20```, you can type : ```http://172.20.20.20``` in your browser to access CasCADe.
 
 To enable In Silico PCR tool [Dicey](https://github.com/gear-genomics/dicey) (a.k.a. [Silica](https://www.gear-genomics.com/silica/)), run the ```enable_dicey.sh``` script. Again provide your organism of interest and genome assembly in place of *Saccharomyces_cerevisiae* and R64-1-1:
 ```
