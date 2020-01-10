@@ -61,7 +61,6 @@ def check_md5sum(sumfile,file_to_check):
     if download_file_md5sum[0] == ensemble_md5sum[0] :
         return True
     return False
-        
 
 def download_and_check(ftp_handle,ftp_directory,checksum_file,file_type,file_suffix,glob_suffix,jbrowse_download_directory,checksum_func):
     
@@ -410,7 +409,8 @@ def load_geneinfo_RGENs_into_Mongo(jbrowse_download_directory, mongo_username, m
     
     for collection_name in (gene_info_collection, meta_data_collection):
         if collection_name in pyMongoClient[mongo_database].collection_names():
-            return(collection_name + " already exists in Mongo database")
+            print(collection_name + " already exists in Mongo database")
+            return True
     
     gene_info_collection_obj = pyMongoClient[mongo_database][gene_info_collection]
     meta_data_collection_obj = pyMongoClient[mongo_database][meta_data_collection]
@@ -433,6 +433,7 @@ def load_geneinfo_RGENs_into_Mongo(jbrowse_download_directory, mongo_username, m
     except Exception as err:
         return(err)
 
+    print("Succesfully inserted gene annotations and RGENs into Mongo database.")
     return True
 
 def create_blastdb(jbrowse_download_directory, blastdb_directory, genome_version, blast_path):
