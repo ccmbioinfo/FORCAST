@@ -80,8 +80,9 @@ Now, run the script to grant apache the correct file permissions.
 
 Next, the apache server needs to be configured to make the tool web accessible.
 
-Open the file ```/etc/apache2/sites-available/000-default.conf```, and modify the DocumentRoot to the location where CasCADe was installed, and add this section below:
+Open the file ```/etc/apache2/sites-available/000-default.conf```, modify the DocumentRoot to the location where CasCADe was installed, and add this section below:
 ```
+    DocumentRoot /var/www/html/CasCADe
      <Directory '/var/www/html/CasCADe'>
         Options +ExecCGI
         AddHandler cgi-script .py
