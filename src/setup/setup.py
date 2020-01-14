@@ -66,13 +66,13 @@ if os.path.exists(jbrowse_download_directory) is False:
         os.chmod(jbrowse_download_directory,0o777)
     except Exception as err:
         print_and_exit(err)
-    else:
-        print("Directory "+ jbrowse_download_directory +" already exists. Skipping creation")
-        os.chmod(jbrowse_download_directory,0o777)
+else:
+    print("Directory "+ jbrowse_download_directory +" already exists. Skipping creation")
+    os.chmod(jbrowse_download_directory,0o777)
 
 data_exists = False
 # skip when flag set or genome files already downloaded
-if arg.skip_download:
+if args.skip_download:
     print("--skip-download flag is specified on command line. Skipping download from Ensembl")
 elif os.listdir(jbrowse_download_directory):
     data_exists = True
@@ -80,7 +80,7 @@ elif os.listdir(jbrowse_download_directory):
 else:
     # download files from Ensembl
     return_value = download_files_from_ensembl(jbrowse_path, jbrowse_data_directory, jbrowse_download_directory, args.genome_file, args.genome.lower(), ENSEMBL_VERSION)
-    if not return_value:
+    if return_value is not True:
         print_and_exit("Downloading files from Ensembl failed with error: "+ str(return_value))
 
 if args.genome_file:
@@ -96,7 +96,7 @@ if args.skip_download_processing:
 elif data_exists:
     print("Skipping processing of data from Ensembl")
 else:
-    #process downloaded files
+    # process downloaded files
     print("Processing downloaded files")
     return_value = process_files_for_upload(args.root_path, jbrowse_download_directory, args.genome_version, args.faToTwoBit_path)
     if return_value is not True:
@@ -107,7 +107,7 @@ if args.skip_jbrowse_load:
 elif os.path.exists(os.path.join(jbrowse_data_directory, "gRNA_CRISPR.gff")) and os.path.exists(os.path.join(jbrowse_data_directory, "acceptedPrimers.gff")):
     print("GFF files for genome exist. Skipping loading data into JBrowse")
 else:    
-    #process data & load into JBrowse.
+    # process data & load into JBrowse.
     if args.skip_jbrowse_load_genome is False:
         return_value = load_genome_into_JBrowse(jbrowse_path, jbrowse_data_directory, jbrowse_download_directory)
         if return_value is not True:
