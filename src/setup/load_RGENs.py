@@ -3,7 +3,7 @@
 """
 Hillary Elrick October 29th, 2019
 
-Script to load or replace RGENs stored in the database to be used in designs by CasCADe.
+Script to load or replace RGENs stored in the database to be used in designs by ForCasT.
 Looks for the rgens.json file in the same directory as the script and requires the CLI of either 'update' or 'replace'.
 Warning: replacing the RGEN database will unlink existing guides in the database from their RGENs
 """

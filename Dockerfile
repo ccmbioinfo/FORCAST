@@ -11,7 +11,7 @@ RUN apt-get update && \
 # CHANGE DOCUMENT ROOT AND SERVERNAME
 WORKDIR /etc/apache2
 RUN sed -i -e "/DocumentRoot/a \ \t\<Directory \'\/var\/www\/html\'\>\n\t\tOptions +ExecCGI\n\t\tAddHandler cgi-script .py\n\t\tAllow from all\n\t</Directory\>" sites-available/000-default.conf
-RUN sed -i '1 i\ServerName CasCADe' apache2.conf
+RUN sed -i '1 i\ServerName ForCasT' apache2.conf
 
 # GET HOST CODE
 COPY . /var/www/html/
