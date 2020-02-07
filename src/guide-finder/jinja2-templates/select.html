@@ -96,10 +96,22 @@
         .max-exceeded {
             font-size: 0.75rem;
             padding: 0.5rem;
-            color: #721c24;
+            color: #975b00;
+            background-color: #fff2c1;
+            border-color: #f5c6cb;
+            width: 75%;
+            margin: auto;
+            border: 1px solid transparent;
+            border-radius: .25rem;
+            margin-top: 0.5rem;
+        }
+        .skip-scoring {
+            font-size: 0.75rem;
+            padding: 0.5rem;
+            color: #89454b;
             background-color: #f8d7da;
             border-color: #f5c6cb;
-            width: 50%;
+            width: 75%;
             margin: auto;
             border: 1px solid transparent;
             border-radius: .25rem;
@@ -216,6 +228,7 @@
         }
 
         function validateRegion() {
+            let searchInput = $('#searchInput').val();
             // auto-format jbrowse's location
             if (searchInput.split("..").length == 2){
                 searchInput = searchInput.replace("..","-");
@@ -225,7 +238,6 @@
             return true
             // reset tooltip
             $('#searchInput').tooltip('hide');
-            let searchInput = $('#searchInput').val();
             if (searchInput.length == 0) {return false;}
             // check input formatted correctly
             let separated = searchInput.split(":");

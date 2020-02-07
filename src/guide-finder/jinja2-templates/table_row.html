@@ -15,14 +15,14 @@
 <td class="text-nowrap">{{ guideSeq }}</td>
 <td class="text-nowrap">{{ guideLocation }}</td>
 {% if 'MIT' in guide %}
-	{% if guide['max_exceeded'] == True %}
+	{% if guide['max_exceeded'] == True or guide['skip'] == True %}
 		<td>-</td>
 	{% else %}
 		<td>{{ guide["MIT"] }}</td>
 	{% endif %}
 {% endif %}
 {% if 'CFD' in guide %}
-	{% if guide['max_exceeded'] == True %}
+	{% if guide['max_exceeded'] == True or guide['skip'] == True %}
 		<td>-</td>
 	{% else %}
 		<td>{{ guide["CFD"] }}</td>
@@ -32,4 +32,3 @@
 	{{offtargetModal}}	
 </td>
 </tr>
-<!--onclick="toggleCheckbox('{{guideID}}');"-->
