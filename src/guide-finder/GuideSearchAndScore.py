@@ -74,6 +74,12 @@ class GuideSearchAndScore:
         else:
             self.guideLength = kwargs['guideLength']
 
+        # check maxOffTargets sent
+        if 'maxOffTargets' not in kwargs:
+            self.sendError("Max off targets is not set")
+        else:
+            self.maxOffTargets = kwargs['maxOffTargets']
+        
         #TODO: implement
         if 'offtargetPAMS' in kwargs:
             self.offTargetPAMS = kwargs['offtargetPAMS']
@@ -563,7 +569,7 @@ class GuideSearchAndScore:
             time_2 = time.time()
             print("Finished finding gRNAs. " + str(round(time_2-time_1,4)))
             print("Searching for potential off target sites...")
-        guideDict = find_offtargets.findOffTargets(guideDict, self.rgenID, self.genome, batchID, genome_fa, tempfiles_path)
+        guideDict = find_offtargets.findOffTargets(guideDict, self.rgenID, self.genome, self.maxOffTargets, batchID, genome_fa, tempfiles_path)
         if self.cli: 
             time_3 = time.time()
             print("Finished finding offtargets. " + str(round(time_3-time_2,4)))
@@ -611,39 +617,45 @@ def main():
         print("Content-type: text/html\n")
         inputForm = cgi.FieldStorage()
         parameters = {}
-        for arg in ['searchInput', 'genome', 'gene', 'rgenID', 'guideLength', 'offtargetPAMs']:
+        parameters['command-line'] = False
+
+        for arg in ['searchInput', 'genome', 'gene', 'rgenID', 'guideLength', 'offtargetPAMs', 'setMax', 'maxOffTargets']:
             if inputForm.getvalue(arg) is not None:
                 parameters[arg] = inputForm.getvalue(arg)
 
-        parameters['command-line'] = False        
+        # only use the max if the checkbox is selected
+        parameters['maxOffTargets'] = parameters['maxOffTargets'] if parameters['setMax'] == 'true' else None
+        
         GuideSearchAndScore(**parameters)
     else:
         desc = """ The command-line version of GuideSearchAndScore.py will return potential guides along with their scores and off-targets.
-        It requires:
-          genome of interest (--genome)
-          chromosomal search input in chrX:start-end format (--input)
-          gene of interest (--gene)
-          rgenID of RGEN to use (--rgenID)
-          length of protospacers (--spacer)
-          output file (--output)
          """
         
         parser = argparse.ArgumentParser(prog='GuideSearchAndScore',description=desc)
-        parser.add_argument('--genome', help='Genome database (e.g. mm10)', required=True)
-        parser.add_argument('--input', help='Chromosomal coordinates for region of interest', required=True)
-        parser.add_argument('--gene', help='Gene of interest', required=True)
-        parser.add_argument('--rgenID', nargs='?', default=1, help='id of desired RGEN') # default to 1
-        parser.add_argument('--spacer', nargs='?', default=20, type=int, help='Length of protospacer (e.g. 20)') # default to 20
-        parser.add_argument('--output', help='Location of output csv file', required=True)
+        parser._action_groups.pop()
+        required = parser.add_argument_group('required arguments')
+        optional = parser.add_argument_group('optional arguments')
+        required.add_argument('--genome', help='Genome database (e.g. mm10)', required=True)
+        required.add_argument('--input', help='Chromosomal coordinates for region of interest', required=True)
+        required.add_argument('--gene', help='Gene of interest', required=True)
+        required.add_argument('--output', help='Location of output csv file', required=True)
+        # optional flags:
+        # default RGEN to 1 (SpCas9 with unmodified rgens.json)
+        optional.add_argument('--rgenID', nargs='?', default=1, help='id of desired RGEN')
+        # default guide length (protospacer) to 20
+        optional.add_argument('--spacer', nargs='?', default=20, type=int, help='Length of protospacer (e.g. 20)')
+        # default max off targets to 1000
+        optional.add_argument('--maxOffTargets', nargs='?', default=1000, type=int, help='Maximum number of off-targets to consider for any guide. Use -1 for no max')
         args = parser.parse_args()
 
         parameters = {
             'genome': args.genome,
             'searchInput': args.input,
             'gene': args.gene,
+            'output': args.output,
             'rgenID': args.rgenID,
             'guideLength': args.spacer,
-            'output': args.output,
+            'maxOffTargets': None if args.maxOffTargets == -1 else args.maxOffTargets, # convert -1 to False for CLI
             'command-line': True
         }
         GuideSearchAndScore(**parameters)
