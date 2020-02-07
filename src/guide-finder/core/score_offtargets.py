@@ -43,6 +43,8 @@ def cfdScore(guideDict):
 			# don't report aggregated CFD score if off target list was truncated
 			guide['CFD'] = '0'
 			continue
+		elif guide['skip']:
+			guide['CFD'] = '-1' # show below max_exceeded
 		
 		guideSeq = str(guide['guide_seq'])
 		cumulative_score = []
@@ -78,6 +80,9 @@ def mitScore(guideDict, rgenRecod):
 		if guide['max_exceeded']:
 			# don't calculate MIT score if off target list was truncated
 			guide['MIT'] = '0'
+			continue
+		elif guide['skip']:
+			guide['MIT'] = '-1' # show below max_exceeded
 			continue
 		
 		guideSeq = str(guide['guide_seq'])
@@ -141,6 +146,9 @@ def defaultRank(guideDict):
 		cumulative_rank = 0
 		if guide['max_exceeded']:
 			cumulative_rank = 10**(5) # add large weight
+		elif guide['skip']:
+			cumulative_rank = 10**(5) + 1 # show below max_exceeded
+
 		for i, count in enumerate(guide['offtarget_counts']):
 			cumulative_rank += (int(count)*(10**(4-i)))
 

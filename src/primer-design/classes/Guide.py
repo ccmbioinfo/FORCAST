@@ -91,10 +91,9 @@ class Guide(Gene):
 		try:
 			for e in elements:
 				if e['feature_type'] == 'transcript':
-					if self.super.geneName not in e['external_name']:
+					if str(self.super.ensemblID) != str(e['Parent']):
 						tempDict = {}
 						tempDict['feature_type'] = e['feature_type']
-						tempDict['external_name'] = e['external_name']
 						tempDict['start'] = e['start']
 						tempDict['end'] = e['end']
 						tempDict['chr'] = e['seq_region_name']
@@ -109,7 +108,7 @@ class Guide(Gene):
 					tempDict['description'] = e['description']
 					filteredElements.append(tempDict)
 		except Exception, e:
-			returnError("Problem parsing the regulatory elements" + str(e))
+			returnError("Problem parsing regulatory elements during QA" + str(e))
 
 		if len(filteredElements) > 0:
 			print(

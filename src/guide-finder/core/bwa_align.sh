@@ -25,7 +25,6 @@ fi
 saifile=$basefilename.sai
 bwa aln -n 4 -l 0 -o 0 -t 2 -N "${bwa_index}" "${tempfiles}/${fastafile}" > "${tempfiles}/${saifile}"
 
-
 if [ ! -f "${tempfiles}/$saifile" ]; then
 	echo "Error at bwa aln step, check bwa index or input fasta ${2}"	
 	exit 1
@@ -33,7 +32,7 @@ fi
 
 # convert the sai file to sam, and convert multiple alignments to individual reads
 samfile=$basefilename.sam
-bwa samse -n 1000000 "${bwa_index}" "${tempfiles}/${saifile}" "${tempfiles}/${fastafile}" | "${dir_path}/xa2multi.pl" > "${tempfiles}/${samfile}"
+bwa samse -n 50000 "${bwa_index}" "${tempfiles}/${saifile}" "${tempfiles}/${fastafile}" | "${dir_path}/xa2multi.pl" > "${tempfiles}/${samfile}"
 
 if [ ! -f "${tempfiles}/$samfile" ]; then
 	echo "Error at bwa samse or xa2multi.pl step"	
@@ -58,5 +57,4 @@ if [ ! -f "${tempfiles}/$bedfile" ]; then
 	exit 1
 fi
 
-# end result is a bed file which has its coordinates extended to include a PAM and is then converted to fasta
-
+# end result is a bed file of the guides from the input fasta along with their offtargets

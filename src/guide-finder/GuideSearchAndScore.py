@@ -410,11 +410,17 @@ class GuideSearchAndScore:
                 total_offtargets_processed = 0
                 with open(self.output_file, mode='w') as csv_file:
                     writer = csv.writer(csv_file, delimiter=",")
+                    num_skipped = 0
+                    num_exceeded = 0
                     for guideID, guide in self.guideDict.items():
                         writer.writerow([str(guideID)+":"])
                         if guide['max_exceeded']:
                             writer.writerow(['Max off target sites exceeded ('+str(sum(guide['offtarget_counts']))+" shown)"])
                             total_offtargets_processed += 1000
+                            num_exceeded += 1
+                        elif guide['skip']:
+                            writer.writerow(['Multiple hits with <= 1 mismatch found in genome. Skipped finding off-targets'])
+                            num_skipped += 1
                         else:
                             writer.writerow(['Total number of potential off-target sites:' + str(sum(guide['offtarget_counts']))])
                             total_offtargets_processed += sum(guide['offtarget_counts']) 
@@ -426,16 +432,22 @@ class GuideSearchAndScore:
                             writer.writerow(['CFD Score: ' + str(guide['CFD'])])
                         writer.writerow(['Location', 'Sequence', 'Mismatches', 'Context'])
                         writer.writerow([self.calculateLocation(guide), self.formatSequence(guide['guide_seq'], guide['pam_seq']), '0', 'guide'])
-                        for offtarget in guide['offtargets']:
-                            row = [offtarget['loc']]
-                            row.append(self.formatSequence(offtarget['seq'], offtarget['pam']))
-                            row.append(countLower(offtarget['seq']))
-                            try:
-                                row.append(offtarget['context'])
-                            except Exception as e:
-                                row.append('-')
-                            writer.writerow(row)
-                        writer.writerow(['TOTAL OFF TARGETS PROCESSED: ', str(total_offtargets_processed)])
+                    writer.writerow([str(len(self.guideDict.keys()))+" GUIDES FOUND"]) 
+                    writer.writerow([str(num_skipped)+" SKIPPED"])
+                    writer.writerow([str(num_exceeded)+" EXCEEDED MAX OFF TARGETS"])
+                    writer.writerow([str(total_offtargets_processed)+" OFF TARGETS FOUND"])
+                    """
+                    # UNCOMMENT TO GET ALL THE OFF TARGETS
+                    for offtarget in guide['offtargets']:
+                        row = [offtarget['loc']]
+                        row.append(self.formatSequence(offtarget['seq'], offtarget['pam']))
+                        row.append(countLower(offtarget['seq']))
+                        try:
+                            row.append(offtarget['context'])
+                        except Exception as e:
+                            row.append('-')
+                        writer.writerow(row)
+                    """
         else:    
             for guideID, guide in self.guideDict.items():            
                 csv_path = os.path.join(self.dbConnection.ROOT_PATH,'src/guide-finder/tempfiles', self.batchID+"_"+guideID+".csv")
@@ -444,9 +456,9 @@ class GuideSearchAndScore:
                         writer = csv.writer(csv_file, delimiter=',')
                         # build and write heading row 
                         column_headings = ['chromosome', 'location', 'strand', 'protospacer sequence', 'PAM', 'mismatches', 'context']
-                        if 'MIT' in self.scores and not guide['max_exceeded']:
+                        if 'MIT' in self.scores and not (guide['max_exceeded'] or guide['skip']):
                             column_headings.append('MIT')
-                        if 'CFD' in self.scores and not guide['max_exceeded']:
+                        if 'CFD' in self.scores and not (guide['max_exceeded'] or guide['skip']):
                             column_headings.append('CFD')
                         column_headings.append('no mismatches in seed')
                         writer.writerow(column_headings)
@@ -459,9 +471,9 @@ class GuideSearchAndScore:
                         guide_row.append(guide['pam_seq'])
                         guide_row.append('0') # num mismatches
                         guide_row.append('guide') # context
-                        if 'MIT' in self.scores and not guide['max_exceeded']:
+                        if 'MIT' in self.scores and not (guide['max_exceeded'] or guide['skip']):
                             guide_row.append(guide['MIT'])
-                        if 'CFD' in self.scores and not guide['max_exceeded']:
+                        if 'CFD' in self.scores and not (guide['max_exceeded'] or guide['skip']):
                             guide_row.append(guide['CFD'])
                         guide_row.append('')
                         writer.writerow(guide_row)
@@ -469,7 +481,7 @@ class GuideSearchAndScore:
                         # initialize variables for determining whether offtarget has mismatch in seed
                         seedDirection = self.rgenRecord['SeedRegion'][0]
                         seedLength = int(self.rgenRecord['SeedRegion'][1:])
-                        # build and write row for each of the potential off target sites                        
+                        # build and write row for each of the potential off target sites                 
                         for offtarget in guide['offtargets']:
                             offtarget_row = offtarget['loc'].split(':')
                             offtarget_row.append(offtarget['seq'])
@@ -479,9 +491,9 @@ class GuideSearchAndScore:
                                 offtarget_row.append(offtarget['context'])
                             except Exception as e:
                                 offtarget_row.append('-')
-                            if 'MIT' in self.scores and not guide['max_exceeded']:
+                            if 'MIT' in self.scores and not (guide['max_exceeded'] or guide['skip']):
                                 offtarget_row.append(offtarget['MIT'])
-                            if 'CFD' in self.scores and not guide['max_exceeded']:
+                            if 'CFD' in self.scores and not (guide['max_exceeded'] or guide['skip']):
                                 offtarget_row.append(offtarget['CFD'])
                             if self.hasMismatchInSeed(offtarget['seq'], seedDirection, seedLength, len(guide['guide_seq'])):
                                 offtarget_row.append('')
@@ -489,6 +501,8 @@ class GuideSearchAndScore:
                                 offtarget_row.append('*')
                             writer.writerow(offtarget_row)
                 except Exception as e:
+                    print(guideID)
+                    print(guide)
                     self.sendError("Error writing off target CSV file, "+str(e))
         
     def getENSID(self):
@@ -575,8 +589,8 @@ class GuideSearchAndScore:
         if inputSeq.count(":") == 1 and inputSeq.count("-") == 1:
             chrm = inputSeq.split(":")[0]
             start, end = list(map(int, (inputSeq.split(":")[1]).split("-")))
-            if abs(start-end) > 750:
-                self.sendError("Please enter an input sequence with fewer than 750 bases")
+            if abs(start-end) > 3000:
+                self.sendError("Please enter an input sequence with fewer than 3000 bases")
         else:
             self.sendError("Please enter input search sequence in 'chrX:start-end' format")
 

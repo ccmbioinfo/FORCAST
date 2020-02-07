@@ -26,20 +26,17 @@ def get_latest_ensembl_version():
         releaseRequest = requests.get(ensembl_url, headers={"Content-Type": "application/json"}, timeout=5)
     except requests.exceptions.Timeout:
         print("The Ensembl Rest API is not responding (https://rest.ensembl.org). Some functionality may be unavailable")
-        success = 0
+        return str(-1)
 	
     if not releaseRequest.ok:
         releaseRequest.raise_for_status()
         print("Problem fetching information from Ensembl")
-        success = 0
+        return str(-1)
 
     release = releaseRequest.json()['releases']
     # check if the release matches what is currently stored in Mongo
     if len(release) != 1:
         print ("Problem with call to Ensembl, multiple releases returned: " + str(",".join(map(str, release))))
-        success = 0 
-
-    if success == 0:
         return str(-1)
 
     return str(release[0])
@@ -61,7 +58,6 @@ def check_md5sum(sumfile,file_to_check):
     if download_file_md5sum[0] == ensemble_md5sum[0] :
         return True
     return False
-        
 
 def download_and_check(ftp_handle,ftp_directory,checksum_file,file_type,file_suffix,glob_suffix,jbrowse_download_directory,checksum_func):
     
@@ -113,12 +109,17 @@ def download_files_from_ensembl(jbrowse_path, jbrowse_data_directory, jbrowse_do
     ''' This function coordinates downloading required files from Ensembl to load into JBrowse and MongoDB in later steps'''
     try:
         with FTP(ENSEMBL_FTP) as ens_ftp:
-            
             ens_ftp.login() and print("Connected to Ensembl ftp directory")
-           
+
+            ftp_genome_directory = os.path.join("pub","release-"+str(ensembl_version), "fasta", genome, "dna")
+
             if genome_file_path is None:
-                
-                ens_ftp.cwd(os.path.join("pub","release-"+str(ensembl_version), "fasta", genome, "dna"))
+                # download chromosome files for genome from Ensembl 
+                try:
+                    ens_ftp.cwd(ftp_genome_directory)
+                except ftplib.error_perm:
+                    raise Exception("Unable to locate genome files for "+str(genome)+ ". Please ensure "+str(ftp_genome_directory)+" exists and is reachable")
+
                 chr_files = [file_name for file_name in ens_ftp.nlst() if '.dna.chromosome' in file_name]
                 ens_ftp.cwd("../../../../../")
                 
@@ -140,9 +141,13 @@ def download_files_from_ensembl(jbrowse_path, jbrowse_data_directory, jbrowse_do
                     subprocess.run("rm "+chr_file_string,shell=True)
                 else:
                     raise Exception("Error downloading Genome file. Please retry.")
-
-            ens_ftp.cwd(os.path.join("pub","release-"+str(ensembl_version), "fasta", genome, "dna"))
-            #Downloading gff file for gene annotations.
+            
+            try:
+                ens_ftp.cwd(ftp_genome_directory)
+            except ftplib.error_perm:
+                raise Exception("Unable to locate genome files for "+str(genome)+ ". Please ensure "+str(ftp_genome_directory)+" exists and is reachable")
+            
+            # download gff file for gene annotations.
             if download_and_check(ens_ftp,os.path.join("../../../gff3", genome),"crcsum.gff3.txt","Annotation gff file",ensembl_version + ".gff3.gz","*." + ensembl_version + ".gff3.gz",jbrowse_download_directory,check_crcsum) == True:
                 print("Annotation gff file successfully downloaded.")
             else:
@@ -155,8 +160,10 @@ def download_files_from_ensembl(jbrowse_path, jbrowse_data_directory, jbrowse_do
                 else:
                     raise Exception("Error downloading regulatory regions gff file. Please retry.")
     except Exception as err:
-            return(err)
+        return(err)
+
     return True
+
 
 def process_fasta_file(filename, genome_version, faToTwoBit_path):
     
@@ -410,7 +417,8 @@ def load_geneinfo_RGENs_into_Mongo(jbrowse_download_directory, mongo_username, m
     
     for collection_name in (gene_info_collection, meta_data_collection):
         if collection_name in pyMongoClient[mongo_database].collection_names():
-            return(collection_name + " already exists in Mongo database")
+            print(collection_name + " already exists in Mongo database")
+            return True
     
     gene_info_collection_obj = pyMongoClient[mongo_database][gene_info_collection]
     meta_data_collection_obj = pyMongoClient[mongo_database][meta_data_collection]
@@ -433,6 +441,7 @@ def load_geneinfo_RGENs_into_Mongo(jbrowse_download_directory, mongo_username, m
     except Exception as err:
         return(err)
 
+    print("Succesfully inserted gene annotations and RGENs into Mongo database.")
     return True
 
 def create_blastdb(jbrowse_download_directory, blastdb_directory, genome_version, blast_path):

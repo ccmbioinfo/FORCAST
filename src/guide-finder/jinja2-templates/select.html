@@ -6,7 +6,7 @@
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
     <link rel="icon" href="../../crispr-icon.png" sizes="100x100">
-    <title>CasCADe Guide Search</title>
+    <title>ForCasT Guide Search</title>
     <style>
         .title {
             padding: 1rem;
@@ -96,10 +96,22 @@
         .max-exceeded {
             font-size: 0.75rem;
             padding: 0.5rem;
-            color: #721c24;
+            color: #975b00;
+            background-color: #fff2c1;
+            border-color: #f5c6cb;
+            width: 75%;
+            margin: auto;
+            border: 1px solid transparent;
+            border-radius: .25rem;
+            margin-top: 0.5rem;
+        }
+        .skip-scoring {
+            font-size: 0.75rem;
+            padding: 0.5rem;
+            color: #89454b;
             background-color: #f8d7da;
             border-color: #f5c6cb;
-            width: 50%;
+            width: 75%;
             margin: auto;
             border: 1px solid transparent;
             border-radius: .25rem;
@@ -110,7 +122,7 @@
   <body>
 	<div class="container" style="padding: 1rem">
         <div class="title">
-        <h3 style="display:inline-block">Guide Selection for CasCADe</h3>
+        <h3 style="display:inline-block">Guide Selection for ForCasT</h3>
         </div>
 		<div id="accordion">
 			<div class="card">
@@ -216,6 +228,7 @@
         }
 
         function validateRegion() {
+            let searchInput = $('#searchInput').val();
             // auto-format jbrowse's location
             if (searchInput.split("..").length == 2){
                 searchInput = searchInput.replace("..","-");
@@ -225,7 +238,6 @@
             return true
             // reset tooltip
             $('#searchInput').tooltip('hide');
-            let searchInput = $('#searchInput').val();
             if (searchInput.length == 0) {return false;}
             // check input formatted correctly
             let separated = searchInput.split(":");
