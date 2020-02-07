@@ -85,17 +85,17 @@ Next, the apache server needs to be configured to make the tool web accessible.
 
 Open the file ```/etc/apache2/sites-available/000-default.conf```, and modify the DocumentRoot to the location where ForCasT was installed, and add this section below:
 ```
+     DocumentRoot /var/www/html/ForCasT
      <Directory '/var/www/html/ForCasT'>
         Options +ExecCGI
         AddHandler cgi-script .py
         Allow from all
-     </Directory>
+    </Directory>
 ```
 
-Then, restart apache2 and start mongo
+Then, restart apache2
 ```
     systemctl restart apache2
-    systemctl start mongodb
 ```
 
 ForCasT should now be accessible from your browser at ```http://<your servers address>```. For example if your VM's IP address is ```172.20.20.20```, you can type : ```http://172.20.20.20``` in your browser to access ForCasT.
