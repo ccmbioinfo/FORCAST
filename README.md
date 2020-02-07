@@ -2,7 +2,7 @@
 
 ## Contents  
 [Hardware Requirements](#hardware-requirements)<br>
-[Installing With Docker **RECOMMENDED**](#installing-with-docker)<br>
+[Installing With Docker *\*(RECOMMENDED)\**](#installing-with-docker)<br>
 [Installing Natively](#installing-natively)<br>
 [Customization](#customization)<br>
 [Migration](#migration)<br>
@@ -14,7 +14,7 @@ ForCasT can be installed on any machine running a [docker-compatible operating s
 In either case, a minimum of 8GB of RAM and 100GB of hard disk space is recommended.
 
 ## Installing with Docker
-**RECOMMENDED OPTION** 
+*\*RECOMMENDED OPTION\** 
 For first time users, and those using personal computers, this is the recommended way to install ForCasT.
 
 First, install the [docker engine](https://docs.docker.com/install/). If using Linux, also install [docker compose](https://docs.docker.com/compose/install/) (this is included by default in Mac and Windows installations of docker).
