@@ -76,8 +76,44 @@ body {
 	color: #8c8c8c;
 }
 
+.navigationIcon {
+	width: 1.2rem;
+	height: 1.2rem;
+}
+
+.navigationLink, .selectedNavigation {
+	font-family: 'Roboto', sans-serif;
+	font-size: 1.2rem;
+	vertical-align: top;
+}
+
+.workflow {
+	padding: 3rem 10rem 3rem 10rem;
+	text-align: center;
+}
+
+.workflow-icon {
+	width: 15rem;
+}
+
+.workflow-text {
+	color: white;
+	padding: 0.5rem;
+	font-size: 1rem;
+	font-weight: bold;
+}
+
+.workflow-card {
+	padding: 3rem;
+	display:inline-block;
+}
+
 .selectedNavigation, .selectedNavigation:hover {
 	color: white;	
+}
+
+.footer-link {
+	color: #dedede99;
 }
 
 .navigationLink:hover{
