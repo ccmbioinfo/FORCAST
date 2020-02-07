@@ -5,6 +5,7 @@ bin/primer3
 jbrowse/data.*
 jbrowse/Makefile
 jbrowse/setup.log
+jbrowse/jbrowse.conf
 config
 mongodb
 
