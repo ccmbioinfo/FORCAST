@@ -12,7 +12,7 @@
 		<link rel="stylesheet" href="bin/bootstrap-4.4.1-dist/css/bootstrap.min.css">
 		<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.6-rc.0/css/select2.min.css" rel="stylesheet">
 		<script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.6-rc.0/js/select2.min.js"></script>
-		<link rel="stylesheet" href="css/landing-page.css">
+		<link rel="stylesheet" href="css/doc-page.css">
 		<script src="js/functions.js"></script>
 		<link rel="icon" href="img/crispr-icon.png" sizes="100x100">
 	</head>
@@ -42,7 +42,23 @@
 		<div class="jumbotron">
 			<div class="container topPadding">
 				<h1 id="tool-title"><b>ForCasT</b></h1>
-				<p id="tool-desc">The <b>For</b> <b>Cas</b> <b>T</b>ool, or ForCasT, provides functionality to design, view, and evaluate guides and primers for CRISPR mutagenesis experiments in model organisms. It integrates existing tools including <a href="https://jbrowse.org/">JBrowse</a>, <a href="http://bio-bwa.sourceforge.net/">BWA</a>, <a href="https://bedtools.readthedocs.io">bedtools</a>, <a href="http://www.htslib.org/">SAMtools</a>, <a href="http://bioinfo.ut.ee/primer3-0.4.0/">Primer3</a>, <a href="https://blast.ncbi.nlm.nih.gov/Blast.cgi">BLAST</a>, and <a href="https://gear.embl.de/silica/">Silica</a> to create a complete pipeline.</p>
+				<p class="tool-desc">
+					The For Cas Tool, or <b>ForCasT</b>, enables researchers to design
+					Cas-mediated mutagenesis experiments in model organisms with ease. Any Ensembl genome can be loaded 
+					and explored in the tool with the interactive genome browser <a href="https://jbrowse.org/">JBrowse</a>. Given a target sequence,
+					potential guides can be generated using one of several possible RNA-guided endonulceases including Cas9, Cpf1/Cas12a, ScCas9, 
+					and others (custom RGENs are also possible). Guides are then evaluated for specificity by searching for potential off-targets with up to
+					4 mismatches across the genome of interest, scoring them, and assigning them a genetic context (intronic, exonic, intergenic).
+				</p>
+				<p class="tool-desc">
+					Genotyping primers can be automatically designed for a set of guides using <a href="http://bioinfo.ut.ee/primer3-0.4.0/">Primer3</a>.
+					Primers are evaluated for specificity using <a href="https://blast.ncbi.nlm.nih.gov/Blast.cgi">BLAST</a>, 
+					and <a href="https://gear.embl.de/silica/">Silica</a>. All oligonucleotides are visible in the genome browser as tracks and downloadable as doc, csv, or APE files. They are saved permanantly to
+					the database and can be re-visited and exported at any point.
+				</p>
+				<p class="tool-desc">
+					ForCasT provides a rigourous pipeline for genome editing and give you full control of your data. It's open source and
+					completely free to use, modify, and install. Visit our <a href="https://github.com/ccmbioinfo/ForCasT">GitHub</a> for installation instructions.
 			</div>
 		</div>
 		<!-- end jumbotron -->
@@ -51,7 +67,7 @@
 		<div class="workflow" >
 			<div class="workflow-card">
 				<img class="workflow-icon" src='img/database.png'>
-				<p class="workflow-text">Pre-Load Genome</p>
+				<p class="workflow-text">Download and Set up with Genome</p>
 			</div>
 			<div class="workflow-card">
 				<img class="workflow-icon" src='img/dna.png'>
@@ -64,12 +80,10 @@
 		</div>
 		<!-- end workflow description -->
 
-
-
 		</div>
 		<div class="footer">
 			<p class="footer-link">
-				Icons from <a href="https://www.flaticon.com/authors/smashicons" title="Smashicons">Smashicons</a> (<a href="https://www.flaticon.com/" title="Flaticon">flaticon.com</a>)
+				Icons from <a href="https://www.flaticon.com/" title="Flaticon">flaticon.com</a>
 			</p>
 		</div> 
 	</body>

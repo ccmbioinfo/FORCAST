@@ -117,6 +117,17 @@
             border-radius: .25rem;
             margin-top: 0.5rem;
         }
+        .settings-checkbox {
+            margin: 0.2rem;
+        }
+        #maxOffTargets {
+            width: 15%;
+            margin: 0.2rem;
+            display: inline-block;
+        }
+        .panel-title {
+            margin-bottom: 0.1rem;
+        }
     </style>
   </head>
   <body>
@@ -155,7 +166,21 @@
                         </div>
                         <div class="form-row">
                             <div class="form-group col-md-3"></div>
-                            <div class="form-group col-md-6 right">
+                            <div class="form-group col-md-5">
+                                <div class="panel-group">
+                                    <div class="panel panel-default">
+                                      <div class="panel-heading">
+                                        <p class="panel-title">
+                                          <a data-toggle="collapse" href="#advanced-settings" class="collapsed" aria-expanded="false">Advanced Settings</a>
+                                        </p>
+                                      </div>
+                                      <div id="advanced-settings" class="panel-collapse collapse" >
+                                       <input type="checkbox" class="settings-checkbox" id="setMax" checked>Max<input type="text" class="form-control" id="maxOffTargets" value="1000">potential off-targets per guide
+                                      </div>
+                                    </div>
+                                  </div>
+                                </div>
+                            <div class="form-group col-md-1 right">
                                 <button type="button" onclick="guideSearch()" class="btn btn-primary">Search</button>
                             </div>
                             <div class="form-group col-md-3"></div>
@@ -277,7 +302,9 @@
                     genome: getUrlVars()['genome'],
                     gene: $('#gene').val(),
                     rgenID: $('#RGENS').val(),
-                    guideLength: $('#protospacerLength').val()
+                    guideLength: $('#protospacerLength').val(),
+                    setMax: $('#setMax').prop('checked'),
+                    maxOffTargets: $('#maxOffTargets').val()
                 },
                 success: function(html){
                     $("#loadingIcon").hide();

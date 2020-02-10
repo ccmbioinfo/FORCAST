@@ -231,6 +231,7 @@ def changeCase(guide, offtarget_guide, offtarget_pam, pam_location):
 
 	return resultGuide, resultPam
 """
+
 def changeCase(guide, offtarget_guide):
 	""" change case to indicate matches/mismatches to offtarget """
 	assert (len(guide) == len(offtarget_guide)), "Guide and Off-Target must be of same length"
@@ -243,12 +244,12 @@ def changeCase(guide, offtarget_guide):
 
 	return resultGuide
 
-def countOffTargets(batchID, potentialGuides, rgen, tempfile_directory):
+def countOffTargets(batchID, potentialGuides, rgen, maxOffTargets, tempfile_directory):
 	"""
 	Given a batchID, list of potential guides, and an rgen, parse the extended fastas and get dict of off-targets.
 	Using the rgen, remove all the matches that aren't adjacent to a PAM motif
 	"""
-	offTargetMotifs = getMotifs(rgen['OffTargetPAMS']) # NB: OffTargetPAMS also includes the classical PAM for the rgen
+	offTargetMotifs = getMotifs(rgen['OffTargetPAMS']) # NB: OffTargetPAMS should also include the classical PAM for the rgen
 	pamLocation = rgen['PamLocation']
 	rgenSeed = rgen['SeedRegion']
 
@@ -271,7 +272,7 @@ def countOffTargets(batchID, potentialGuides, rgen, tempfile_directory):
 				strand = location[-1]
 				# only add off-target to guide's dict if it has the motif
 				if hasMotif(offTargetMotifs, pamLocation, strand, seq):
-					if sum(potentialGuides[guideID]['offtarget_counts']) >= 1000:
+					if maxOffTargets and sum(potentialGuides[guideID]['offtarget_counts']) >= int(maxOffTargets):
 						# don't track any more
 						potentialGuides[guideID]['max_exceeded'] = True 
 					else:
@@ -381,7 +382,7 @@ def screenRepetetive(batchID, potentialGuides, tempfile_directory):
 				potentialGuides[guideID]['skip'] = False
 
 
-def findOffTargets(potentialGuides, rgenID, genome, batchID, genome_fa, tempfile_directory):
+def findOffTargets(potentialGuides, rgenID, genome, maxOffTargets, batchID, genome_fa, tempfile_directory):
 	# connect to database and get rgen variables from id
 	rgen = getRgenRecord(rgenID)
 
@@ -397,7 +398,7 @@ def findOffTargets(potentialGuides, rgenID, genome, batchID, genome_fa, tempfile
 	#print("Converting bed coordinates to fasta")
 	convertExtendedBedToFasta(batchID, genome, genome_fa, tempfile_directory)
 	#print("Counting off-targets")
-	potentialGuides = countOffTargets(batchID, potentialGuides, rgen, tempfile_directory)
+	potentialGuides = countOffTargets(batchID, potentialGuides, rgen, maxOffTargets, tempfile_directory)
 
 	return potentialGuides
 	

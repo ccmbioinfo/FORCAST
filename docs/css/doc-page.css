@@ -15,10 +15,10 @@ body {
 
 .content {
 	flex: 1 0 auto;
-	padding-bottom: 3rem;
 }
 
 .topPadding {
+	max-width: 960px;
 	padding-top: 3rem;
 }
 
@@ -30,12 +30,11 @@ body {
 }
 
 .navbar {
-	background-color: none;
+	background-color: rgba(0,0,0,0.4);
 }
 
 .footer {
 	flex-shrink: 0;
-	background-color: rgba(0,0,0,0.5);
 	width: 100%;
 	bottom: 0;
 	left: 0;
@@ -88,12 +87,39 @@ body {
 }
 
 .workflow {
-	padding: 3rem 10rem 3rem 10rem;
+	padding: 1rem 10rem 3rem 10rem;
 	text-align: center;
 }
 
+.workflow-card {
+	padding: 3rem 2rem 0rem 2rem;
+	display:inline-block;
+}
+
 .workflow-icon {
-	width: 15rem;
+	width: 12rem;
+}
+
+@media screen and (max-width:1360px) {
+	.workflow {
+		padding: 1rem 5rem 1rem 5rem
+	}
+	.workflow-icon {
+		width: 8rem;
+	}
+	.workflow-card {
+		padding: 3rem 1rem 0rem 1rem;
+		display:inline-block;
+	}
+	.workflow-text {
+		font-size: 0.8rem;
+	}
+}
+
+@media screen and (max-width:1000px) {
+	.workflow-card {
+		display: block;
+	}
 }
 
 .workflow-text {
@@ -103,17 +129,13 @@ body {
 	font-weight: bold;
 }
 
-.workflow-card {
-	padding: 3rem;
-	display:inline-block;
-}
-
 .selectedNavigation, .selectedNavigation:hover {
 	color: white;	
 }
 
 .footer-link {
 	color: #dedede99;
+	font-size: 0.9rem;
 }
 
 .navigationLink:hover{
@@ -130,17 +152,17 @@ body {
 	color: white;
 }
 
-#tool-desc {
+.tool-desc {
 	color: white;
 }
 
-#tool-desc a {
+.tool-desc a {
 	color: white;
 	font-weight: bold;
 }
 
-#tool-desc b {
-	color: #4cbcde;
+.tool-desc b {
+	color: #45c0ff;
 }
 
 .select2-container {
@@ -151,4 +173,13 @@ body {
 	color: white;
 	background-color:#82cbff;
 	border: none;
+}
+
+.logos {
+	width: 15rem;
+}
+
+.logo-section {
+	text-align: center;
+	background-color:rgb(255, 255, 255, 0.8);
 }
