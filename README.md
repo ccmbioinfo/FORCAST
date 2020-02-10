@@ -30,13 +30,15 @@ Navigate to the `ForCasT` directory. By default, the `.env` file defines yeast (
     ASSEMBLY=R64-1-1
 ```
 
-Change these defaults to your desired organism/genome build if they are different. A full list of available genomes can be found at [ftp://ftp.ensembl.org/pub/release-98/fasta](ftp://ftp.ensembl.org/pub/release-98/fasta/).
+Change these defaults to your desired organism/genome build if they are different. A full list of available genomes can be found at [ftp://ftp.ensembl.org/pub/current_fasta](ftp://ftp.ensembl.org/pub/current_fasta).
 
 From within the `ForCasT` directory, build the docker container:
 
 ```docker-compose up```
 
-Depending on the size of your organism, it may take several hours to download the genome and build the index files. Once the setup is complete, the message: ` * Starting Apache httpd web server apache2 * ` will be displayed. ForCasT should be available via web browser at your server's domain address (or at localhost if running locally).
+Depending on the size of your organism, it may take several hours to download the genome and build the index files. Once the setup is complete, the message: ` * Starting Apache httpd web server apache2 * ` will be displayed. ForCasT should now be available via web browser at your server's domain address (or at localhost if running locally on your personal computer).
+
+Once you're finished using ForCasT, it can be shut-down by typing Ctrl-C and typing ```docker-compose down``` on the command-line. Your guides and primers will be saved to the ```/mongo``` folder and the indexed genome files saved to the ```/jbrowse``` folder for the next time you start up ForCasT (again via ```docker-compose up```).
 
 ## Installing Natively
 (Requires `sudo` privileges and a machine running Ubuntu 16.04)
