@@ -24,13 +24,13 @@ Clone the FORCAST repository:
     git clone https://github.com/ccmbioinfo/FORCAST.git
 ```
 
-Navigate to the `FORCAST` directory. By default, the `.env` file defines yeast (*Saccharomyces_cerevisiae*) as the organism of interest with genome assembly R64-1-1:
+Navigate to the `FORCAST` directory. The `sample.env` file defines yeast (*Saccharomyces_cerevisiae*) as the organism of interest with genome assembly R64-1-1:
 ```
     ORGANISM=Saccharomyces_cerevisiae
     ASSEMBLY=R64-1-1
 ```
 
-Change these defaults to your desired organism/genome build if they are different. A full list of available genomes can be found at [ftp://ftp.ensembl.org/pub/current_fasta](ftp://ftp.ensembl.org/pub/current_fasta).
+Rename the file to `.env` and change these defaults to your desired organism/genome build if they are different. A full list of available genomes can be found at [ftp://ftp.ensembl.org/pub/current_fasta](ftp://ftp.ensembl.org/pub/current_fasta).
 
 From within the `FORCAST` directory, build the docker container:
 
