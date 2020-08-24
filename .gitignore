@@ -1,5 +1,5 @@
 # program/data folders
-*.env
+.env
 bin/dicey
 bin/ncbi-blast-2.7.1+
 bin/primer3
