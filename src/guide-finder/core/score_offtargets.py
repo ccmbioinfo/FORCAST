@@ -17,6 +17,7 @@ sys.path.append(os.path.join(dir_path, "../../helpers"))
 from Config3 import Config
 from itertools import product
 import cfd_code.cfd_score_calculator3 as cfd
+import deep_cpf1_code.DeepCpf1.py as deep_cpf1
 
 def getRgenRecord(rgenID):
 	dbConnection = Config()	
@@ -62,7 +63,6 @@ def cfdScore(guideDict):
 		aggregate_score = int(round(aggregate_score*100))
 		guide['CFD'] = str(aggregate_score)
 		
-
 
 def mitScore(guideDict, rgenRecod):
 	"""
@@ -135,6 +135,17 @@ def mitScore(guideDict, rgenRecod):
 		aggregate_score = 100 / (100+sum(cumulative_score))
 		aggregate_score = int(round(aggregate_score*100))
 		guide['MIT'] = str(aggregate_score)
+
+
+def deepCpf1Score(guideDict, rgenRecod):
+	"""
+	Given a dict of guides, calculates the Deep Cpf1 score of each guide. 
+	Incorporates this information into the dict.
+
+	Method: Kim, H., Min, S., Song, M. et al. Deep learning improves prediction of CRISPR–Cpf1 guide RNA activity. 
+	Nat Biotechnol 36, 239–241 (2018). https://doi.org/10.1038/nbt.4061
+	"""
+	pass
 
 
 def defaultRank(guideDict):
