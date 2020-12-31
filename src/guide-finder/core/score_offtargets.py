@@ -17,6 +17,8 @@ sys.path.append(os.path.join(dir_path, "../../helpers"))
 from Config3 import Config
 from itertools import product
 import cfd_code.cfd_score_calculator3 as cfd
+sys.path.append(os.path.join(dir_path,"inDelphi-model"))
+import inDelphi
 
 def getRgenRecord(rgenID):
 	dbConnection = Config()	
@@ -29,11 +31,43 @@ def getRgenRecord(rgenID):
 		return
 
 
+def inDelphiScore(guideDict):
+	"""
+	Given a dict of guides, calculate the inDelphi score of each guide and adds this information to the dictionary
+
+	Method: Max W. Shen*, Mandana Arbab*, Jonathan Y. Hsu, Daniel Worstell, Sannie J. Culbertson, Olga Krabbe,
+	Christopher A. Cassa, David R. Liu, David K. Gifford, and Richard I. Sherwood.
+	"Predictable and precise template-free editing of pathogenic variants." Nature, 2018.
+	doi:10.1038/s41586-018-0686-x
+	"""
+	import math
+	inDelphi.init_model(celltype = 'mESC')
+
+	for guideID, guide in guideDict.items():
+		if guide['max_exceeded']:
+			guide['Precision'] = '0'
+			guide['Frameshift Frequency'] = '0'
+			guide['MH Strength'] = '0'
+			continue
+		elif guide['skip']:
+			guide['Precision'] = '-1'
+			guide['Frameshift Frequency'] = '-1'
+			guide['MH Strength'] = '0'
+
+		fullSeq = str(guide['guide_seq']) + str(guide['pam_seq']) + str(guide['guide_seq']) #FOR TESTING!
+		cutsite = len(guide['guide_seq'])
+
+		pred_df, stats = inDelphi.predict(fullSeq, cutsite)
+		guide['Precision'] = round(stats['Precision'],2)
+		guide['Frameshift Frequency'] = round(stats['Frameshift frequency'],2)
+		# from GitHub: natural log of phi refers to microhomology strength
+		guide['MH Strength'] = round(math.log(stats['Phi']),2)
+
 def cfdScore(guideDict):
 	"""
 	Given a dict of guides, calculates the CFD score of each of the off-targets as well as the cumulative CFD score
 	for the entire guide. Incorporates this information into the dict
-	
+
 	Method: Doench, 2016 (https://www.ncbi.nlm.nih.gov/pmc/articles/PMC4744125)
 	Code Included in Supplementary Materials
 	"""
@@ -45,7 +79,7 @@ def cfdScore(guideDict):
 			continue
 		elif guide['skip']:
 			guide['CFD'] = '-1' # show below max_exceeded
-		
+
 		guideSeq = str(guide['guide_seq'])
 		cumulative_score = []
 		for offtarget in guide['offtargets']:
@@ -61,7 +95,6 @@ def cfdScore(guideDict):
 		aggregate_score = 100 / (100+sum(cumulative_score))
 		aggregate_score = int(round(aggregate_score*100))
 		guide['CFD'] = str(aggregate_score)
-		
 
 
 def mitScore(guideDict, rgenRecod):
@@ -69,13 +102,13 @@ def mitScore(guideDict, rgenRecod):
 	Given a dict of guides, calculates the MIT score of each off-target as well as the cumulative MIT score
 	for the entire guide. Incorporates this information into the dict.
 
-	
+
 	Method: Hsu, 2013 (https://www.nature.com/articles/nbt.2647)
 	Values and scoring formula from: https://web.archive.org/web/20160825081629/http://crispr.mit.edu/about
-	Using sgRNA activity ratios for alternative pams from: https://www.ncbi.nlm.nih.gov/pmc/articles/PMC4744125  
+	Using sgRNA activity ratios for alternative pams from: https://www.ncbi.nlm.nih.gov/pmc/articles/PMC4744125
 	"""
 	M=[0,0,0.014,0,0,0.395,0.317,0,0.389,0.079,0.445,0.508,0.613,0.851,0.732,0.828,0.615,0.804,0.685,0.583]
-	
+
 	for guideID, guide in guideDict.items():
 		if guide['max_exceeded']:
 			# don't calculate MIT score if off target list was truncated
@@ -84,12 +117,12 @@ def mitScore(guideDict, rgenRecod):
 		elif guide['skip']:
 			guide['MIT'] = '-1' # show below max_exceeded
 			continue
-		
+
 		guideSeq = str(guide['guide_seq'])
 		cumulative_score = []
 		for offtarget in guide['offtargets']:
 			offSeq = offtarget['seq'].upper()
-			offPam = offtarget['pam'].upper()			
+			offPam = offtarget['pam'].upper()
 			assert (len(guideSeq) == len(offSeq)), "Guide and Off-target are different lengths"
 			score = 0
 			mismatches = []
@@ -98,7 +131,7 @@ def mitScore(guideDict, rgenRecod):
 				if str(guideSeq[i]) != str(offSeq[i]):
 					mismatches.append(i)
 					weight *= (1-M[i])
-			
+
 			if len(mismatches) == 0:
 				# no mismatches gets score of 1
 				score=1
@@ -109,12 +142,12 @@ def mitScore(guideDict, rgenRecod):
 				except ZeroDivisionError:
 					# handle only one mismatch
 					distance = 0
-				
-				# calculate term to multiply weight by 
+
+				# calculate term to multiply weight by
 				multiplier = ((19 - distance)/float(19)*4)+1
 				multiplier = (1.0/multiplier)
 				multiplier = multiplier * (1.0/(len(mismatches)**2))
-				
+
 				score = weight * multiplier * 100
 
 			# reduce scores for alternative PAMS
@@ -152,7 +185,7 @@ def defaultRank(guideDict):
 		for i, count in enumerate(guide['offtarget_counts']):
 			cumulative_rank += (int(count)*(10**(4-i)))
 
-		guide['Rank'] = cumulative_rank			
+		guide['Rank'] = cumulative_rank
 
 
 def scoreOffTargets(guideDict, rgenID):
@@ -165,11 +198,12 @@ def scoreOffTargets(guideDict, rgenID):
 			mitScore(guideDict, rgen["OffTargetPAMS"])
 		if 'CFD' in scores:
 			cfdScore(guideDict)
-		
-	defaultRank(guideDict)		
-			
+		if 'inDelphi' in scores:
+			inDelphiScore(guideDict)
+
+	defaultRank(guideDict)
 	return guideDict
-	
+
 
 def main():
 	scoreOffTargets({}, 1)
