@@ -116,7 +116,7 @@ def getCredentials():
 	config = {}
 	try:
 		config_file = open("/var/www/mongo.cred")
-	except Exception, e:
+	except Exception as e:
 		# this is ok it just means there are no credentials
 		return
 	for line in config_file:		
@@ -200,17 +200,18 @@ def fetchInstalledGenomes():
 
 
 def main():
-	print "A class for interfacing to the mongo database. Given a genome, connects to the correct database"
-	print "and stores the database, release, current gene collection, guide collection, and primer collection."
-	print "as attributes which other functions can access. Also stores the root path, i.e. where the web server"
-	print "points to and the jbrowse and primer design scripts are located. If the mongodb is secured"
-	print "with credentials, these are accessed from the mongo.cred file in var/www"
-	print "Databases currently available:"
+	desc = "A class for interfacing to the mongo database. Given a genome, connects to the correct database"
+	desc += "and stores the database, release, current gene collection, guide collection, and primer collection."
+	desc += "as attributes which other functions can access. Also stores the root path, i.e. where the web server"
+	desc +=  "points to and the jbrowse and primer design scripts are located. If the mongodb is secured"
+	desc += "with credentials, these are accessed from the mongo.cred file in var/www"
+	desc += "Databases currently available:"
+	print(desc)
 	genomes = fetchInstalledGenomes()
 	for g in genomes:
 		orgName = g[1]		
 		genomeString = g[0] + " (" + orgName + ")"
-		print genomeString
+		print(genomeString)
 			
 	
 if __name__ == "__main__":

@@ -100,7 +100,7 @@ class GuideSearchAndScore:
 
     def setScores(self):
         scores = set({}) # make a set
-        options = ['MIT', 'CFD']
+        options = ['MIT', 'CFD', 'Precision', 'Frameshift Frequency','MH Strength']
         available = []
         for key, guide in self.guideDict.items():
             for s in options:
@@ -419,6 +419,21 @@ class GuideSearchAndScore:
                     num_skipped = 0
                     num_exceeded = 0
                     for guideID, guide in self.guideDict.items():
+                        """
+                        TEMPORARY CODE FOR BULK SEARCH
+                        """
+                        print("Strand="+self.calculateLocation(guide).rsplit(":",1)[1])
+                        print("Guide="+self.formatSequence(guide['guide_seq'], guide['pam_seq']))
+                        print("Location="+self.calculateLocation(guide))
+                        print("MIT_Score="+str(guide['MIT']))
+                        print("CFD_Score="+str(guide['CFD']))
+                        print("Total_Off-targets="+str(sum(guide['offtarget_counts'])))
+                        print("Off-target_Profile="+"-".join(map(str,guide['offtarget_counts'])))
+                        print("Off-target_Profile_Seed="+"-".join(map(str,guide['offtargets_seed'])))
+                        """
+                        END TEMPORARY CODE
+                        """
+
                         writer.writerow([str(guideID)+":"])
                         if guide['max_exceeded']:
                             writer.writerow(['Max off target sites exceeded ('+str(sum(guide['offtarget_counts']))+" shown)"])
@@ -559,31 +574,21 @@ class GuideSearchAndScore:
         get_sequence.fetch_sequence(twoBitToFa_path, self.searchInput, genome_2bit, os.path.join(tempfiles_path,batchID+'_out.fa')) 
         if self.cli: 
             time_1 = time.time()
-            print("Finished fetching sequence. " + str(round(time_1-time_0,4)))
-            print("Determining guides in search region...")
 
         protospacer_length = getattr(self, 'guideLength', 0) # passing 0 indicates default should be used
         guideDict = find_grna.find_grna(self.rgenID, protospacer_length, os.path.join(tempfiles_path, batchID+'_out.fa'))
 
         if self.cli: 
             time_2 = time.time()
-            print("Finished finding gRNAs. " + str(round(time_2-time_1,4)))
-            print("Searching for potential off target sites...")
         guideDict = find_offtargets.findOffTargets(guideDict, self.rgenID, self.genome, self.maxOffTargets, batchID, genome_fa, tempfiles_path)
         if self.cli: 
             time_3 = time.time()
-            print("Finished finding offtargets. " + str(round(time_3-time_2,4)))
-            print("Scoring potential off target sites and guides...")
         guideDict = score_offtargets.scoreOffTargets(guideDict, self.rgenID)
         if self.cli: 
             time_4 = time.time()
-            print("Finished scoring. " + str(round(time_4-time_3,4)))
-            print("Categorizing potential off target sites...")
         guideDict = categorize_offtargets.categorizeOffTargets(guideDict, self.rgenID, self.genome, batchID)
         if self.cli:
             time_5 = time.time()
-            print("Finished categorizing. " + str(round(time_5-time_4,4)))
-            print("TOTAL TIME ELAPSED: " + str(round(time_5-time_0,4)))
 
         return guideDict, batchID
 
