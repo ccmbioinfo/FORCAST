@@ -54,13 +54,16 @@ def inDelphiScore(guideDict):
 			guide['Frameshift Frequency'] = '-1'
 			guide['MH Strength'] = '0'
 
-		fullSeq = str(guide['guide_seq']) + str(guide['pam_seq']) + str(guide['guide_seq']) #FOR TESTING!
+		#TODO: NEED TO REPLACE NEXT LINE
+		# the last term should be replaced with ~20 bps after the cutsite
+		# get this via the get_sequence code
+		fullSeq = str(guide['guide_seq']) + str(guide['pam_seq']) + str(guide['guide_seq'])
 		cutsite = len(guide['guide_seq'])
 
 		pred_df, stats = inDelphi.predict(fullSeq, cutsite)
 		guide['Precision'] = round(stats['Precision'],2)
 		guide['Frameshift Frequency'] = round(stats['Frameshift frequency'],2)
-		# from GitHub: natural log of phi refers to microhomology strength
+		# from inDelphi GitHub: natural log of phi refers to microhomology strength
 		guide['MH Strength'] = round(math.log(stats['Phi']),2)
 
 def cfdScore(guideDict):
