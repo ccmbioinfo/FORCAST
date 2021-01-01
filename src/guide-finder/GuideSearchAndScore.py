@@ -100,7 +100,7 @@ class GuideSearchAndScore:
 
     def setScores(self):
         scores = set({}) # make a set
-        options = ['MIT', 'CFD']
+        options = ['MIT', 'CFD', 'Precision', 'Frameshift Frequency', 'MH Strength']
         available = []
         for key, guide in self.guideDict.items():
             for s in options:
@@ -108,7 +108,7 @@ class GuideSearchAndScore:
                     available.append(s)
             if len(available) == len(options):
                 break
-       
+
         return available
 
     def renderTemplate(self, template_name, template_values):
@@ -129,14 +129,13 @@ class GuideSearchAndScore:
 
     def tableHeadingHTML(self):
         """ determine which info for the guides is available and display the headings for those """
-       
+
         scoreHeading = ''
         scoreHeaders = '' 
         if len(self.scores) > 0:
             scoreHeading += "<th colspan='{num_scores}'>Scoring</th>".format(num_scores=len(self.scores))
             for score in self.scores:
                 scoreHeaders += "<th>{score}</th>".format(score=score)
-
         template_values = {
             'score_heading': scoreHeading,
             'score_headers': scoreHeaders
