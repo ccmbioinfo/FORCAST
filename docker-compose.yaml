@@ -17,5 +17,7 @@ services:
             && ./setup.sh
             && python3 /var/www/html/src/setup/setup.py -r /var/www/html -g ${ORGANISM} -v ${ASSEMBLY} -fa2bit /var/www/html/bin/faToTwoBit -b /var/www/html/bin/ncbi-blast-2.7.1+/bin
             && /var/www/html/src/setup/enable_dicey.sh ${ORGANISM} ${ASSEMBLY}
+            && cd /var/www/html/src/installation
+            && sudo ./setPermissions.sh
             && sudo service apache2 start
             && tail -f /dev/null"

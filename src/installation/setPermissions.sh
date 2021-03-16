@@ -1,5 +1,13 @@
-# need to make sure these files and directories can be run from the web
-cd ../..
+#!/bin/bash
+# script to ensure these files and directories can be run from the web
+
+curr_dir=${PWD##*/}
+if [ $curr_dir == "installation" ]; then
+    cd ../..
+else
+    echo "this script must be run from the installation folder"
+    exit
+fi
 
 sudo chgrp -R www-data config
 sudo chmod -R 755 config
