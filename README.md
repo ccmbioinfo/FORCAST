@@ -1,24 +1,13 @@
 # Finding, Optimizing, and Reporting Cas Targets (FORCAST): a fully integrated and open source pipeline to design CRISPR mutagenesis experiments
 
 ## Contents
-[Citation](#citation]<br>
 [Hardware Requirements](#hardware-requirements)<br>
 [Installing With Docker *\*(RECOMMENDED)\**](#installing-with-docker)<br>
 [Installing Natively](#installing-natively)<br>
 [Customization](#customization)<br>
 [Migration](#migration)<br>
+[Citation](#citation)<br>
 [Troubleshooting](#troubleshooting)<br>
-
-## Citation
-
-<a href="https://doi.org/10.1101/2020.04.21.053090">
-
-```
-FORCAST: a fully integrated and open source pipeline to design Cas-mediated mutagenesis experiments
-Hillary Elrick, Viswateja Nelakuditi, Greg Clark, Michael Brudno, Arun K. Ramani, Lauryl M.J. Nutter
-bioRxiv 2020.04.21.053090; doi: https://doi.org/10.1101/2020.04.21.053090
-```
-</a>
 
 ## Hardware Requirements
 FORCAST can be installed on any machine running a [docker-compatible operating system](https://docs.docker.com/install/). Alternately, to run FORCAST natively, Ubuntu 16.04 is required.
@@ -188,6 +177,17 @@ sudo python customPython/MongoHandler.py mm10
 ```
 
 Your existing Primer and Guide designs should now be accessible in the new FORCAST installation!
+
+## Citation
+
+<a href="https://doi.org/10.1101/2020.04.21.053090">
+
+```
+FORCAST: a fully integrated and open source pipeline to design Cas-mediated mutagenesis experiments
+Hillary Elrick, Viswateja Nelakuditi, Greg Clark, Michael Brudno, Arun K. Ramani, Lauryl M.J. Nutter
+bioRxiv 2020.04.21.053090; doi: https://doi.org/10.1101/2020.04.21.053090
+```
+</a>
 
 ## Troubleshooting
 
