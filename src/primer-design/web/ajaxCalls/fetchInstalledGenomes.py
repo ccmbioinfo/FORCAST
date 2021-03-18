@@ -29,7 +29,7 @@ def main():
 	for option in result:
 		org = option[0]
 		name = option[1]
-		print """<option value="{org}">{name}</option>""".format(**locals())
+		print """<option value="{org}">{name} ({org})</option>""".format(**locals())
 
 		
 if __name__ == "__main__":
