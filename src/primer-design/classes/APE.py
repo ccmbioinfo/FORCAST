@@ -336,7 +336,7 @@ class APE(object):
 			filetowrite.append("ACCESSION   " + str(",".join(zip(*self.geneObject.exons)[5])))
 		filetowrite.append("KEYWORDS    ." + (self.geneObject.symbol).upper())
 		filetowrite.append("SOURCE      " + str(self.geneObject.Config.organismName))
-		filetowrite.append(comment + ">dna:chromosome: GRCm38:" + self.geneObject.chromosome + "(" + str(self.geneObject.strand) + ")" + ":" + str(self.geneObject.sequenceStart) + "..." + str(self.geneObject.sequenceEnd))
+		filetowrite.append(comment + ">dna:chromosome: " + self.geneObject.genome + ":" + self.geneObject.chromosome + "(" + str(self.geneObject.strand) + ")" + ":" + str(self.geneObject.sequenceStart) + "..." + str(self.geneObject.sequenceEnd))
 		filetowrite.append(comment)
 		filetowrite.append(comment + self.geneObject.symbol.capitalize() + " gDNA and 1000bp upstream and downstream flank")
 		filetowrite.append(comment)
