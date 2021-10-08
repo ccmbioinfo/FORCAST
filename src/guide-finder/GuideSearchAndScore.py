@@ -570,6 +570,10 @@ class GuideSearchAndScore:
             import time
             time_0 = time.time()
             print("Fetching sequence...")
+            print("tempfiles directory",tempfiles_path)
+            print("genome_fa",genome_fa)
+            print("twoBittoFa",twoBitToFa_path)
+            print("genome_2bit",genome_2bit)
 
         get_sequence.fetch_sequence(twoBitToFa_path, self.searchInput, genome_2bit, os.path.join(tempfiles_path,batchID+'_out.fa')) 
         if self.cli: 

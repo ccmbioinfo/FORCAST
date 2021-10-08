@@ -27,6 +27,7 @@ def fetch_sequence(twobit_to_fa, chrom_coord, genome_twobit, output_fasta):
     start = str(int(start)-1)
     seq_param, start_param, end_param = '-seq={0}'.format(chrom), '-start={0}'.format(start), '-end={0}'.format(end)
     tmp_fasta = os.path.join(dir_path,"tmp.fa")
+    print(tmp_fasta)
 
     try:
         subprocess.run([twobit_to_fa, seq_param, start_param, end_param, genome_twobit, tmp_fasta])  
