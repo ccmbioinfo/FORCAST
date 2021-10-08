@@ -1,0 +1,188 @@
+[bwa_index] Pack FASTA... 20.55 sec
+[bwa_index] Construct BWT for the packed sequence...
+[BWTIncCreate] textLength=5446862286, availableWord=395261040
+[BWTIncConstructFromPacked] 10 iterations done. 99999998 characters processed.
+[BWTIncConstructFromPacked] 20 iterations done. 199999998 characters processed.
+[BWTIncConstructFromPacked] 30 iterations done. 299999998 characters processed.
+[BWTIncConstructFromPacked] 40 iterations done. 399999998 characters processed.
+[BWTIncConstructFromPacked] 50 iterations done. 499999998 characters processed.
+[BWTIncConstructFromPacked] 60 iterations done. 599999998 characters processed.
+[BWTIncConstructFromPacked] 70 iterations done. 699999998 characters processed.
+[BWTIncConstructFromPacked] 80 iterations done. 799999998 characters processed.
+[BWTIncConstructFromPacked] 90 iterations done. 899999998 characters processed.
+[BWTIncConstructFromPacked] 100 iterations done. 999999998 characters processed.
+[BWTIncConstructFromPacked] 110 iterations done. 1099999998 characters processed.
+[BWTIncConstructFromPacked] 120 iterations done. 1199999998 characters processed.
+[BWTIncConstructFromPacked] 130 iterations done. 1299999998 characters processed.
+[BWTIncConstructFromPacked] 140 iterations done. 1399999998 characters processed.
+[BWTIncConstructFromPacked] 150 iterations done. 1499999998 characters processed.
+[BWTIncConstructFromPacked] 160 iterations done. 1599999998 characters processed.
+[BWTIncConstructFromPacked] 170 iterations done. 1699999998 characters processed.
+[BWTIncConstructFromPacked] 180 iterations done. 1799999998 characters processed.
+[BWTIncConstructFromPacked] 190 iterations done. 1899999998 characters processed.
+[BWTIncConstructFromPacked] 200 iterations done. 1999999998 characters processed.
+[BWTIncConstructFromPacked] 210 iterations done. 2099999998 characters processed.
+[BWTIncConstructFromPacked] 220 iterations done. 2199999998 characters processed.
+[BWTIncConstructFromPacked] 230 iterations done. 2299999998 characters processed.
+[BWTIncConstructFromPacked] 240 iterations done. 2399999998 characters processed.
+[BWTIncConstructFromPacked] 250 iterations done. 2499999998 characters processed.
+[BWTIncConstructFromPacked] 260 iterations done. 2599999998 characters processed.
+[BWTIncConstructFromPacked] 270 iterations done. 2699999998 characters processed.
+[BWTIncConstructFromPacked] 280 iterations done. 2799999998 characters processed.
+[BWTIncConstructFromPacked] 290 iterations done. 2899999998 characters processed.
+[BWTIncConstructFromPacked] 300 iterations done. 2999999998 characters processed.
+[BWTIncConstructFromPacked] 310 iterations done. 3099999998 characters processed.
+[BWTIncConstructFromPacked] 320 iterations done. 3199999998 characters processed.
+[BWTIncConstructFromPacked] 330 iterations done. 3299999998 characters processed.
+[BWTIncConstructFromPacked] 340 iterations done. 3399999998 characters processed.
+[BWTIncConstructFromPacked] 350 iterations done. 3499999998 characters processed.
+[BWTIncConstructFromPacked] 360 iterations done. 3599999998 characters processed.
+[BWTIncConstructFromPacked] 370 iterations done. 3699999998 characters processed.
+[BWTIncConstructFromPacked] 380 iterations done. 3799999998 characters processed.
+[BWTIncConstructFromPacked] 390 iterations done. 3899999998 characters processed.
+[BWTIncConstructFromPacked] 400 iterations done. 3999999998 characters processed.
+[BWTIncConstructFromPacked] 410 iterations done. 4099999998 characters processed.
+[BWTIncConstructFromPacked] 420 iterations done. 4199999998 characters processed.
+[BWTIncConstructFromPacked] 430 iterations done. 4299999998 characters processed.
+[BWTIncConstructFromPacked] 440 iterations done. 4399999998 characters processed.
+[BWTIncConstructFromPacked] 450 iterations done. 4499999998 characters processed.
+[BWTIncConstructFromPacked] 460 iterations done. 4599999998 characters processed.
+[BWTIncConstructFromPacked] 470 iterations done. 4699999998 characters processed.
+[BWTIncConstructFromPacked] 480 iterations done. 4799525390 characters processed.
+[BWTIncConstructFromPacked] 490 iterations done. 4890729438 characters processed.
+[BWTIncConstructFromPacked] 500 iterations done. 4971787854 characters processed.
+[BWTIncConstructFromPacked] 510 iterations done. 5043828766 characters processed.
+[BWTIncConstructFromPacked] 520 iterations done. 5107854910 characters processed.
+[BWTIncConstructFromPacked] 530 iterations done. 5164757502 characters processed.
+[BWTIncConstructFromPacked] 540 iterations done. 5215328654 characters processed.
+[BWTIncConstructFromPacked] 550 iterations done. 5260272382 characters processed.
+[BWTIncConstructFromPacked] 560 iterations done. 5300214446 characters processed.
+[BWTIncConstructFromPacked] 570 iterations done. 5335711070 characters processed.
+[BWTIncConstructFromPacked] 580 iterations done. 5367256494 characters processed.
+[BWTIncConstructFromPacked] 590 iterations done. 5395290142 characters processed.
+[BWTIncConstructFromPacked] 600 iterations done. 5420202478 characters processed.
+[BWTIncConstructFromPacked] 610 iterations done. 5442340590 characters processed.
+[bwa_index] 2501.60 seconds elapse.
+[bwa_index] Update BWT... 16.01 sec
+[bwa_index] Pack forward-only FASTA... 12.26 sec
+[bwa_index] Construct SA from BWT and Occ... 1095.50 sec
+[bwt_gen] Finished constructing BWT in 613 iterations.
+[main] Version: 0.7.12-r1039
+[main] CMD: bwa index /var/www/html/ForCasT/jbrowse/data.GRCm39/downloads/GRCm39.fa
+[main] Real time: 3663.437 sec; CPU: 3645.908 sec
+Fetching latest Ensembl version....
+Connected to Ensembl ftp directory
+Downloading Genome fasta file checksum file into directory/var/www/html/ForCasT/jbrowse/data.GRCm39/downloads
+Downloading file Mus_musculus.GRCm39.dna.chromosome.1.fa.gz into directory /var/www/html/ForCasT/jbrowse/data.GRCm39/downloads
+Mus_musculus.GRCm39.dna.chromosome.1.fa.gz successfully downloaded.
+Downloading Genome fasta file checksum file into directory/var/www/html/ForCasT/jbrowse/data.GRCm39/downloads
+Downloading file Mus_musculus.GRCm39.dna.chromosome.10.fa.gz into directory /var/www/html/ForCasT/jbrowse/data.GRCm39/downloads
+Mus_musculus.GRCm39.dna.chromosome.10.fa.gz successfully downloaded.
+Downloading Genome fasta file checksum file into directory/var/www/html/ForCasT/jbrowse/data.GRCm39/downloads
+Downloading file Mus_musculus.GRCm39.dna.chromosome.11.fa.gz into directory /var/www/html/ForCasT/jbrowse/data.GRCm39/downloads
+Mus_musculus.GRCm39.dna.chromosome.11.fa.gz successfully downloaded.
+Downloading Genome fasta file checksum file into directory/var/www/html/ForCasT/jbrowse/data.GRCm39/downloads
+Downloading file Mus_musculus.GRCm39.dna.chromosome.12.fa.gz into directory /var/www/html/ForCasT/jbrowse/data.GRCm39/downloads
+Mus_musculus.GRCm39.dna.chromosome.12.fa.gz successfully downloaded.
+Downloading Genome fasta file checksum file into directory/var/www/html/ForCasT/jbrowse/data.GRCm39/downloads
+Downloading file Mus_musculus.GRCm39.dna.chromosome.13.fa.gz into directory /var/www/html/ForCasT/jbrowse/data.GRCm39/downloads
+Mus_musculus.GRCm39.dna.chromosome.13.fa.gz successfully downloaded.
+Downloading Genome fasta file checksum file into directory/var/www/html/ForCasT/jbrowse/data.GRCm39/downloads
+Downloading file Mus_musculus.GRCm39.dna.chromosome.14.fa.gz into directory /var/www/html/ForCasT/jbrowse/data.GRCm39/downloads
+Mus_musculus.GRCm39.dna.chromosome.14.fa.gz successfully downloaded.
+Downloading Genome fasta file checksum file into directory/var/www/html/ForCasT/jbrowse/data.GRCm39/downloads
+Downloading file Mus_musculus.GRCm39.dna.chromosome.15.fa.gz into directory /var/www/html/ForCasT/jbrowse/data.GRCm39/downloads
+Mus_musculus.GRCm39.dna.chromosome.15.fa.gz successfully downloaded.
+Downloading Genome fasta file checksum file into directory/var/www/html/ForCasT/jbrowse/data.GRCm39/downloads
+Downloading file Mus_musculus.GRCm39.dna.chromosome.16.fa.gz into directory /var/www/html/ForCasT/jbrowse/data.GRCm39/downloads
+Mus_musculus.GRCm39.dna.chromosome.16.fa.gz successfully downloaded.
+Downloading Genome fasta file checksum file into directory/var/www/html/ForCasT/jbrowse/data.GRCm39/downloads
+Downloading file Mus_musculus.GRCm39.dna.chromosome.17.fa.gz into directory /var/www/html/ForCasT/jbrowse/data.GRCm39/downloads
+Mus_musculus.GRCm39.dna.chromosome.17.fa.gz successfully downloaded.
+Downloading Genome fasta file checksum file into directory/var/www/html/ForCasT/jbrowse/data.GRCm39/downloads
+Downloading file Mus_musculus.GRCm39.dna.chromosome.18.fa.gz into directory /var/www/html/ForCasT/jbrowse/data.GRCm39/downloads
+Mus_musculus.GRCm39.dna.chromosome.18.fa.gz successfully downloaded.
+Downloading Genome fasta file checksum file into directory/var/www/html/ForCasT/jbrowse/data.GRCm39/downloads
+Downloading file Mus_musculus.GRCm39.dna.chromosome.19.fa.gz into directory /var/www/html/ForCasT/jbrowse/data.GRCm39/downloads
+Mus_musculus.GRCm39.dna.chromosome.19.fa.gz successfully downloaded.
+Downloading Genome fasta file checksum file into directory/var/www/html/ForCasT/jbrowse/data.GRCm39/downloads
+Downloading file Mus_musculus.GRCm39.dna.chromosome.2.fa.gz into directory /var/www/html/ForCasT/jbrowse/data.GRCm39/downloads
+Mus_musculus.GRCm39.dna.chromosome.2.fa.gz successfully downloaded.
+Downloading Genome fasta file checksum file into directory/var/www/html/ForCasT/jbrowse/data.GRCm39/downloads
+Downloading file Mus_musculus.GRCm39.dna.chromosome.3.fa.gz into directory /var/www/html/ForCasT/jbrowse/data.GRCm39/downloads
+Mus_musculus.GRCm39.dna.chromosome.3.fa.gz successfully downloaded.
+Downloading Genome fasta file checksum file into directory/var/www/html/ForCasT/jbrowse/data.GRCm39/downloads
+Downloading file Mus_musculus.GRCm39.dna.chromosome.4.fa.gz into directory /var/www/html/ForCasT/jbrowse/data.GRCm39/downloads
+Mus_musculus.GRCm39.dna.chromosome.4.fa.gz successfully downloaded.
+Downloading Genome fasta file checksum file into directory/var/www/html/ForCasT/jbrowse/data.GRCm39/downloads
+Downloading file Mus_musculus.GRCm39.dna.chromosome.5.fa.gz into directory /var/www/html/ForCasT/jbrowse/data.GRCm39/downloads
+Mus_musculus.GRCm39.dna.chromosome.5.fa.gz successfully downloaded.
+Downloading Genome fasta file checksum file into directory/var/www/html/ForCasT/jbrowse/data.GRCm39/downloads
+Downloading file Mus_musculus.GRCm39.dna.chromosome.6.fa.gz into directory /var/www/html/ForCasT/jbrowse/data.GRCm39/downloads
+Mus_musculus.GRCm39.dna.chromosome.6.fa.gz successfully downloaded.
+Downloading Genome fasta file checksum file into directory/var/www/html/ForCasT/jbrowse/data.GRCm39/downloads
+Downloading file Mus_musculus.GRCm39.dna.chromosome.7.fa.gz into directory /var/www/html/ForCasT/jbrowse/data.GRCm39/downloads
+Mus_musculus.GRCm39.dna.chromosome.7.fa.gz successfully downloaded.
+Downloading Genome fasta file checksum file into directory/var/www/html/ForCasT/jbrowse/data.GRCm39/downloads
+Downloading file Mus_musculus.GRCm39.dna.chromosome.8.fa.gz into directory /var/www/html/ForCasT/jbrowse/data.GRCm39/downloads
+Mus_musculus.GRCm39.dna.chromosome.8.fa.gz successfully downloaded.
+Downloading Genome fasta file checksum file into directory/var/www/html/ForCasT/jbrowse/data.GRCm39/downloads
+Downloading file Mus_musculus.GRCm39.dna.chromosome.9.fa.gz into directory /var/www/html/ForCasT/jbrowse/data.GRCm39/downloads
+Mus_musculus.GRCm39.dna.chromosome.9.fa.gz successfully downloaded.
+Downloading Genome fasta file checksum file into directory/var/www/html/ForCasT/jbrowse/data.GRCm39/downloads
+Downloading file Mus_musculus.GRCm39.dna.chromosome.MT.fa.gz into directory /var/www/html/ForCasT/jbrowse/data.GRCm39/downloads
+Mus_musculus.GRCm39.dna.chromosome.MT.fa.gz successfully downloaded.
+Downloading Genome fasta file checksum file into directory/var/www/html/ForCasT/jbrowse/data.GRCm39/downloads
+Downloading file Mus_musculus.GRCm39.dna.chromosome.X.fa.gz into directory /var/www/html/ForCasT/jbrowse/data.GRCm39/downloads
+Mus_musculus.GRCm39.dna.chromosome.X.fa.gz successfully downloaded.
+Downloading Genome fasta file checksum file into directory/var/www/html/ForCasT/jbrowse/data.GRCm39/downloads
+Downloading file Mus_musculus.GRCm39.dna.chromosome.Y.fa.gz into directory /var/www/html/ForCasT/jbrowse/data.GRCm39/downloads
+Mus_musculus.GRCm39.dna.chromosome.Y.fa.gz successfully downloaded.
+full genome file created successfully! Removing chromosome fasta files
+Downloading Annotation gff file checksum file into directory/var/www/html/ForCasT/jbrowse/data.GRCm39/downloads
+Downloading file Mus_musculus.GRCm39.104.gff3.gz into directory /var/www/html/ForCasT/jbrowse/data.GRCm39/downloads
+Annotation gff file successfully downloaded.
+Downloading Regulatory regions gff file checksum file into directory/var/www/html/ForCasT/jbrowse/data.GRCm39/downloads
+Downloading file mus_musculus.GRCm39.Regulatory_Build.regulatory_features.20201021.gff.gz into directory /var/www/html/ForCasT/jbrowse/data.GRCm39/downloads
+Regulatory regions gff file successfully downloaded.
+Processing downloaded files
+Unzipping downloaded files.
+Unzipping complete.
+Processing file /var/www/html/ForCasT/jbrowse/data.GRCm39/downloads/mus_musculus.104.full_genome.fa
+Generating bwa index files
+Generating 2bit file
+Generating .fai file
+Processing complete!
+Processing file/var/www/html/ForCasT/jbrowse/data.GRCm39/downloads/mus_musculus.GRCm39.Regulatory_Build.regulatory_features.20201021.gff
+Processing complete!
+Processing file/var/www/html/ForCasT/jbrowse/data.GRCm39/downloads/Mus_musculus.GRCm39.104.gff3
+Processing complete!
+Loading genome file into JBrowse. This might take a while.
+Sucessfully loaded genome into JBrowse
+Loading annotations in JBrowse
+Sucessfully loaded annotations  into JBrowse
+JBrowse data directory for this genome is at /var/www/html/ForCasT/jbrowse/data.GRCm39
+Loading gene annotations and RGENs into Mongo database
+Successfully connected to Mongodb
+Traceback (most recent call last):
+  File "setup.py", line 130, in <module>
+    return_value = load_geneinfo_RGENs_into_Mongo(jbrowse_download_directory, args.mongo_user, args.mongo_password, args.mongo_database, ENSEMBL_VERSION, args.genome, args.genome_version)
+  File "/var/www/html/ForCasT/src/setup/fetch_and_setup_ensembl.py", line 405, in load_geneinfo_RGENs_into_Mongo
+    if 'RGEN' not in pyMongoClient.list_database_names():
+  File "/usr/local/lib/python3.5/dist-packages/pymongo/mongo_client.py", line 1699, in list_database_names
+    for doc in self.list_databases(session, nameOnly=True)]
+  File "/usr/local/lib/python3.5/dist-packages/pymongo/mongo_client.py", line 1680, in list_databases
+    res = admin.command(cmd, session=session)
+  File "/usr/local/lib/python3.5/dist-packages/pymongo/database.py", line 655, in command
+    read_preference) as (sock_info, slave_ok):
+  File "/usr/lib/python3.5/contextlib.py", line 59, in __enter__
+    return next(self.gen)
+  File "/usr/local/lib/python3.5/dist-packages/pymongo/mongo_client.py", line 1135, in _socket_for_reads
+    server = topology.select_server(read_preference)
+  File "/usr/local/lib/python3.5/dist-packages/pymongo/topology.py", line 226, in select_server
+    address))
+  File "/usr/local/lib/python3.5/dist-packages/pymongo/topology.py", line 184, in select_servers
+    selector, server_timeout, address)
+  File "/usr/local/lib/python3.5/dist-packages/pymongo/topology.py", line 200, in _select_servers_loop
+    self._error_message(selector))
+pymongo.errors.ServerSelectionTimeoutError: localhost:27017: [Errno 111] Connection refused
