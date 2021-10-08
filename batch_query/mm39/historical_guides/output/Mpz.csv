@@ -1,0 +1,12 @@
+2-:
+Total number of potential off-target sites:438
+Off-target Counts: 0-0-2-39-397
+No mismatches in Seed: 0-0-0-0-0
+MIT Score: 73
+CFD Score: 81
+Location,Sequence,Mismatches,Context
+chr1:170986502-170986483:-,"TCTTGCCCACTATGTCCGGT, GGG",0,guide
+1 GUIDES FOUND
+0 SKIPPED
+0 EXCEEDED MAX OFF TARGETS
+438 OFF TARGETS FOUND

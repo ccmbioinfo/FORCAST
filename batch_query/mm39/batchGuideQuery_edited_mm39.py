@@ -64,7 +64,7 @@ def locationSearchCommand(org):
 		blastCommand.append('-db')
 
 		# blast db that was created by makeblastdb command on mm10.fa files from ensembl
-		blastCommand.append("/var/www/html/ForCasT/jbrowse/data.mm10/blastdb/"+str(org)+'_blastdb')
+		blastCommand.append("/var/www/html/ForCasT/jbrowse/data.GRCm39/blastdb/"+str(org)+'_blastdb')
 		blastCommand.append('-task')
 
 		# since the primers are short, need to pass this argument or no hits will be found
@@ -157,7 +157,7 @@ def parseOutput(output, strand):
 
 def processGuides(file, org):
   conversion = {key+str(i):str for i in range(1,5) for key in ['MIT_Score','CFD_Score','Total_Off-targets','Off-target_Profile','Off-target_Profile_Seed','Strand']} 
-  df = pd.read_excel(file, converters=conversion)
+  df = pd.read_csv(file, converters=conversion)
   blastLocation = locationSearchCommand(org)
   hitSearch = re.compile("^primerBLAST[\s]([^\s]+)\s([0-9]*)[\s]*(minus|plus)[\s]*([0-9]*)[\s]*([0-9]*)")
 
@@ -190,7 +190,7 @@ def processGuides(file, org):
 
         gene = row['Target']
         location, strand = hits[0].rsplit(":",1)
-        p = subprocess.Popen(["python3","/var/www/html/ForCasT/src/guide-finder/GuideSearchAndScore.py", "--genome=mm10", "--gene="+str(gene), "--input="+str(location),"--output=output/"+str(gene)+".csv","--maxOffTargets=-1"], stdout=PIPE)
+        p = subprocess.Popen(["/usr/bin/python3.5","/var/www/html/ForCasT/src/guide-finder/GuideSearchAndScore.py", "--genome=GRCm39", "--gene="+str(gene), "--input="+str(location),"--output=output2/"+str(gene)+".csv","--maxOffTargets=-1"], stdout=PIPE)
         out, err = p.communicate()
         result_dict = parseOutput(out, strand)
         for field, value in result_dict.items():
@@ -206,8 +206,8 @@ def processGuides(file, org):
           else:
             df.at[index, field+g] = str(value)
 
-  from openpyxl.utils import get_column_letter
-  df.to_excel("Results2.xlsx", index=False)
+ # from openpyxl.utils import get_column_letter
+  df.to_csv("Results_mm39.csv", index=False)
   return
 
 def main():
@@ -220,3 +220,4 @@ def main():
 
 if __name__ == "__main__":
   main()
+

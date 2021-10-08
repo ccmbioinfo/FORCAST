@@ -1,0 +1,4 @@
+Production Center,Expt'l Set,Stud Source,Dam Source,Category,Sample Name,Target,Sex,#gRNAs,gRNA1,Location1,Strand1,MIT_Score1,CFD_Score1,Total_Off-targets1,Off-target_Profile1,Off-target_Profile_Seed1,gRNA2,Location2,Strand2,MIT_Score2,CFD_Score2,Total_Off-targets2,Off-target_Profile2,Off-target_Profile_Seed2,gRNA3,Location3,Strand3,MIT_Score3,CFD_Score3,Total_Off-targets3,Off-target_Profile3,Off-target_Profile_Seed3,gRNA4,Location4,Strand4,MIT_Score4,CFD_Score4,Total_Off-targets4,Off-target_Profile4,Off-target_Profile_Seed4
+,,,,,,Cd302,,,AGAGGAAAACGCGTTTATAC,chr2:60088293-60088315,-,88,86,158,0-0-0-7-151,0-0-0-0-0,,,,,,,,,,,,,,,,,,,,,,,,
+,,,,,,Slc30a2,,,GGGCCTACCCACTCCACGAT,chr4:134074573-134074595,-,92,96,77,0-0-0-6-71,0-0-0-0-0,,,,,,,,,,,,,,,,,,,,,,,,
+,,,,,,Slc30a2,,,ATCAGAACTCATAACCTCGG,chr4:134074966-134074988,-,84,86,227,0-0-1-11-215,0-0-0-0-0,,,,,,,,,,,,,,,,,,,,,,,,
