@@ -1,9 +1,5 @@
 version: "3.9"
 services:
-  # mongo:
-  #   image: mongo:3.6
-  #   ports:
-  #     - 127.0.0.1:27017:27017
   forcast:
     build: .
     image: ghcr.io/ccmbioinfo/forcast
@@ -11,37 +7,21 @@ services:
       - 80:80
     volumes:
       - ./sites-enabled:/etc/apache2/sites-enabled
-      - ./:/var/www/html
+      - ./bin:/var/www/html/bin
+      - ./docs:/var/www/html/docs
+      - ./src:/var/www/html/src
+      - ./jbrowse/plugins/ColorByCDS:/var/www/html/jbrowse/plugins/ColorByCDS
+      - ./jbrowse/plugins/ExportSequence:/var/www/html/jbrowse/plugins/ExportSequence
+      - ./crispr-icon.png:/var/www/html/crispr-icon.png
+      - ./index.html:/var/www/html/index.html
       - mongodb:/var/lib/mongodb
 volumes:
   mongodb:
 
-
-
-# Install genome and enable dicey
-
-
-
-#version: '2'
-
-#services:
-#    webserver:
-#        image: helrick/forcast
-#        expose:
-#            - ${APACHE2_PORT}
-#        ports:
-#            - ${APACHE2_PORT}:${APACHE2_PORT}
-#        volumes:
-#            - ./mongodb:/data/db
-#            - ./src:/var/www/html/src
-#            - ./jbrowse:/var/www/html/jbrowse
-#        command: >
-#            bash -c "sudo mongod --fork --logpath /var/log/mongodb.log
-#            && cd /var/www/html/jbrowse
-#            && ./setup.sh
-#            && python3 /var/www/html/src/setup/setup.py -r /var/www/html -g ${ORGANISM} -v ${ASSEMBLY} -fa2bit /var/www/html/bin/faToTwoBit -b /var/www/html/bin/ncbi-blast-2.7.1+/bin
-#            && /var/www/html/src/setup/enable_dicey.sh ${ORGANISM} ${ASSEMBLY}
-#            && cd /var/www/html/src/installation
-#            && sudo ./setPermissions.sh
-#            && sudo service apache2 start
-#            && tail -f /dev/null"
+# After startup, exec into the container and run
+# cd /var/www/html/src/setup
+# python3 setup.py -r /var/www/html -g Saccharomyces_cerevisiae -v R64-1-1 -fa2bit /var/www/html/bin/faToTwoBit -b /usr/bin
+# mkdir -p /opt/dicey/indexes/R64-1-1
+# cd /opt/dicey/indexes/R64-1-1
+# wget -r -np -nH --cut-dirs 2 -A "Saccharomyces_cerevisiae.*" https://gear.embl.de/data/tracy/
+# rename "s/^.*.fa\./R64-1-1.fa./" *
