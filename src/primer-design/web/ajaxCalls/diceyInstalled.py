@@ -35,7 +35,7 @@ def main():
 		return
 
 	dbConnection = Config(genome)
-	if os.path.isfile(os.path.join(dbConnection.ROOT_PATH,"bin/dicey/indexes/"+genome+"/"+genome+".fa.fm9")):
+	if os.path.isfile(os.path.join(dbConnection.DICEY_PATH, "indexes", genome, genome+".fa.fm9")):
 		print "1"
 	else:
 		print "0"

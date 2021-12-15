@@ -25,6 +25,8 @@ RUN apt update -y && \
     curl https://bootstrap.pypa.io/pip/2.7/get-pip.py | python
 RUN mkdir -p /opt/dicey/bin && \
     mkdir -p /opt/dicey/dicey_tempfiles && \
+    chgrp www-data /opt/dicey/dicey_tempfiles && \
+    chmod g+w /opt/dicey/dicey_tempfiles && \
     curl -Lo /opt/dicey/bin/dicey https://github.com/gear-genomics/dicey/releases/download/v0.1.8/dicey_v0.1.8_linux_x86_64bit && \
     chmod +x /opt/dicey/bin/dicey
 ARG JBROWSE_VERSION=1.12.3
