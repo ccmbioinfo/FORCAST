@@ -8,7 +8,7 @@ Requires: batch id, guideID, label, and notes
 
 """
 
-import os, sys, json, cgi, git, datetime
+import os, sys, json, cgi, datetime
 from subprocess import Popen, PIPE, DEVNULL
 
 dir_path = os.path.dirname(os.path.abspath(__file__))
@@ -139,15 +139,6 @@ class GuideAdd:
     
     def insertGuide(self):
         """ create a new record in the database for the guide """
-
-        # get the current git commit hash
-        try:
-            repo = git.Repo(search_parent_directories=True)
-            git_hash = repo.head.object.hexsha
-        except Exception as e:
-            # don't prevent guide from being added
-            git_hash = ''
-        # build the dict
         newGuideRecord = {
             'batchName': self.metadata['gene'],
             'status': 'Accepted',
@@ -164,7 +155,6 @@ class GuideAdd:
             'ENSID': self.metadata['ENSID'],
             'guideLocation': self.guide['guideLocation'],
             'rgenID': self.metadata['rgenID'],
-            'commitHash': git_hash,
             'dateAdded': datetime.datetime.utcnow()
         }
         # TODO: think about how best to display the scores -> on primer end need to allow for possibility of no score
