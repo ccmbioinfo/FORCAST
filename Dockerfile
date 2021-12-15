@@ -16,7 +16,7 @@ RUN apt update -y && \
 # FORCAST uses both Python 2 and 3 for some reason
         python python3-pip \
 # Bioinformatics tools used when installing new genomes
-        bwa bedtools samtools ncbi-blast+ && \
+        bwa bedtools samtools ncbi-blast+ \
 # FORCAST primer design feature after setup
         primer3 && \
 # Remove lists pulled by apt update for consistent images
