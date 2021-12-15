@@ -1,13 +1,13 @@
-var geneName = getUrlVars()['gene'];
-var ENSID = getUrlVars()['ensid'];
-var GENOME = getUrlVars()['org'];
+var params = new URLSearchParams(location.search);
+var geneName = params.get('gene');
+var ENSID = params.get('ensid');
+var GENOME = params.get('org');
 var RELEASE = function (){
-	//TODO: get the genome here! (hardcoding for mm10 atm)
         var tempRelease = null;
         $.ajax({
                 'type' : "POST",
                 'dataType' : "html",
-		'data' : {genome: 'mm10'},
+		'data' : { genome: GENOME },
                 'async' : false,
                 'url' : "./ajaxCalls/fetchRelease.py",
                 success : function (html) {
@@ -18,15 +18,6 @@ var RELEASE = function (){
 }();
 
 document.title = geneName + " Manual Primer Entry";
-
-// thank you anonymous author at html-online.com/articles/get-url-parameters-javascript/
-function getUrlVars() {
-    var vars = {};
-    var parts = window.location.href.replace(/[?&]+([^=&]+)=([^&]*)/gi, function(m,key,value) {
-        vars[key] = value;
-    });
-    return vars;
-}
 
 function populateOnLoad(){
 	$('#page-title').html("Manually Enter Primer Pair for " + geneName);
