@@ -358,7 +358,7 @@ def load_gff_into_JBrowse(root_dir,jbrowse_path, jbrowse_data_directory, jbrowse
             if dataset_id_exists is False:
                 jbrowse_fh.write(dataset_id+"\n")
                 jbrowse_fh.write('url  = ?data='+os.path.basename(jbrowse_data_directory)+"\n")
-                jbrowse_fh.write('name = '+ genome.lower())
+                jbrowse_fh.write('name = '+ genome.lower() + "\n\n")
 
         gRNA_gff = os.path.join(jbrowse_data_directory,"gRNA_CRISPR.gff")
         primer_gff = os.path.join(jbrowse_data_directory,"acceptedPrimers.gff")
