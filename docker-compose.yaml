@@ -21,7 +21,4 @@ volumes:
 # After startup, exec into the container and run
 # cd /var/www/html/src/setup
 # python3 setup.py -r /var/www/html -g Saccharomyces_cerevisiae -v R64-1-1 -fa2bit /var/www/html/bin/faToTwoBit -b /usr/bin
-# mkdir -p /opt/dicey/indexes/R64-1-1
-# cd /opt/dicey/indexes/R64-1-1
-# wget -r -np -nH --cut-dirs 2 -A "Saccharomyces_cerevisiae.*" https://gear.embl.de/data/tracy/
-# rename "s/^.*.fa\./R64-1-1.fa./" *
+# ./enable_dicey.sh Saccharomyces_cerevisiae R64-1-1
