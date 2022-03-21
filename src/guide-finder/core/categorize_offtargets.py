@@ -38,14 +38,14 @@ def categorizeOffTargets(guideDict, rgenID, genome, batchID):
 	dbConnection = Config(genome)
 	rgen = getRgenRecord(rgenID, dbConnection)
 	# construct bed intersect command
-	segmentsFile = os.path.join(dbConnection.ROOT_PATH, "jbrowse/data."+genome, "downloads", genome+".segments.bed")
+	segmentsFile = os.path.join(dbConnection.ROOT_PATH, "jbrowse/data/"+genome, "downloads", genome+".segments.bed")
 	extendedBed = os.path.join(dbConnection.ROOT_PATH, "src/guide-finder/tempfiles", str(batchID)+"_extended.bed")
 	bedCommand = ["bedtools", "intersect", "-a", extendedBed, "-b", segmentsFile, "-wb"]
 	p = Popen(bedCommand, stdin=PIPE, stdout=PIPE, stderr=PIPE)
 	out, err = p.communicate()
 	if err:
 		sys.exit(err)
-	
+
 	categorized = []
 	for line in out.splitlines():
 		# assign every intersection to its off-target
@@ -59,7 +59,7 @@ def categorizeOffTargets(guideDict, rgenID, genome, batchID):
 				contextString = str(intersect[-1])
 				# start the context string or append to the existing one
 				offTarget['context'] = formatContext('', contextString) if 'context' not in offTarget else formatContext(offTarget['context'], contextString)
-	
+
 	return guideDict
 
 
@@ -76,7 +76,7 @@ def formatContext(existingContext, newIntersection):
 		if 'intronic' in existingContext:
 			return existingContext
 		elif 'exonic' in existingContext:
-			return existingContext.replace('exonic', 'exonic/intronic') # give more specific categorization 
+			return existingContext.replace('exonic', 'exonic/intronic') # give more specific categorization
 		else:
 			return newIntersection + " | " + existingContext
 	elif newIntersection == 'intergenic':

@@ -10,6 +10,7 @@ services:
       - ./bin:/var/www/html/bin
       - ./docs:/var/www/html/docs
       - ./src:/var/www/html/src
+      - ./jbrowse/data:/var/www/html/jbrowse/data
       - ./jbrowse/plugins/ColorByCDS:/var/www/html/jbrowse/plugins/ColorByCDS
       - ./jbrowse/plugins/ExportSequence:/var/www/html/jbrowse/plugins/ExportSequence
       - ./crispr-icon.png:/var/www/html/crispr-icon.png

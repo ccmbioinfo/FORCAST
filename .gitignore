@@ -3,7 +3,7 @@
 bin/dicey
 bin/ncbi-blast-2.7.1+
 bin/primer3
-jbrowse/data.*
+jbrowse/data*
 jbrowse/Makefile
 jbrowse/setup.log
 jbrowse/jbrowse.conf

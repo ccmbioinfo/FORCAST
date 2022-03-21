@@ -1,16 +1,7 @@
-import requests
-import sys
-import ftplib
+import ftplib, glob, json, os, re, requests, subprocess
 from ftplib import FTP
-import os
-import glob
-import subprocess
-import re
-import pprint
-import pymongo
-from pymongo import MongoClient
 from urllib.parse import quote_plus
-import json
+from pymongo import MongoClient
 
 dir_path = os.path.dirname(os.path.abspath(__file__))
 
@@ -19,16 +10,16 @@ ENSEMBL_FTP = "ftp.ensembl.org"
 def get_latest_ensembl_version():
 
     '''This function fetches the latest Emsembl annoatation version via Ensembl API'''
-    
+
     print("Fetching latest Ensembl version....")
     ensembl_url = "https://rest.ensembl.org/info/data/?"
     success = 1
     try:
-        releaseRequest = requests.get(ensembl_url, headers={"Content-Type": "application/json"}, timeout=5)
+        releaseRequest = requests.get(ensembl_url, headers={"Content-Type": "application/json"}, timeout=30)
     except requests.exceptions.Timeout:
         print("The Ensembl Rest API is not responding (https://rest.ensembl.org). Some functionality may be unavailable")
         return str(-1)
-	
+
     if not releaseRequest.ok:
         releaseRequest.raise_for_status()
         print("Problem fetching information from Ensembl")
@@ -52,7 +43,7 @@ def check_crcsum(sumfile, file_to_check):
     return False
 
 def check_md5sum(sumfile,file_to_check):
-    
+
     '''This function checks the md5sum of the file file_to_check'''
     download_file_md5sum = subprocess.check_output(["md5sum",file_to_check]).decode("utf-8").strip().split(" ")
     ensemble_md5sum = subprocess.check_output(["grep",os.path.basename(file_to_check),sumfile]).decode("utf-8").strip().split(" ")
@@ -61,7 +52,7 @@ def check_md5sum(sumfile,file_to_check):
     return False
 
 def download_and_check(ftp_handle,ftp_directory,checksum_file,file_type,file_suffix,glob_suffix,jbrowse_download_directory,checksum_func):
-    
+
     ''' This function performs tha actual download of fa, gff files from Ensembl and performs checksums on them '''
     ftp_handle.cwd(ftp_directory)
     for file_name in ftp_handle.nlst():
@@ -90,7 +81,7 @@ def download_and_check(ftp_handle,ftp_directory,checksum_file,file_type,file_suf
     return False
 
 def copy_user_files(genome_file_path,jbrowse_download_directory):
-    
+
     if os.path.isfile(genome_file_path):
         (user_genome_directory,user_genome_file) = os.path.split(genome_file_path)
         if user_genome_file.endswith('.fa.gz') is False:
@@ -115,7 +106,7 @@ def download_files_from_ensembl(jbrowse_path, jbrowse_data_directory, jbrowse_do
             ftp_genome_directory = os.path.join("pub","release-"+str(ensembl_version), "fasta", genome, "dna")
 
             if genome_file_path is None:
-                # download chromosome files for genome from Ensembl 
+                # download chromosome files for genome from Ensembl
                 try:
                     ens_ftp.cwd(ftp_genome_directory)
                 except ftplib.error_perm:
@@ -123,37 +114,37 @@ def download_files_from_ensembl(jbrowse_path, jbrowse_data_directory, jbrowse_do
 
                 chr_files = [file_name for file_name in ens_ftp.nlst() if '.dna.chromosome' in file_name]
                 ens_ftp.cwd("../../../../../")
-                
+
                 for chr_file in chr_files:
-                    if download_and_check(ens_ftp,os.path.join("pub","release-"+str(ensembl_version), "fasta", genome, "dna"),"crcsum.fa.txt","Genome fasta file",chr_file,chr_file,jbrowse_download_directory,check_crcsum) == True: 
+                    if download_and_check(ens_ftp,os.path.join("pub","release-"+str(ensembl_version), "fasta", genome, "dna"),"crcsum.fa.txt","Genome fasta file",chr_file,chr_file,jbrowse_download_directory,check_crcsum) == True:
                         print(chr_file+" successfully downloaded.")
                         ens_ftp.cwd("../../../../../")
                     else:
                         raise Exception("Error downloading "+ chr_file+". Please retry.")
-                
+
                 try:
                     chr_file_string = " ".join([os.path.join(jbrowse_download_directory,file_name) for file_name in chr_files])
                     subprocess.run("cat " + chr_file_string+ ">"+os.path.join(jbrowse_download_directory,genome+"."+ensembl_version+"."+"full_genome"+".fa.gz"), shell=True, check=True)
                 except:
                     raise Exception("Error creating full_genome.fa.gz file. Aborting")
-                
+
                 if os.path.exists(os.path.join(jbrowse_download_directory,genome+"."+ensembl_version+"."+"full_genome"+".fa.gz")):
                     print("full genome file created successfully! Removing chromosome fasta files")
                     subprocess.run("rm "+chr_file_string,shell=True)
                 else:
                     raise Exception("Error downloading Genome file. Please retry.")
-            
+
             try:
                 ens_ftp.cwd(ftp_genome_directory)
             except ftplib.error_perm:
                 raise Exception("Unable to locate genome files for "+str(genome)+ ". Please ensure "+str(ftp_genome_directory)+" exists and is reachable")
-            
+
             # download gff file for gene annotations.
             if download_and_check(ens_ftp,os.path.join("../../../gff3", genome),"crcsum.gff3.txt","Annotation gff file",ensembl_version + ".gff3.gz","*." + ensembl_version + ".gff3.gz",jbrowse_download_directory,check_crcsum) == True:
                 print("Annotation gff file successfully downloaded.")
             else:
                 raise Exception("Error downloading annotation gff3 file. Please retry.")
-            
+
             if genome.lower() == 'mus_musculus' or genome.lower() == 'homo_sapiens':
                 #mus_musculus and homo_sapiens have separate files for regulatory regions in Ensembl.
                 if download_and_check(ens_ftp,os.path.join("../../regulation", genome),"md5sum.regulatory.gff.txt","Regulatory regions gff file",".gff.gz","*Regulatory*gff.gz",jbrowse_download_directory,check_md5sum) == True:
@@ -167,7 +158,7 @@ def download_files_from_ensembl(jbrowse_path, jbrowse_data_directory, jbrowse_do
 
 
 def process_fasta_file(filename, genome_version, faToTwoBit_path):
-    
+
     '''This function adds "chr" to the genome fasta file and removes text after the first space in the header'''
     (fileprefix,ext) = os.path.splitext(filename)
     output_file = fileprefix + ".processed" + ext
@@ -176,15 +167,15 @@ def process_fasta_file(filename, genome_version, faToTwoBit_path):
     print("Processing file " + filename)
     with open(filename,"r") as inp_fh, open(output_file,"w") as out_fh :
         for line in inp_fh:
-            if line.startswith('>'): 
+            if line.startswith('>'):
                 tmpList = line.split(" ") #disregard any text in header after a white space.
                 if 'chr' in tmpList[0].lower():
-                    out_fh.write(tmpList[0]+"\n") 
+                    out_fh.write(tmpList[0]+"\n")
                 else:
                     out_fh.write(tmpList[0][0] + "chr" + tmpList[0][1:]+"\n") # ">"+ chr + chromosome number
             else:
                 out_fh.write(line)
-    
+
     if not os.path.exists(short_genome_name+".bwt"):
         print("Generating bwa index files")
         subprocess.run(["ln", "-fs", output_file, short_genome_name])
@@ -204,7 +195,7 @@ def process_fasta_file(filename, genome_version, faToTwoBit_path):
         if not os.path.exists(short_genome_name+".fai"):
             print("Cannot create genome fai file")
             return False
-        
+
     print("Processing complete!")
 
 def process_gff_file(filename):
@@ -216,9 +207,9 @@ def process_gff_file(filename):
     exon_dict = {}
     with open(filename,"r") as inp_fh: #slurp file first
         for line in inp_fh:
-            field_list = line.split("\t") 
+            field_list = line.split("\t")
             if len(field_list) == 9 and field_list[2] == 'exon':
-                transcript_match = re.search("transcript:(.+?);",field_list[8]) 
+                transcript_match = re.search("transcript:(.+?);",field_list[8])
                 if transcript_match is not None and len(transcript_match.groups()) == 1:
                     if transcript_match.group(1) not in exon_dict:
                         exon_dict[transcript_match.group(1)] = {}
@@ -226,15 +217,15 @@ def process_gff_file(filename):
                         exon_dict[transcript_match.group(1)][field_list[3]] = {}
                     if field_list[4] not in exon_dict[transcript_match.group(1)][field_list[3]]:
                         exon_dict[transcript_match.group(1)][field_list[3]][field_list[4]] = {}
-                 
+
                 ensembl_end_phase = re.search("ensembl_end_phase=(.+?);",field_list[8])
                 if ensembl_end_phase is not None and len(ensembl_end_phase.groups()) == 1 :
                     exon_dict[transcript_match.group(1)][field_list[3]][field_list[4]]['ensembl_end_phase'] = ensembl_end_phase.group(0)
-                
+
                 ensembl_phase = re.search("ensembl_phase=(.+?);",field_list[8])
                 if ensembl_phase is not None and len(ensembl_phase.groups()) == 1 :
                     exon_dict[transcript_match.group(1)][field_list[3]][field_list[4]]['ensembl_phase'] = ensembl_phase.group(0)
-    
+
     with open(filename,"r") as inp_fh, open(output_file,"w") as out_fh:
         #now process the file
         for line in inp_fh:
@@ -255,13 +246,13 @@ def process_gff_file(filename):
                                     # if exon start or end position is the same as this CDS or if the exon completely includes the CDS:
                                     if int(start_pos) == int(field_list[3]) or int(end_pos) == int(field_list[4]) or (int(start_pos) < int(field_list[3]) and int(end_pos) > int(field_list[4])) :
                                         field_list[8] = exon_dict[transcript_match.group(1)][start_pos][end_pos]['ensembl_end_phase'] + exon_dict[transcript_match.group(1)][start_pos][end_pos]['ensembl_phase'] + field_list[8]
-            
+
             out_fh.write("\t".join(field_list))
     print("Processing complete!")
 
 
 def process_files_for_upload(root_path, jbrowse_download_directory, genome_version, faToTwoBit_path):
-   
+
     '''This function unzips the downloaded files and coordinates processing of those files for JBrowse load'''
     print("Unzipping downloaded files.")
     downloaded_files = glob.glob(os.path.join(jbrowse_download_directory,"*[fagff3].gz"))
@@ -289,7 +280,7 @@ def process_files_for_upload(root_path, jbrowse_download_directory, genome_versi
     if return_value is not True:
         return return_value
 
-    return True 
+    return True
 
 def create_segments_bed(root_path, jbrowse_download_directory, genome_version):
 
@@ -302,7 +293,7 @@ def create_segments_bed(root_path, jbrowse_download_directory, genome_version):
     for gff_file in glob.glob(os.path.join(jbrowse_download_directory,"*processed*gff*")):
         if 'Regulatory_Build' not in gff_file:
             annotation_gff3 = gff_file
-    
+
     if fai_file is None or annotation_gff3 is None:
         return("fai fasta file or annotation gff file not found in the directory" + jbrowse_download_directory)
 
@@ -331,7 +322,7 @@ def load_gff_into_JBrowse(root_dir,jbrowse_path, jbrowse_data_directory, jbrowse
 
     ''' This function loads genes, transcripts and regulatoary regions from gff files into JBrowse and copies the trackList.json template to the JBrowse data folder '''
     print("Loading annotations in JBrowse")
-    to_copy_json = os.path.join(root_dir,"src/setup","trackList_no_regulatory.json") 
+    to_copy_json = os.path.join(root_dir,"src/setup","trackList_no_regulatory.json")
     gff_files = glob.glob(os.path.join(jbrowse_download_directory,"*processed*gff*"))
     try:
         for gff_file in gff_files:
@@ -343,12 +334,12 @@ def load_gff_into_JBrowse(root_dir,jbrowse_path, jbrowse_data_directory, jbrowse
                 subprocess.run([os.path.join(jbrowse_path,"bin","flatfile-to-json.pl"), "--gff", gff_file, "--trackLabel", "Transcripts", "--type", "transcript,pseudogenic_transcript,mRNA,miRNA,ncRNA,scRNA,snoRNA,snRNA,lnc_RNA,rRNA,tRNA", "--trackType", "CanvasFeatures", '--out', jbrowse_data_directory])
         subprocess.run([os.path.join(jbrowse_path,"bin","generate-names.pl"),'--out', jbrowse_data_directory])
         subprocess.run(['cp',to_copy_json,os.path.join(jbrowse_data_directory,"trackList.json")])
-        
+
         #this section will write tracks.conf file to the jbrowse data folder and adds the genome name on Jbrowse menu
         with open(os.path.join(jbrowse_data_directory,"tracks.conf"),"w") as out_fh:
-            out_fh.write("[general]\ndataset_id = "+str(genome_version))
-        
-        dataset_id = '[datasets.'+genome_version+']'
+            out_fh.write(f"[general]\ndataset_id = {genome_version}")
+
+        dataset_id = f"[datasets.{genome_version}]"
         dataset_id_exists = False
         with open(os.path.join(jbrowse_path,"jbrowse.conf"),"a+") as jbrowse_fh:
             jbrowse_fh.seek(0,0)
@@ -356,9 +347,9 @@ def load_gff_into_JBrowse(root_dir,jbrowse_path, jbrowse_data_directory, jbrowse
                 if line.startswith(dataset_id):
                     dataset_id_exists = True
             if dataset_id_exists is False:
-                jbrowse_fh.write(dataset_id+"\n")
-                jbrowse_fh.write('url  = ?data='+os.path.basename(jbrowse_data_directory)+"\n")
-                jbrowse_fh.write('name = '+ genome.lower() + "\n\n")
+                jbrowse_fh.write(f"{dataset_id}\n")
+                jbrowse_fh.write(f"url  = ?data=data/{genome_version}\n")
+                jbrowse_fh.write(f"name = {genome} ({genome_version})\n\n")
 
         gRNA_gff = os.path.join(jbrowse_data_directory,"gRNA_CRISPR.gff")
         primer_gff = os.path.join(jbrowse_data_directory,"acceptedPrimers.gff")
@@ -366,7 +357,7 @@ def load_gff_into_JBrowse(root_dir,jbrowse_path, jbrowse_data_directory, jbrowse
         if not os.path.exists(gRNA_gff):
             subprocess.run(['touch',gRNA_gff])
             os.chmod(gRNA_gff,0o777)
-    
+
         if not os.path.exists(primer_gff):
             subprocess.run(['touch',primer_gff])
             os.chmod(primer_gff,0o777)
@@ -376,7 +367,7 @@ def load_gff_into_JBrowse(root_dir,jbrowse_path, jbrowse_data_directory, jbrowse
     return True
 
 def load_geneinfo_RGENs_into_Mongo(jbrowse_download_directory, mongo_username, mongo_password, mongo_database, ensembl_version, genome, genome_version):
-    
+
     ''' This function loads gene annoations into Mongo database under collection "geneInfo_<ensembl_version>" '''
     gene_info_collection = "geneInfo_" + str(ensembl_version)
     meta_data_collection = "metadata"
@@ -388,10 +379,10 @@ def load_geneinfo_RGENs_into_Mongo(jbrowse_download_directory, mongo_username, m
             geneInfo_gff = gff_file
     if geneInfo_gff is None:
         return("Cannot find annotation gff file in directory" + jbrowse_download_directory)
-   
+
     mongo_uri = "mongodb://localhost:27017"
     if mongo_username is not None and mongo_password is not None:
-       mongo_uri = "mongodb://%s:%s@%s" % (quote_plus(mongo_username), quote_plus(mongo_password), "localhost") #straight up copied from api.mongodb.com 
+       mongo_uri = "mongodb://%s:%s@%s" % (quote_plus(mongo_username), quote_plus(mongo_password), "localhost") #straight up copied from api.mongodb.com
 
     try:
         pyMongoClient = MongoClient(mongo_uri)
@@ -415,12 +406,12 @@ def load_geneinfo_RGENs_into_Mongo(jbrowse_download_directory, mongo_username, m
             print("Error inserting RGENs into Mongo database: "+ str(e))
     else:
         print("RGEN collection already exists in Mongo database, will not overwrite")
-    
+
     for collection_name in (gene_info_collection, meta_data_collection):
         if collection_name in pyMongoClient[mongo_database].collection_names():
             print(collection_name + " already exists in Mongo database")
             return True
-    
+
     gene_info_collection_obj = pyMongoClient[mongo_database][gene_info_collection]
     meta_data_collection_obj = pyMongoClient[mongo_database][meta_data_collection]
     geneDict = {}
@@ -434,7 +425,7 @@ def load_geneinfo_RGENs_into_Mongo(jbrowse_download_directory, mongo_username, m
                     if 'Name' not in tmpDict:
                         tmpDict['Name'] = tmpDict['ID']
                     if tmpDict['ID'] not in geneDict:
-                        geneDict[tmpDict['ID']] = {"ENSID":tmpDict['ID'],"Name": tmpDict['Name'], "chr":tmpArr[0], "start":int(tmpArr[3]), "end": int(tmpArr[4]), "strand": tmpArr[6]}    
+                        geneDict[tmpDict['ID']] = {"ENSID":tmpDict['ID'],"Name": tmpDict['Name'], "chr":tmpArr[0], "start":int(tmpArr[3]), "end": int(tmpArr[4]), "strand": tmpArr[6]}
     try:
         gene_info_collection_obj.insert_many(list(geneDict.values()))
         gene_info_collection_obj.create_index("ENSID")
@@ -446,25 +437,25 @@ def load_geneinfo_RGENs_into_Mongo(jbrowse_download_directory, mongo_username, m
     return True
 
 def create_blastdb(jbrowse_download_directory, blastdb_directory, genome_version, blast_path):
-    
+
     ''' This function will create a blast database '''
-    
+
     blast_input_fasta_file = genome_version + ".fa"
     blast_output_db = genome_version + "_blastdb"
 
     fasta_file = glob.glob(os.path.join(jbrowse_download_directory,"*processed*fa"))
     if len(fasta_file) == 0:
         return("Genome fasta file not found in "+ jbrowse_download_directory)
-    
+
     try:
         os.chdir(blastdb_directory)
         subprocess.run(['ln', '-s', fasta_file[0], blast_input_fasta_file])
         subprocess.run([os.path.join(blast_path,"makeblastdb"), '-in', blast_input_fasta_file, '-input_type', 'fasta', '-dbtype', 'nucl', '-title', blast_output_db, '-parse_seqids', '-out', blast_output_db])
     except Exception as err:
         return(err)
-    
+
     return True
 
 if __name__=="__main__":
     main()
-	
+

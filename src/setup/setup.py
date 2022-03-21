@@ -1,3 +1,5 @@
+#!/usr/bin/env python3
+
 import argparse
 import sys
 import os
@@ -5,7 +7,7 @@ from fetch_and_setup_ensembl import *
 
 def print_and_exit(msg):
 	print(msg)
-	sys.exit(0)
+	sys.exit(1)
 
 parser = argparse.ArgumentParser(description='This program will download the genome and gene annotation files from Ensembl for the user specified genome and an optional Ensembl annotation version. This program will then load the genome and setup various annotation tracks in JBrowse. This program will also load the gene definitions into MongoDB. Users can control the behavior of this program by passing appropriate command line flags.')
 
@@ -41,15 +43,15 @@ ENSEMBL_VERSION = args.ensembl_version if args.ensembl_version is not None else 
 if int(ENSEMBL_VERSION) == -1 :
 	print_and_exit("Cannot fetch Ensembl version. Exiting")
 
-#JBrowse data directory is always data.<genome_version>
+#JBrowse data directory is always data/<genome_version>
 if os.path.exists(args.root_path) is False:
     print_and_exit("Error! "+ args.root_path +" is an invalid path!")
 
 jbrowse_path = os.path.join(args.root_path,"jbrowse")
-jbrowse_data_directory = os.path.join(jbrowse_path, "data."+args.genome_version)
+jbrowse_data_directory = os.path.join(jbrowse_path, f"data/{args.genome_version}")
 jbrowse_download_directory = os.path.join(jbrowse_data_directory, "downloads")
 
-#create jbrowse data and download directories 
+#create jbrowse data and download directories
 if os.path.exists(jbrowse_data_directory) is False :  #check to make sure that the data is already not loaded into this folder. may be check for jbrowse json data folder
     try:
         os.mkdir(jbrowse_data_directory)
@@ -106,7 +108,7 @@ if args.skip_jbrowse_load:
     print("--skip-jbrowse-load flag is specified on command line. Skipping loading data into JBrowse.")
 elif os.path.exists(os.path.join(jbrowse_data_directory, "gRNA_CRISPR.gff")) and os.path.exists(os.path.join(jbrowse_data_directory, "acceptedPrimers.gff")):
     print("GFF files for genome exist. Skipping loading data into JBrowse")
-else:    
+else:
     # process data & load into JBrowse.
     if args.skip_jbrowse_load_genome is False:
         return_value = load_genome_into_JBrowse(jbrowse_path, jbrowse_data_directory, jbrowse_download_directory)
@@ -143,7 +145,7 @@ else:
     print("creating BLAST database")
     if args.blastdb_path is None:
         print_and_exit("path to blast bin folder not specified! Exiting")
-    return_value = create_blastdb(jbrowse_download_directory, blastdb_directory, args.genome_version, args.blastdb_path)  
+    return_value = create_blastdb(jbrowse_download_directory, blastdb_directory, args.genome_version, args.blastdb_path)
     if return_value is True:
         print("Succesfully created blast database at " + blastdb_directory)
     else:
