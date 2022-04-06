@@ -17,30 +17,54 @@ ENSEMBL="$1"
 SPECIES="$2"
 ASSEMBLY="$3"
 
-# saccharomyces_cerevisiae only has toplevel
-
 # Ensembl has configured its HTTPS server incorrectly, missing an intermediate certificate in the chain
 # This is a workaround that still verifies the certificate chain, but it would still permit an attack
 # from whatismychaincert.com or somebody compromising that website.
-curl --output ensembl.org.chained.crt 'https://whatsmychaincert.com/generate?include_leaf=1;host=ftp.ensembl.org'
+curl --fail --output ensembl.org.chained.crt 'https://whatsmychaincert.com/generate?include_leaf=1;host=ftp.ensembl.org'
+
 # URLs are case-sensitive. Directories are lowercase, files are mixed.
-curl --cacert ensembl.org.chained.crt --fail-early --fail \
-    --output fasta.sum https://ftp.ensembl.org/pub/release-$ENSEMBL/fasta/${SPECIES,,}/dna/CHECKSUMS \
-    --remote-name      https://ftp.ensembl.org/pub/release-$ENSEMBL/fasta/${SPECIES,,}/dna/$SPECIES.$ASSEMBLY.dna.primary_assembly.fa.gz \
-    --output gff3.sum  https://ftp.ensembl.org/pub/release-$ENSEMBL/gff3/${SPECIES,,}/CHECKSUMS \
+TARGETS=(
+    --output fasta.sum https://ftp.ensembl.org/pub/release-$ENSEMBL/fasta/${SPECIES,,}/dna/CHECKSUMS
+    --output gff3.sum  https://ftp.ensembl.org/pub/release-$ENSEMBL/gff3/${SPECIES,,}/CHECKSUMS
     --remote-name      https://ftp.ensembl.org/pub/release-$ENSEMBL/gff3/${SPECIES,,}/$SPECIES.$ASSEMBLY.$ENSEMBL.gff3.gz
-check_sum $SPECIES.$ASSEMBLY.dna.primary_assembly.fa.gz fasta.sum
+)
+
+# Could check if the regulation directory exists (not 404) but that's an extra network request
+if [[ $SPECIES == Homo_sapiens || $SPECIES == Mus_musculus ]]; then
+    >&2 echo $SPECIES is expected to have a regulatory build.
+    TARGETS+=(
+        --output reg.sum
+        https://ftp.ensembl.org/pub/release-$ENSEMBL/regulation/${SPECIES,,}/CHECKSUMS
+    )
+fi
+
+>&2 echo Downloading all checksums and the GFF3...
+# Since checksums are small, we can parallelize
+curl --cacert ensembl.org.chained.crt --fail-early --fail --parallel ${TARGETS[@]}
 check_sum $SPECIES.$ASSEMBLY.$ENSEMBL.gff3.gz gff3.sum
 
-# Could check if the regulation directory exists (not 404) but that's another network request
+# Download the primary assembly to avoid weird contigs. If the file isn't there then
+# the top level and the primary assembly are identical. (e.g. Saccharomyces_cerevisiae)
+if grep "$SPECIES.$ASSEMBLY.dna.primary_assembly.fa.gz" fasta.sum; then
+    FASTA=$SPECIES.$ASSEMBLY.dna.primary_assembly.fa.gz
+else
+    FASTA=$SPECIES.$ASSEMBLY.dna.toplevel.fa.gz
+fi
+>&2 echo Selected FASTA file $FASTA
+TARGETS=(--remote-name https://ftp.ensembl.org/pub/release-$ENSEMBL/fasta/${SPECIES,,}/dna/$FASTA)
+
 if [[ $SPECIES == Homo_sapiens || $SPECIES == Mus_musculus ]]; then
-    wget2 --ca-certificate ensembl.org.chained.crt \
-        --execute robots=off --recursive --level=1 --no-parent --no-directories \
-        --accept "CHECKSUMS" --accept "*.gff.gz" \
-        https://ftp.ensembl.org/pub/release-$ENSEMBL/regulation/${SPECIES,,}/
-    DOWNLOAD=./${SPECIES,,}.$ASSEMBLY.Regulatory_Build.regulatory_features.*.gff.gz
-    if [[ $(md5sum $DOWNLOAD) != $(grep $DOWNLOAD CHECKSUMS) ]]; then
-        >&2 echo "Checksum mismatch for $DOWNLOAD"
-        exit 1
-    fi
+    # Get the name of the regulatory file without the ./ prefix from md5sum output
+    # Recent mouse builds also have an extraneous checksum for a file that's not there so use END to select the last one
+    FILENAME=$(grep "${SPECIES,,}.$ASSEMBLY.Regulatory_Build.regulatory_features.*.gff.gz" reg.sum | awk 'END{print substr($2, 3)}')
+    >&2 echo Found regulatory build $FILENAME
+    TARGETS+=(--remote-name https://ftp.ensembl.org/pub/release-$ENSEMBL/regulation/${SPECIES,,}/$FILENAME)
+fi
+
+>&2 echo Downloading remaining files...
+curl --cacert ensembl.org.chained.crt --fail-early --fail --parallel ${TARGETS[@]}
+check_sum $FASTA fasta.sum
+if [[ ( $SPECIES == Homo_sapiens || $SPECIES == Mus_musculus ) && $(md5sum ./$FILENAME) != $(grep $FILENAME reg.sum) ]]; then
+    >&2 echo "Checksum mismatch for $FILENAME"
+    exit 1
 fi
