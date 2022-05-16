@@ -1,0 +1,44 @@
+29+:
+Total number of potential off-target sites:486
+Off-target Counts: 0-0-4-50-432
+No mismatches in Seed: 0-0-1-3-9
+MIT Score: 53
+CFD Score: 78
+Location,Sequence,Mismatches,Context
+chr16:96754758-96754777:+,"CCTGCAAAGTCTGTCTCAAA, GGG",0,guide
+10-:
+Total number of potential off-target sites:515
+Off-target Counts: 0-0-5-45-465
+No mismatches in Seed: 0-0-0-1-5
+MIT Score: 64
+CFD Score: 75
+Location,Sequence,Mismatches,Context
+chr16:96754779-96754760:-,"CCTTTGAGACAGACTTTGCA, GGG",0,guide
+11-:
+Total number of potential off-target sites:331
+Off-target Counts: 0-0-2-29-300
+No mismatches in Seed: 0-0-0-2-5
+MIT Score: 69
+CFD Score: 81
+Location,Sequence,Mismatches,Context
+chr16:96754780-96754761:-,"CCCTTTGAGACAGACTTTGC, AGG",0,guide
+28+:
+Total number of potential off-target sites:428
+Off-target Counts: 0-0-2-37-389
+No mismatches in Seed: 0-0-2-6-11
+MIT Score: 60
+CFD Score: 77
+Location,Sequence,Mismatches,Context
+chr16:96754757-96754776:+,"CCCTGCAAAGTCTGTCTCAA, AGG",0,guide
+6-:
+Total number of potential off-target sites:464
+Off-target Counts: 0-0-1-31-432
+No mismatches in Seed: 0-0-0-2-3
+MIT Score: 63
+CFD Score: 76
+Location,Sequence,Mismatches,Context
+chr16:96754775-96754756:-,"TGAGACAGACTTTGCAGGGC, TGG",0,guide
+5 GUIDES FOUND
+0 SKIPPED
+0 EXCEEDED MAX OFF TARGETS
+2224 OFF TARGETS FOUND
