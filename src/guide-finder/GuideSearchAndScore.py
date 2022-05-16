@@ -1,4 +1,4 @@
-#!/usr/bin/python3
+#!/usr/bin/python3.5
 
 """
 Hillary Elrick, September 16th, 2019
@@ -465,6 +465,7 @@ class GuideSearchAndScore:
                             column_headings.append('MIT')
                         if 'CFD' in self.scores and not (guide['max_exceeded'] or guide['skip']):
                             column_headings.append('CFD')
+                        writer.writerow(['Location', 'Sequence', 'Mismatches', 'Context'])
                         column_headings.append('no mismatches in seed')
                         writer.writerow(column_headings)
 
@@ -573,7 +574,7 @@ class GuideSearchAndScore:
             time_3 = time.time()
             print("Finished finding offtargets. " + str(round(time_3-time_2,4)))
             print("Scoring potential off target sites and guides...")
-        guideDict = score_offtargets.scoreOffTargets(guideDict, self.rgenID)
+        guideDict = score_offtargets.scoreOffTargets(guideDict, self.rgenID,genome_fa,twoBitToFa_path,genome_2bit,tempfiles_path)
         if self.cli: 
             time_4 = time.time()
             print("Finished scoring. " + str(round(time_4-time_3,4)))
