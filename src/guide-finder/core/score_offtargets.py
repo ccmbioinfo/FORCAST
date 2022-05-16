@@ -19,6 +19,8 @@ from itertools import product
 import cfd_code.cfd_score_calculator3 as cfd
 sys.path.append(os.path.join(dir_path,"inDelphi-model"))
 import inDelphi
+import get_sequence
+import time
 
 def getRgenRecord(rgenID):
 	dbConnection = Config()	
@@ -31,7 +33,7 @@ def getRgenRecord(rgenID):
 		return
 
 
-def inDelphiScore(guideDict):
+def inDelphiScore(guideDict,genome_fa,twoBitToFa_path,genome_2bit,tempfiles_path, cleaves):
 	"""
 	Given a dict of guides, calculate the inDelphi score of each guide and adds this information to the dictionary
 
@@ -57,8 +59,46 @@ def inDelphiScore(guideDict):
 		#TODO: NEED TO REPLACE NEXT LINE
 		# the last term should be replaced with ~20 bps after the cutsite
 		# get this via the get_sequence code
-		fullSeq = str(guide['guide_seq']) + str(guide['pam_seq']) + str(guide['guide_seq'])
+		print(guide['guide_seq'])
+
+		cleavePos=int(str(cleaves)[2:-2])
+		print(cleavePos)
+		#get strand
+		print(guide['strand'])
+		#apply strand logic to coordinates before submitting to get_sequence.py
+		if guide['strand'] == "+":
+			coords=str("%s:%s-%s"%(guide['pam_chrom'],guide['guide_genomic_start'],(guide['pam_genomic_start']+cleavePos+20)))
+		elif guide['strand'] == "-":
+			coords=str("%s:%s-%s"%(guide['pam_chrom'],(guide['pam_genomic_start']-len(guide['guide_seq'])+3),(guide['pam_genomic_start']+1+cleavePos+22)))
+#		coords=str("%s:%s-%s"%(guide['pam_chrom'],guide['guide_genomic_start'],(guide['pam_genomic_start']+cleavePos+20)))
+
+		print(coords)
+
+		timestr = time.strftime("%Y%m%d-%H%M%S")
+		getseq=str(get_sequence.fetch_sequence(twoBitToFa_path, coords, genome_2bit, os.path.join(tempfiles_path,timestr+'_out.fa')))
+		print(os.path.join(tempfiles_path,timestr+'_out.fa'))
+
+		#get 20 bp sequence after PAM
+		with open(os.path.join(tempfiles_path, timestr+'_out.fa'), 'r') as f:
+			for line in f:
+				if line.startswith(">"):
+					location = line.strip()
+					location = location[1:] # remove > marker
+					continue
+				else:
+					fullSeq = line.strip() # seq is next line after label
+
+		#set up strand complementation
+		forward_nuc = 'ATGC'
+		reverse_nuc = 'TACG'
+		translate_code = str.maketrans(forward_nuc, reverse_nuc)
+		if guide['strand'] == "+":
+			fullSeq=fullSeq
+		elif guide['strand'] == "-":
+  			fullSeq = "".join(list(reversed(fullSeq))).translate(translate_code)
+
 		cutsite = len(guide['guide_seq'])
+		print(fullSeq)
 
 		pred_df, stats = inDelphi.predict(fullSeq, cutsite)
 		guide['Precision'] = round(stats['Precision'],2)
@@ -191,10 +231,11 @@ def defaultRank(guideDict):
 		guide['Rank'] = cumulative_rank
 
 
-def scoreOffTargets(guideDict, rgenID):
+def scoreOffTargets(guideDict, rgenID,genome_fa,twoBitToFa_path,genome_2bit,tempfiles_path):
 	# connect to database and get the rgen variables from id
 	rgen = getRgenRecord(rgenID)
 	scores = rgen['Scores']
+	cleaves = rgen['Cleaves']
 
 	if scores:
 		if 'MIT' in scores:
@@ -202,7 +243,7 @@ def scoreOffTargets(guideDict, rgenID):
 		if 'CFD' in scores:
 			cfdScore(guideDict)
 		if 'inDelphi' in scores:
-			inDelphiScore(guideDict)
+			inDelphiScore(guideDict,genome_fa,twoBitToFa_path,genome_2bit,tempfiles_path,cleaves)
 
 	defaultRank(guideDict)
 	return guideDict
