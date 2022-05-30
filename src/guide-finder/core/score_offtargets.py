@@ -97,7 +97,7 @@ def inDelphiScore(guideDict,genome_fa,twoBitToFa_path,genome_2bit,tempfiles_path
 		elif guide['strand'] == "-":
   			fullSeq = "".join(list(reversed(fullSeq))).translate(translate_code)
 
-		cutsite = len(guide['guide_seq'])
+		cutsite = len(guide['guide_seq']) + cleavePos
 		print(fullSeq)
 
 		pred_df, stats = inDelphi.predict(fullSeq, cutsite)
