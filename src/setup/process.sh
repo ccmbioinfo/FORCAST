@@ -19,8 +19,10 @@ ln -fs *.processed.fa "$ASSEMBLY.fa"
 bwa index "$ASSEMBLY.fa" # creates $ASSEMBLY.bwt
 faToTwoBit "$ASSEMBLY.fa" $ASSEMBLY.2bit
 samtools faidx "$ASSEMBLY.fa" # creates $ASSEMBLY.fa.fai
-# Do I need to use a compressed FASTA instead?
-dicey index -o $ASSEMBLY.fa.fm9 "$ASSEMBLY.fa"
+
+ln -s ../downloads/*.fa.gz "$ASSEMBLY.fa.gz"
+# This will silently fail if the source is not gzipped. Also creates $ASSEMBLY.fa.fm9_check
+dicey index -o $ASSEMBLY.fa.fm9 "$ASSEMBLY.fa.gz"
 
 python3 "$SETUP_BIN/process_gff3.py" $GFF
 rm "$FASTA" $GFF
