@@ -29,7 +29,7 @@ class GuideSearchAndScore:
     def __init__(self, **kwargs):
         """ class for controlling the guide searching workflow and displaying results """
         # track whether web or cli
-        self.cli = kwargs['command-line'] 
+        self.cli = kwargs['command-line']
         if self.cli:
             self.output_file = kwargs['output']
         else:
@@ -43,7 +43,7 @@ class GuideSearchAndScore:
         else:
             self.isValidInput(kwargs['searchInput'])
             self.searchInput = kwargs['searchInput']
-       
+
         # validate genome
         if 'genome' not in kwargs:
             self.sendError("'genome' parameter not set")
@@ -51,13 +51,13 @@ class GuideSearchAndScore:
             # attempt connection to genome's db before storing
             self.dbConnection = Config(kwargs['genome'])
             self.genome = kwargs['genome']
-       
+
         # check gene sent
         if 'gene' not in kwargs:
             self.sendError("Please select a Target from the dropdown list")
         else:
             self.gene = kwargs['gene']
-      
+
         # validate rgenID
         if 'rgenID' not in kwargs:
             self.sendError("Please select an RGEN from the dropdown list")
@@ -79,11 +79,11 @@ class GuideSearchAndScore:
             self.sendError("Max off targets is not set")
         else:
             self.maxOffTargets = kwargs['maxOffTargets']
-        
+
         #TODO: implement
         if 'offtargetPAMS' in kwargs:
             self.offTargetPAMS = kwargs['offtargetPAMS']
-        
+
         self.guideDict, self.batchID = self.performGuideSearch()
         self.scores = self.setScores()
 
@@ -108,7 +108,7 @@ class GuideSearchAndScore:
                     available.append(s)
             if len(available) == len(options):
                 break
-       
+
         return available
 
     def renderTemplate(self, template_name, template_values):
@@ -129,9 +129,9 @@ class GuideSearchAndScore:
 
     def tableHeadingHTML(self):
         """ determine which info for the guides is available and display the headings for those """
-       
+
         scoreHeading = ''
-        scoreHeaders = '' 
+        scoreHeaders = ''
         if len(self.scores) > 0:
             scoreHeading += "<th colspan='{num_scores}'>Scoring</th>".format(num_scores=len(self.scores))
             for score in self.scores:
@@ -156,7 +156,7 @@ class GuideSearchAndScore:
 
         sortedGuides = OrderedDict((x, self.guideDict[x]) for x in sortedIDs)
         bodyHTML = "<tbody>"+self.tableRowsHTML(sortedGuides)+"</tbody>"
-        
+
         return bodyHTML
 
     def tableRowsHTML(self, sortedGuides):
@@ -178,7 +178,7 @@ class GuideSearchAndScore:
             rowsHTML += self.renderTemplate("table_row.html", template_values)
 
         return rowsHTML
-    
+
     def rowPopoverHTML(self, guideID):
         """ given a guideID fetch the label and notes if it's already in the database, give the option to add it otherwise """
 
@@ -197,20 +197,20 @@ class GuideSearchAndScore:
         searchQuery = {
             "guideSeq": self.guideDict[guideID]['guide_seq'],
             "pamSeq": self.guideDict[guideID]['pam_seq'],
-            "guideLocation": self.calculateLocation(self.guideDict[guideID]) 
+            "guideLocation": self.calculateLocation(self.guideDict[guideID])
         }
         if self.dbConnection.guideCollection.find(searchQuery).count() > 0:
             existingGuide = self.dbConnection.guideCollection.find_one(searchQuery, {"label": 1, "Notes": 1})
             return 'Update Guide', existingGuide['label'], existingGuide['Notes']
         else:
             return 'Add to Database', '', ''
-    
+
     def guideExistsInDatabase(self, guideID):
         """ return true if the guide is already stored, false otherwise """
         searchQuery = {
             "guideSeq": self.guideDict[guideID]['guide_seq'],
             "pamSeq": self.guideDict[guideID]['pam_seq'],
-            "guideLocation": self.calculateLocation(self.guideDict[guideID]) 
+            "guideLocation": self.calculateLocation(self.guideDict[guideID])
         }
         if self.dbConnection.guideCollection.find(searchQuery).count() > 0:
             return True
@@ -225,7 +225,7 @@ class GuideSearchAndScore:
             return pam_seq + ", " + guide_seq
         else:
             self.sendError("Unrecognized PAM Location for RGEN: " + str(self.rgenRecord['PamLocation']))
-    
+
     def calculateLocation(self, guide):
         """ using the strand of the guide and the genomic start, format the location string """
         if guide['strand'] == '+':
@@ -234,7 +234,7 @@ class GuideSearchAndScore:
             return guide['pam_chrom'] + ":" + str(guide['guide_genomic_start']) + "-" + str(int(guide['guide_genomic_start']-len(guide['guide_seq']))+1) + ":-"
         else:
             self.sendError("Unrecognized strand for guide: " + str(guide['strand']))
-    
+
     def offtargetHTML(self, guideID, guide):
         """ creates the HTML for the off-target modal of a given guide """
         template_values = {
@@ -246,7 +246,7 @@ class GuideSearchAndScore:
             'totalCount': str(sum(guide['offtarget_counts']))
         }
         return self.renderTemplate("offtarget_cell.html", template_values)
-    
+
     def offtargetCountsHTML(self, guideID, guide):
         """ formats the links to the off-target modals """
         off_target_counts = "<div style='color: #2676ff; font-weight: bold'>"
@@ -300,13 +300,13 @@ class GuideSearchAndScore:
             return resultHTML
         else:
             return "<p>No Off-Targets with {mismatches} Mismatches</p>".format(mismatches=str(num_mismatches))
-    
+
     def offTargetTableHTML(self, offtarget_list, maxShown):
         """ sorts, formats and returns a table of off-targets from the offtarget list provided """
-        
+
         num_offtargets = len(offtarget_list)
         offtarget_list = offtarget_list[:maxShown]
-        
+
         for offtarget in offtarget_list:
             offtarget.update({'formatted_seq': self.colourLowercaseRed(self.formatSequence(offtarget['seq'], offtarget['pam']))})
         # sort by score if available
@@ -318,14 +318,14 @@ class GuideSearchAndScore:
         total_count = ''
         if num_offtargets > maxShown:
             total_count = "<p>({max} of {total} shown)</p>".format(max=str(maxShown), total=str(num_offtargets))
-      
+
         template_values = {
             'offtargetSubset': offtarget_list,
             'totalCount': total_count
         }
 
         return self.renderTemplate('offtarget_table.html', template_values)
- 
+
     def separateOffTargets(self, off_target_subset):
         """ given a list of filtered off-targets, separate the regular ones from those that have no mismatches in the rgen's seed region """
         seedDirection = self.rgenRecord['SeedRegion'][0]
@@ -346,11 +346,11 @@ class GuideSearchAndScore:
         if seedDirection == '+':
             for idx in range(0, seedLength):
                 if offtargetSeq[idx].islower():
-                    return True 
+                    return True
         elif seedDirection == '-':
             for idx in reversed(range(guideLength-seedLength,guideLength)):
                 if offtargetSeq[idx].islower():
-                    return True 
+                    return True
 
         return False
 
@@ -387,10 +387,10 @@ class GuideSearchAndScore:
         return
 
     def sendError(self, errorString):
-        """ format exceptions in HTML to prevent page from crashing """ 
+        """ format exceptions in HTML to prevent page from crashing """
         if not hasattr(self, 'dbConnection'):
             self.dbConnection = Config()
-        
+
         if self.cli:
             raise Exception(errorString)
         else:
@@ -429,7 +429,7 @@ class GuideSearchAndScore:
                             num_skipped += 1
                         else:
                             writer.writerow(['Total number of potential off-target sites:' + str(sum(guide['offtarget_counts']))])
-                            total_offtargets_processed += sum(guide['offtarget_counts']) 
+                            total_offtargets_processed += sum(guide['offtarget_counts'])
                         writer.writerow(['Off-target Counts: ' + "-".join(map(str,guide['offtarget_counts']))])
                         writer.writerow(['No mismatches in Seed: ' +  "-".join(map(str,guide['offtargets_seed']))])
                         if guide['MIT'] and not guide['max_exceeded']:
@@ -438,7 +438,7 @@ class GuideSearchAndScore:
                             writer.writerow(['CFD Score: ' + str(guide['CFD'])])
                         writer.writerow(['Location', 'Sequence', 'Mismatches', 'Context'])
                         writer.writerow([self.calculateLocation(guide), self.formatSequence(guide['guide_seq'], guide['pam_seq']), '0', 'guide'])
-                    writer.writerow([str(len(self.guideDict.keys()))+" GUIDES FOUND"]) 
+                    writer.writerow([str(len(self.guideDict.keys()))+" GUIDES FOUND"])
                     writer.writerow([str(num_skipped)+" SKIPPED"])
                     writer.writerow([str(num_exceeded)+" EXCEEDED MAX OFF TARGETS"])
                     writer.writerow([str(total_offtargets_processed)+" OFF TARGETS FOUND"])
@@ -454,13 +454,13 @@ class GuideSearchAndScore:
                             row.append('-')
                         writer.writerow(row)
                     """
-        else:    
-            for guideID, guide in self.guideDict.items():            
+        else:
+            for guideID, guide in self.guideDict.items():
                 csv_path = os.path.join(self.dbConnection.ROOT_PATH,'src/guide-finder/tempfiles', self.batchID+"_"+guideID+".csv")
                 try:
                     with open(csv_path, mode='w') as csv_file:
                         writer = csv.writer(csv_file, delimiter=',')
-                        # build and write heading row 
+                        # build and write heading row
                         column_headings = ['chromosome', 'location', 'strand', 'protospacer sequence', 'PAM', 'mismatches', 'context']
                         if 'MIT' in self.scores and not (guide['max_exceeded'] or guide['skip']):
                             column_headings.append('MIT')
@@ -469,7 +469,7 @@ class GuideSearchAndScore:
                         column_headings.append('no mismatches in seed')
                         writer.writerow(column_headings)
 
-                        # build and write guide row 
+                        # build and write guide row
                         guide_row = [guide['pam_chrom']]
                         guide_row.append(self.calculateLocation(guide).split(":")[1])
                         guide_row.append(guide['strand'])
@@ -487,7 +487,7 @@ class GuideSearchAndScore:
                         # initialize variables for determining whether offtarget has mismatch in seed
                         seedDirection = self.rgenRecord['SeedRegion'][0]
                         seedLength = int(self.rgenRecord['SeedRegion'][1:])
-                        # build and write row for each of the potential off target sites                 
+                        # build and write row for each of the potential off target sites
                         for offtarget in guide['offtargets']:
                             offtarget_row = offtarget['loc'].split(':')
                             offtarget_row.append(offtarget['seq'])
@@ -510,11 +510,11 @@ class GuideSearchAndScore:
                     print(guideID)
                     print(guide)
                     self.sendError("Error writing off target CSV file, "+str(e))
-        
+
     def getENSID(self):
         """ given the gene symbol, return the ENSEMBL ID from the stored gene collection """
         geneCollection = self.dbConnection.curr_geneCollection
-        result = geneCollection.find({"Name": self.gene}) 
+        result = geneCollection.find({"Name": self.gene})
         if result.count() > 1:
             self.sendError("More than one result in the database for gene symbol: " + self.gene)
         elif result.count() < 1:
@@ -547,17 +547,17 @@ class GuideSearchAndScore:
         # TODO: look into a collision-free hashing function so don't have to re-run entire pipeline if inputs don't change
         batchID = binascii.b2a_hex(os.urandom(9)).decode('utf-8')
 
-        genome_fa = os.path.join(self.dbConnection.ROOT_PATH,'jbrowse', 'data.'+self.genome,"downloads",self.genome+".fa")
+        genome_fa = os.path.join(self.dbConnection.ROOT_PATH,'jbrowse', 'data', self.genome,"processed",self.genome+".fa")
         twoBitToFa_path = os.path.join(self.dbConnection.ROOT_PATH,'bin/twoBitToFa')
-        genome_2bit = os.path.join(self.dbConnection.ROOT_PATH,'jbrowse', 'data.'+self.genome,"downloads",self.genome+'.2bit')
+        genome_2bit = os.path.join(self.dbConnection.ROOT_PATH,'jbrowse', 'data', self.genome,"processed",self.genome+'.2bit')
         tempfiles_path = os.path.join(self.dbConnection.ROOT_PATH,'src/guide-finder/tempfiles')
         if self.cli:
             import time
             time_0 = time.time()
             print("Fetching sequence...")
 
-        get_sequence.fetch_sequence(twoBitToFa_path, self.searchInput, genome_2bit, os.path.join(tempfiles_path,batchID+'_out.fa')) 
-        if self.cli: 
+        get_sequence.fetch_sequence(twoBitToFa_path, self.searchInput, genome_2bit, os.path.join(tempfiles_path,batchID+'_out.fa'))
+        if self.cli:
             time_1 = time.time()
             print("Finished fetching sequence. " + str(round(time_1-time_0,4)))
             print("Determining guides in search region...")
@@ -565,17 +565,17 @@ class GuideSearchAndScore:
         protospacer_length = getattr(self, 'guideLength', 0) # passing 0 indicates default should be used
         guideDict = find_grna.find_grna(self.rgenID, protospacer_length, os.path.join(tempfiles_path, batchID+'_out.fa'))
 
-        if self.cli: 
+        if self.cli:
             time_2 = time.time()
             print("Finished finding gRNAs. " + str(round(time_2-time_1,4)))
             print("Searching for potential off target sites...")
         guideDict = find_offtargets.findOffTargets(guideDict, self.rgenID, self.genome, self.maxOffTargets, batchID, genome_fa, tempfiles_path)
-        if self.cli: 
+        if self.cli:
             time_3 = time.time()
             print("Finished finding offtargets. " + str(round(time_3-time_2,4)))
             print("Scoring potential off target sites and guides...")
         guideDict = score_offtargets.scoreOffTargets(guideDict, self.rgenID)
-        if self.cli: 
+        if self.cli:
             time_4 = time.time()
             print("Finished scoring. " + str(round(time_4-time_3,4)))
             print("Categorizing potential off target sites...")
@@ -625,12 +625,12 @@ def main():
 
         # only use the max if the checkbox is selected
         parameters['maxOffTargets'] = parameters['maxOffTargets'] if parameters['setMax'] == 'true' else None
-        
+
         GuideSearchAndScore(**parameters)
     else:
         desc = """ The command-line version of GuideSearchAndScore.py will return potential guides along with their scores and off-targets.
          """
-        
+
         parser = argparse.ArgumentParser(prog='GuideSearchAndScore',description=desc)
         parser._action_groups.pop()
         required = parser.add_argument_group('required arguments')

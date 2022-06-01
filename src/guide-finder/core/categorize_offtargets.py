@@ -38,7 +38,7 @@ def categorizeOffTargets(guideDict, rgenID, genome, batchID):
 	dbConnection = Config(genome)
 	rgen = getRgenRecord(rgenID, dbConnection)
 	# construct bed intersect command
-	segmentsFile = os.path.join(dbConnection.ROOT_PATH, "jbrowse/data/"+genome, "downloads", genome+".segments.bed")
+	segmentsFile = os.path.join(dbConnection.ROOT_PATH, "jbrowse/data/"+genome, "processed", genome+".segments.bed")
 	extendedBed = os.path.join(dbConnection.ROOT_PATH, "src/guide-finder/tempfiles", str(batchID)+"_extended.bed")
 	bedCommand = ["bedtools", "intersect", "-a", extendedBed, "-b", segmentsFile, "-wb"]
 	p = Popen(bedCommand, stdin=PIPE, stdout=PIPE, stderr=PIPE)

@@ -296,7 +296,7 @@ def convertExtendedBedToFasta(batchID, genome, genome_fa, tempfile_directory):
 		raise Exception("Error in bedtools getfasta command: " + str(p.stderr))
 
 	"""
-	twoBitTwoFaCommand = [os.path.join(dir_path,"../../../bin/twoBitToFa"), os.path.join(dir_path,"../../../jbrowse/data/mm10/downloads/mm10.2bit"),"-bed="+extendedBed, extendedFasta]
+	twoBitTwoFaCommand = [os.path.join(dir_path,"../../../bin/twoBitToFa"), os.path.join(dir_path,"../../../jbrowse/data/mm10/processed/mm10.2bit"),"-bed="+extendedBed, extendedFasta]
 	p = run(twoBitTwoFaCommand,stderr=PIPE)
 	if p.stderr:
 		raise Exception("Error in twoBitToFa: "+str(p.stderr))
