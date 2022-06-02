@@ -46,6 +46,7 @@ class Dicey:
 
 
 	def run(self) -> Optional[Dict[Any]]:
+		# Dicey does not support using standard input, symlinks, or process substitution for its inputs
 		with NamedTemporaryFile(mode="w", encoding="utf-8") as sequences:
 			sequences.write(f">leftPrimer\n{self.sequences[0]}\n>rightPrimer\n{self.sequences[1]}\n")
 			sequences.flush()

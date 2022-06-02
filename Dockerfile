@@ -1,5 +1,4 @@
 FROM ubuntu/apache2:2.4-20.04_beta
-
 # Match Docker expectations for logging like the Docker Library nginx image
 RUN ln -sf /dev/stdout /var/log/apache2/access.log && \
     ln -sf /dev/stderr /var/log/apache2/error.log && \
@@ -23,12 +22,8 @@ RUN apt update -y && \
     rm -rf /var/lib/apt/lists/* && \
 # python-pip is no longer included in the distribution as Python 2 is out of support
     curl https://bootstrap.pypa.io/pip/2.7/get-pip.py | python
-RUN mkdir -p /opt/dicey/bin && \
-    mkdir -p /opt/dicey/dicey_tempfiles && \
-    chgrp www-data /opt/dicey/dicey_tempfiles && \
-    chmod g+w /opt/dicey/dicey_tempfiles && \
-    curl -Lo /opt/dicey/bin/dicey https://github.com/gear-genomics/dicey/releases/download/v0.1.8/dicey_v0.1.8_linux_x86_64bit && \
-    chmod +x /opt/dicey/bin/dicey
+RUN curl -Lo /usr/local/bin/dicey https://github.com/gear-genomics/dicey/releases/download/v0.1.8/dicey_v0.1.8_linux_x86_64bit && \
+    chmod +x /usr/local/bin/dicey
 ARG JBROWSE_VERSION=1.12.3
 RUN curl -LO https://jbrowse.org/releases/JBrowse-${JBROWSE_VERSION}/JBrowse-${JBROWSE_VERSION}.zip && \
     unzip JBrowse-${JBROWSE_VERSION}.zip && \
@@ -38,5 +33,5 @@ RUN curl -LO https://jbrowse.org/releases/JBrowse-${JBROWSE_VERSION}/JBrowse-${J
 RUN pip install --no-cache-dir numpy==1.11.2 pymongo==3.8.0 requests==2.22.0 && \
     pip3 install --no-cache-dir numpy==1.17.2 pymongo==3.8.0 requests==2.20.0 Jinja2==2.10.1
 COPY config-template /var/www/html/config
-
+WORKDIR /var/www/html
 CMD service mongodb start && exec apache2-foreground
