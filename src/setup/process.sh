@@ -20,9 +20,11 @@ bwa index "$ASSEMBLY.fa" # creates $ASSEMBLY.bwt
 faToTwoBit "$ASSEMBLY.fa" $ASSEMBLY.2bit
 samtools faidx "$ASSEMBLY.fa" # creates $ASSEMBLY.fa.fai
 
+# Results of indexing the original and the bgzipped processed FASTA are the same
 ln -s ../downloads/*.fa.gz "$ASSEMBLY.fa.gz"
-# This will silently fail if the source is not gzipped. Also creates $ASSEMBLY.fa.fm9_check
-dicey index -o $ASSEMBLY.fa.fm9 "$ASSEMBLY.fa.gz"
+# This will silently fail if the source is not gzipped. Also creates $ASSEMBLY.fm9_check
+dicey index -o $ASSEMBLY.fm9 "$ASSEMBLY.fa.gz"
+# This is for "dicey search -g $ASSEMBLY.fa", which uses the filename stem to find the fm9
 
 python3 "$SETUP_BIN/process_gff3.py" $GFF
 rm "$FASTA" $GFF

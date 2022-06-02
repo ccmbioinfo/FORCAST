@@ -1,4 +1,4 @@
-#!/usr/bin/python
+#!/usr/bin/env python3
 
 """
 Hillary Elrick February 4th, 2019
@@ -6,97 +6,64 @@ Hillary Elrick February 4th, 2019
 Class definition to ease & organize access to Dicey in silico PCR tool
 """
 
-import sys
-import re
-import os
-import subprocess
-import time
-import json
+import json, os, subprocess, sys
+from tempfile import NamedTemporaryFile
+from typing import Any, Dict, List, Optional
 
 # get the global root path from the Config object
 sys.path.append("..")
-from Config import Config
+from Config3 import Config
+
 
 class Dicey:
 	"""
 	Dicey is used to run in silico PCR on a pair of primers.
-	Default temperature for the primers is 45C
 	"""
-	def __init__(self, sequences, temp='45', genome='mm10'):
-		self.Config = Config()
-		sys.path.insert(0, self.Config.DICEY_PATH)	
+	def __init__(self, sequences: List[str], temperature: int, genome: str):
 		assert len(sequences) == 2, "Exactly two primers required"
+		self.config = Config()
 		self.sequences = sequences
-		self.temp = temp # temperature
-		self.genomePath = self.Config.DICEY_PATH+"/indexes/"+genome+"/"+genome+".fa.gz"
-		self.tempfile = self.createTempFile()	
-		self.diceyCommand = self.constructDiceyCommand()	
+		self.temperature = temperature
+		self.genome_path = os.path.join(self.config.ROOT_PATH, "jbrowse", "data", genome, "processed", genome + ".fa")
 
-	
-	def constructDiceyCommand(self):
+	@property
+	def command(self) -> List[str]:
 		"""
-		Returns the Dicey command with reference to the locally installed Primer3 in addition
-		to the genome of interest and minimum temperature to consider for binding
+		Returns the Dicey command prefix with reference to the locally installed Primer3 in addition
+		to the genome of interest and minimum temperature to consider for binding.
+		The final sequences.fasta parameter is not included.
 		"""
-		# base shell command 
-		diceyCommand = [self.Config.DICEY]
-		diceyCommand.append('search')
-
-		# provide location of primer3 config directory
-		diceyCommand.append('-i')
-		diceyCommand.append(self.Config.PRIMER3_CONFIG)
-		
-		# add in the temperature
-		diceyCommand.append('-c')
-		diceyCommand.append(self.temp)
-
-		# add in the genome
-		diceyCommand.append('-g')
-		diceyCommand.append(self.genomePath)
-
-		# add in temp file
-		diceyCommand.append(self.tempfile)
-
-		return diceyCommand
+		return [
+			"dicey",
+			"search",
+			"--config",
+			self.config.PRIMER3_CONFIG,
+			"--cutTemp",
+			self.temperature,
+			"--genome",
+			self.genome_path
+		]
 
 
-	def createTempFile(self):
-		filename = str(self.sequences[0])+"_"+str(self.sequences[1])+(time.strftime("%Y-%m-%d-%H:%M:%S"))
-		f = open(os.path.join(self.Config.DICEY_PATH, "dicey_tempfiles", filename), "w+")
-			
-		faFormat = '>leftPrimer'
-		faFormat += '\n' + str(self.sequences[0])
-		faFormat += '\n>rightPrimer'
-		faFormat += '\n' + str(self.sequences[1])	
-	
-		f.write(faFormat)
-		f.close()	
-		
-		return f.name
-
-
-	def deleteTempFile(self):
-		if os.path.exists(self.tempfile):
-			os.remove(self.tempfile)
-
-
-	def runSequences(self):		
-		diceyProcess = subprocess.Popen(self.diceyCommand, stdout=subprocess.PIPE, stdin=subprocess.PIPE)
-		(diceyOut, diceyErr) = diceyProcess.communicate()
-
-		try:
-			# decode json
-			jsonResult = json.loads(diceyOut)
-			if 'errors' in jsonResult and len(jsonResult['errors']) > 0:
-				print("Error(s) from Dicey program: ")
-				for error in jsonResult['errors']:
-					print(error['title'])
+	def run(self) -> Optional[Dict[Any]]:
+		with NamedTemporaryFile(mode="w", encoding="utf-8") as sequences:
+			sequences.write(f">leftPrimer\n{self.sequences[0]}\n>rightPrimer\n{self.sequences[1]}\n")
+			sequences.flush()
+			dicey_process = subprocess.run(self.command + [sequences.name], capture_output=True)
+			# If exceptions are okay then switch to check=True
+			if dicey_process.returncode:
+				print(dicey_process.stdout)
+				print(dicey_process.stderr)
 				return
-			data = jsonResult['data']
-		except Exception, e:
-			print("Error reading Dicey results: "+str(e))
-			return
-		
-		return data
-
-	
+			else:
+				try:
+					jsonResult = json.loads(dicey_process.stdout)
+					if 'errors' in jsonResult and len(jsonResult['errors']) > 0:
+						print("Error(s) from Dicey program: ")
+						for error in jsonResult['errors']:
+							print(error['title'])
+						return
+					return jsonResult['data']
+				except Exception as e:
+					print("Error reading Dicey results: " + str(e))
+					return

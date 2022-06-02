@@ -22,4 +22,3 @@ volumes:
 # After startup, exec into the container and run
 # cd /var/www/html/src/setup
 # python3 setup.py -r /var/www/html -g Saccharomyces_cerevisiae -v R64-1-1 -fa2bit /var/www/html/bin/faToTwoBit -b /usr/bin
-# ./enable_dicey.sh Saccharomyces_cerevisiae R64-1-1

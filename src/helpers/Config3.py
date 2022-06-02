@@ -59,10 +59,6 @@ class Config:
 				self.PRIMER3 = line.split('=')[1].strip()
 			elif re.match(r"^PRIMER3_CONFIG=", line):
 				self.PRIMER3_CONFIG = line.split('=')[1].strip()
-			elif re.match(r"DICEY_EXEC=", line):
-				self.DICEY = line.split('=')[1].strip()
-			elif re.match(r"DICEY_PATH=", line):
-				self.DICEY_PATH = line.split('=')[1].strip()
 
 		if not self.BLAST:
 			print("Error: path to BLAST executable not defined in paths.conf")
@@ -70,13 +66,6 @@ class Config:
 			print("Error: path to primer3 executable not defined in paths.conf")
 		elif not self.PRIMER3_CONFIG:
 			print("Error: path to primer3 config directory not defined in paths.conf")
-		elif not self.DICEY:
-			print("Error: path to dicey executable not defined in paths.conf")
-		elif not self.DICEY_PATH:
-			print("Error: path to dicey program folder not defined in paths.conf")
-
-		return
-
 
 	def getRGENs(self):
 		" return the rgen collection"
