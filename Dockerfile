@@ -30,8 +30,8 @@ RUN curl -LO https://jbrowse.org/releases/JBrowse-${JBROWSE_VERSION}/JBrowse-${J
     mv JBrowse-${JBROWSE_VERSION} /var/www/html/jbrowse && \
     rm JBrowse-${JBROWSE_VERSION}.zip && \
     cd /var/www/html/jbrowse && ./setup.sh
-RUN pip install --no-cache-dir numpy==1.11.2 pymongo==3.8.0 requests==2.22.0 && \
-    pip3 install --no-cache-dir numpy==1.17.2 pymongo==3.8.0 requests==2.20.0 Jinja2==2.10.1
+RUN pip install --no-cache-dir pymongo==3.8.0 requests==2.22.0 && \
+    pip3 install --no-cache-dir pymongo==3.8.0 requests==2.20.0 Jinja2==3.1.2
 COPY config-template /var/www/html/config
 WORKDIR /var/www/html
 CMD service mongodb start && exec apache2-foreground
