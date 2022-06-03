@@ -11,7 +11,7 @@ from tempfile import NamedTemporaryFile
 from typing import Any, Dict, List, Optional
 
 # get the global root path from the Config object
-sys.path.append("..")
+sys.path.append(os.path.realpath(os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "..", "helpers")))
 from Config3 import Config
 
 
@@ -19,7 +19,7 @@ class Dicey:
 	"""
 	Dicey is used to run in silico PCR on a pair of primers.
 	"""
-	def __init__(self, sequences: List[str], temperature: int, genome: str):
+	def __init__(self, sequences: List[str], temperature: str, genome: str):
 		assert len(sequences) == 2, "Exactly two primers required"
 		self.config = Config()
 		self.sequences = sequences
@@ -45,7 +45,7 @@ class Dicey:
 		]
 
 
-	def run(self) -> Optional[Dict[Any]]:
+	def run(self) -> Optional[Dict[str, Any]]:
 		# Dicey does not support using standard input, symlinks, or process substitution for its inputs
 		with NamedTemporaryFile(mode="w", encoding="utf-8") as sequences:
 			sequences.write(f">leftPrimer\n{self.sequences[0]}\n>rightPrimer\n{self.sequences[1]}\n")

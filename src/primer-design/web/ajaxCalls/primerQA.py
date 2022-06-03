@@ -11,8 +11,6 @@ import ast, cgi, json, os, sys
 
 # import external classes based on relative file location
 dir_path = os.path.dirname(os.path.abspath(__file__))
-sys.path.append(os.path.join(dir_path, '../../../helpers'))
-from Config import Config
 sys.path.append(os.path.join(dir_path,'../..'))
 from classes.Dicey import Dicey
 
@@ -30,7 +28,7 @@ def main():
 	genome = args.getvalue('genome')
 
 	if primers:
-		primerQA = Dicey(primers, 50, genome)
+		primerQA = Dicey(primers, '50', genome)
 		result = primerQA.run()
 		print(json.dumps(result))
 	else:
