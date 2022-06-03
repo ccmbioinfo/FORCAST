@@ -18,7 +18,6 @@ services:
       - ./jbrowse/plugins/ColorByCDS:/var/www/html/jbrowse/plugins/ColorByCDS
       - ./jbrowse/plugins/ExportSequence:/var/www/html/jbrowse/plugins/ExportSequence
       - ./crispr-icon.png:/var/www/html/crispr-icon.png
-      - ./index.html:/var/www/html/index.html
       - mongodb:/var/lib/mongodb
 volumes:
   mongodb:

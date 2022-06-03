@@ -38,4 +38,5 @@ RUN curl -Lo /usr/local/bin/faToTwoBit https://hgdownload.soe.ucsc.edu/admin/exe
 COPY config-template /var/www/html/config
 WORKDIR /var/www/html
 RUN echo -e "classicMenu = true\ninclude += data/datasets.conf\n\n[aboutThisBrowser]\ntitle = FORCAST" >> jbrowse/jbrowse.conf
+RUN a2enmod rewrite
 CMD service mongodb start && exec apache2-foreground
