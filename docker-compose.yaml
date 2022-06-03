@@ -5,6 +5,9 @@ services:
     image: ghcr.io/ccmbioinfo/forcast
     ports:
       - 80:80
+    tmpfs:
+      - /run
+      - /tmp
     volumes:
       - ./sites-enabled:/etc/apache2/sites-enabled
       - ./bin:/var/www/html/bin
