@@ -31,9 +31,10 @@ if compgen -G "$SOURCE"/*.processed.gff; then
         --trackLabel Regulatory_build \
         --out "$DESTINATION"
 fi
+"$JBROWSE_BIN/generate-names.pl" --out "$DESTINATION"
 cp "$TARGET" "$DESTINATION/trackList.json"
 
 echo -e "[general]\ndataset_id = $ASSEMBLY" > "$DESTINATION/tracks.conf"
 echo -e "[datasets.$ASSEMBLY]\nurl = ?data=data/$ASSEMBLY\nname = $SPECIES ($ASSEMBLY)\n\n" >> jbrowse/jbrowse.conf
-touch "$DESTINATION/gRNA_CRISPR.gff"
-touch "$DESTINATION/acceptedPrimers.gff"
+touch "$DESTINATION/gRNA_CRISPR.gff" "$DESTINATION/acceptedPrimers.gff"
+chown www-data:www-data "$DESTINATION/gRNA_CRISPR.gff" "$DESTINATION/acceptedPrimers.gff"
