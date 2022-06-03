@@ -1,4 +1,4 @@
-#!/usr/bin/python3
+#!/usr/bin/env python3
 
 """
 Hillary Elrick, September 16th, 2019
@@ -548,7 +548,6 @@ class GuideSearchAndScore:
         batchID = binascii.b2a_hex(os.urandom(9)).decode('utf-8')
 
         genome_fa = os.path.join(self.dbConnection.ROOT_PATH,'jbrowse', 'data', self.genome,"processed",self.genome+".fa")
-        twoBitToFa_path = os.path.join(self.dbConnection.ROOT_PATH,'bin/twoBitToFa')
         genome_2bit = os.path.join(self.dbConnection.ROOT_PATH,'jbrowse', 'data', self.genome,"processed",self.genome+'.2bit')
         tempfiles_path = os.path.join(self.dbConnection.ROOT_PATH,'src/guide-finder/tempfiles')
         if self.cli:
@@ -556,7 +555,7 @@ class GuideSearchAndScore:
             time_0 = time.time()
             print("Fetching sequence...")
 
-        get_sequence.fetch_sequence(twoBitToFa_path, self.searchInput, genome_2bit, os.path.join(tempfiles_path,batchID+'_out.fa'))
+        get_sequence.fetch_sequence(self.searchInput, genome_2bit, os.path.join(tempfiles_path,batchID+'_out.fa'))
         if self.cli:
             time_1 = time.time()
             print("Finished fetching sequence. " + str(round(time_1-time_0,4)))

@@ -5,7 +5,6 @@ set -euo pipefail
 ASSEMBLY="$1"
 
 SETUP_BIN=$(dirname $(realpath "$0"))
-PATH="/var/www/html/bin:/opt/dicey/bin:$PATH"
 
 gunzip --keep *.fa.gz *.gff*.gz
 FASTA=$(echo *.fa) # only one

@@ -32,6 +32,9 @@ RUN curl -LO https://jbrowse.org/releases/JBrowse-${JBROWSE_VERSION}/JBrowse-${J
     cd /var/www/html/jbrowse && ./setup.sh
 RUN pip install --no-cache-dir pymongo==3.8.0 requests==2.22.0 && \
     pip3 install --no-cache-dir pymongo==3.8.0 requests==2.20.0 Jinja2==3.1.2
+RUN curl -Lo /usr/local/bin/faToTwoBit https://hgdownload.soe.ucsc.edu/admin/exe/linux.x86_64/faToTwoBit \
+         -Lo /usr/local/bin/twoBitToFa https://hgdownload.soe.ucsc.edu/admin/exe/linux.x86_64/twoBitToFa && \
+    chmod +x /usr/local/bin/faToTwoBit /usr/local/bin/twoBitToFa
 COPY config-template /var/www/html/config
 WORKDIR /var/www/html
 CMD service mongodb start && exec apache2-foreground
