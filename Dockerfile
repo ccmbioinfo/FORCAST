@@ -3,7 +3,11 @@ FROM ubuntu/apache2:2.4-20.04_beta
 RUN ln -sf /dev/stdout /var/log/apache2/access.log && \
     ln -sf /dev/stderr /var/log/apache2/error.log && \
 # Enable Common Gateway Interface scripts that comprise much of FORCAST's backend
-    a2enmod cgi
+    a2enmod cgi && \
+# Enable mod_rewrite for the / homepage redirect
+    a2enmod rewrite && \
+# Disable directory listings. This is a core module, which requires --force
+    a2dismod --force autoindex
 RUN apt update -y && \
     apt install -y \
 # MongoDB 3.6 for storing guides and primers
@@ -22,21 +26,26 @@ RUN apt update -y && \
     rm -rf /var/lib/apt/lists/* && \
 # python-pip is no longer included in the distribution as Python 2 is out of support
     curl https://bootstrap.pypa.io/pip/2.7/get-pip.py | python
+# In-silico PCR tool for primer design
 RUN curl -Lo /usr/local/bin/dicey https://github.com/gear-genomics/dicey/releases/download/v0.1.8/dicey_v0.1.8_linux_x86_64bit && \
     chmod +x /usr/local/bin/dicey
+# UCSC Genome Browser kent binaries
+RUN curl -Lo /usr/local/bin/faToTwoBit https://hgdownload.soe.ucsc.edu/admin/exe/linux.x86_64/faToTwoBit \
+         -Lo /usr/local/bin/twoBitToFa https://hgdownload.soe.ucsc.edu/admin/exe/linux.x86_64/twoBitToFa && \
+    chmod +x /usr/local/bin/faToTwoBit /usr/local/bin/twoBitToFa
 ARG JBROWSE_VERSION=1.12.3
 RUN curl -LO https://jbrowse.org/releases/JBrowse-${JBROWSE_VERSION}/JBrowse-${JBROWSE_VERSION}.zip && \
     unzip JBrowse-${JBROWSE_VERSION}.zip && \
     mv JBrowse-${JBROWSE_VERSION} /var/www/html/jbrowse && \
     rm JBrowse-${JBROWSE_VERSION}.zip && \
-    cd /var/www/html/jbrowse && ./setup.sh
-RUN pip install --no-cache-dir pymongo==3.8.0 requests==2.22.0 && \
-    pip3 install --no-cache-dir pymongo==3.8.0 requests==2.20.0 Jinja2==3.1.2
-RUN curl -Lo /usr/local/bin/faToTwoBit https://hgdownload.soe.ucsc.edu/admin/exe/linux.x86_64/faToTwoBit \
-         -Lo /usr/local/bin/twoBitToFa https://hgdownload.soe.ucsc.edu/admin/exe/linux.x86_64/twoBitToFa && \
-    chmod +x /usr/local/bin/faToTwoBit /usr/local/bin/twoBitToFa
+    cd /var/www/html/jbrowse && ./setup.sh && \
+# Default FORCAST configuration for JBrowse. jbrowse/data/datasets.conf is bind-mounted for editing.
+    echo -e "classicMenu = true\ninclude += data/datasets.conf\n\n[aboutThisBrowser]\ntitle = FORCAST" >> /var/www/html/jbrowse/jbrowse.conf
+# Dependencies for FORCAST CGI scripts
+RUN pip install --no-cache-dir pymongo==3.12.3 requests==2.27.1 && \
+    pip3 install --no-cache-dir pymongo==3.12.3 requests==2.27.1 Jinja2==3.1.2
 COPY config-template /var/www/html/config
 WORKDIR /var/www/html
-RUN echo -e "classicMenu = true\ninclude += data/datasets.conf\n\n[aboutThisBrowser]\ntitle = FORCAST" >> jbrowse/jbrowse.conf
-RUN a2enmod rewrite
+# Replace the /usr/sbin/apachectl script that is called with the Apache master process that respects signals
+ENV APACHE_HTTPD exec /usr/sbin/apache2
 CMD service mongodb start && exec apache2-foreground
