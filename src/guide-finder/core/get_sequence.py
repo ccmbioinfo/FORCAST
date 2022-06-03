@@ -35,7 +35,7 @@ def fetch_sequence(chrom_coord, genome_twobit, output_fasta):
         print(err)
 
     if not os.path.isfile(tmp_fasta) or os.path.getsize(tmp_fasta) == 0:
-        print("twobitToFasta failed: "+" ".join([twobit_to_fa, seq_param, start_param, end_param, genome_twobit, tmp_fasta]))
+        print("twobitToFasta failed: "+" ".join([seq_param, start_param, end_param, genome_twobit, tmp_fasta]))
         sys.exit("sequence is empty for given parameters. Please check your parameters again")
 
     with open(tmp_fasta,"r") as inp_fa, open(output_fasta,"w") as out_fa:
