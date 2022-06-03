@@ -64,8 +64,8 @@ class Config:
 			# otherwise, attempt connecting without credentials
 			client = MongoClient()
 
-		db = client[self.genome]
-		collections = db.collection_names()
+		db = client[self.genome.replace(".", "_")]  # periods forbidden in database names
+		collections = db.list_collection_names()
 
 		# get the release we're using from the most recent geneInfo collection
 		curr_release = fetchCurrentRelease(self.genome, collections)
@@ -128,8 +128,8 @@ def getCurrentGeneCollection(genome):
 		# if no credentials defined
 		client = MongoClient()
 
-	db = client[genome]
-	collections = db.collection_names()
+	db = client[genome.replace(".", "_")]  # periods forbidden in database names
+	collections = db.list_collection_names()
 
 	# get the release we're using from the most recent geneInfo collection
 	curr_release = fetchCurrentRelease(genome, collections)
@@ -150,8 +150,8 @@ def fetchCurrentRelease(genome, collections=None):
 			client = MongoClient('mongodb://%s:%s@localhost' % (config['username'], config['password']))
 		else:
 			client = MongoClient()
-		db = client[genome]
-		collections = db.collection_names()
+		db = client[genome.replace(".", "_")]  # periods forbidden in database names
+		collections = db.list_collection_names()
 
 	# get the release we're using from the most recent geneInfo collection
 	curr_release = -1
@@ -178,11 +178,11 @@ def fetchInstalledGenomes():
 	for db in dbs:
 		if db not in default_dbs:
 			metadataCollection = client[db]['metadata']
-			metadataRecords = metadataCollection.find({})
-			if metadataRecords.count() == 1:
-				orgName = str(metadataCollection.find_one({})['org_name'])
-				orgName = orgName.replace("_"," ").capitalize()
-				genomes.append((db, orgName)) # store org code and name in list as tuple
+			if metadataCollection.count_documents({}) == 1:
+				metadata = metadataCollection.find_one()
+				org_name = metadata['org_name'].replace("_"," ").capitalize()
+				assembly = metadata.get('assembly', db) # fall back to db name for assembly version
+				genomes.append((assembly, org_name)) # store org code and name in list as tuple
 			else:
 				print("Error: metadata collection for " + str(db) + " is misconfigured")
 	return genomes

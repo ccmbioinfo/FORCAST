@@ -35,6 +35,6 @@ fi
 cp "$TARGET" "$DESTINATION/trackList.json"
 
 echo -e "[general]\ndataset_id = $ASSEMBLY" > "$DESTINATION/tracks.conf"
-echo -e "[datasets.$ASSEMBLY]\nurl = ?data=data/$ASSEMBLY\nname = $SPECIES ($ASSEMBLY)\n\n" >> jbrowse/jbrowse.conf
+echo -e "[datasets.$ASSEMBLY]\nurl = ?data=data/$ASSEMBLY\nname = $SPECIES ($ASSEMBLY)\n\n" >> jbrowse/data/datasets.conf
 touch "$DESTINATION/gRNA_CRISPR.gff" "$DESTINATION/acceptedPrimers.gff"
 chown www-data:www-data "$DESTINATION/gRNA_CRISPR.gff" "$DESTINATION/acceptedPrimers.gff"

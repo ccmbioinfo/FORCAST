@@ -8,7 +8,7 @@ from pymongo import MongoClient
 
 dir_path = os.path.dirname(os.path.abspath(__file__))
 
-def load_geneinfo_RGENs(geneInfo_gff, ensembl_version, genome, genome_version,
+def load_geneinfo_RGENs(geneInfo_gff: str, ensembl_version: str, genome: str, genome_version: str,
     mongo_username=None, mongo_password=None, mongo_database=None):
 
     ''' This function loads gene annoations into Mongo database under collection "geneInfo_<ensembl_version>" '''
@@ -26,7 +26,7 @@ def load_geneinfo_RGENs(geneInfo_gff, ensembl_version, genome, genome_version,
 
     print("Successfully connected to Mongodb")
     if mongo_database is None: #fix this.
-        mongo_database = genome_version
+        mongo_database = genome_version.replace(".", "_")  # periods forbidden in database names
 
     # load the RGEN json file into the RGEN database if it doesn't already exist
     if 'RGEN' not in pyMongoClient.list_database_names():
@@ -43,7 +43,7 @@ def load_geneinfo_RGENs(geneInfo_gff, ensembl_version, genome, genome_version,
         print("RGEN collection already exists in Mongo database, will not overwrite")
 
     for collection_name in (gene_info_collection, meta_data_collection):
-        if collection_name in pyMongoClient[mongo_database].collection_names():
+        if collection_name in pyMongoClient[mongo_database].list_collection_names():
             print(collection_name + " already exists in Mongo database")
             return True
 
@@ -64,7 +64,8 @@ def load_geneinfo_RGENs(geneInfo_gff, ensembl_version, genome, genome_version,
     try:
         gene_info_collection_obj.insert_many(list(geneDict.values()))
         gene_info_collection_obj.create_index("ENSID")
-        meta_data_collection_obj.insert_one({'org_name': genome.lower()})
+        # store real assembly in metadata in case the period replacement for the name was applied
+        meta_data_collection_obj.insert_one({ 'org_name': genome.lower(), 'assembly': genome_version })
     except Exception as err:
         return(err)
 
