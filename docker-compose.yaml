@@ -17,11 +17,8 @@ services:
       - ./jbrowse/data:/var/www/html/jbrowse/data
       - ./jbrowse/plugins/ColorByCDS:/var/www/html/jbrowse/plugins/ColorByCDS
       - ./jbrowse/plugins/ExportSequence:/var/www/html/jbrowse/plugins/ExportSequence
-      - ./crispr-icon.png:/var/www/html/crispr-icon.png
       - mongodb:/var/lib/mongodb
 volumes:
   mongodb:
 
-# After startup, exec into the container and run
-# cd /var/www/html/src/setup
-# python3 setup.py -r /var/www/html -g Saccharomyces_cerevisiae -v R64-1-1 -fa2bit /var/www/html/bin/faToTwoBit -b /usr/bin
+# docker-compose exec forcast ./src/setup/setup.sh 106 Saccharomyces_cerevisiae R64-1-1
