@@ -39,7 +39,9 @@ RUN curl -LO https://github.com/GMOD/jbrowse/releases/download/1.12.5-release/JB
     rm JBrowse-1.12.5.zip && \
     cd /var/www/html/jbrowse && ./setup.sh && \
 # Default FORCAST configuration for JBrowse. jbrowse/data/datasets.conf is bind-mounted for editing.
-    echo -e "classicMenu = true\ninclude += data/datasets.conf\n\n[aboutThisBrowser]\ntitle = FORCAST" >> /var/www/html/jbrowse/jbrowse.conf
+    echo -e "classicMenu = true\ninclude += data/datasets.conf\n\n[aboutThisBrowser]\ntitle = FORCAST" >> /var/www/html/jbrowse/jbrowse.conf && \
+# Add favicon
+    sed -i '6i\    <link rel="icon" href="../docs/img/crispr-icon.png" sizes="100x100">' /var/www/html/jbrowse/index.html
 # Dependencies for FORCAST CGI scripts
 RUN pip install --no-cache-dir pymongo==3.12.3 requests==2.27.1 && \
     pip3 install --no-cache-dir pymongo==3.12.3 requests==2.27.1 Jinja2==3.1.2
