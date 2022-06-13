@@ -33,11 +33,10 @@ RUN curl -Lo /usr/local/bin/dicey https://github.com/gear-genomics/dicey/release
 RUN curl -Lo /usr/local/bin/faToTwoBit https://hgdownload.soe.ucsc.edu/admin/exe/linux.x86_64/faToTwoBit \
          -Lo /usr/local/bin/twoBitToFa https://hgdownload.soe.ucsc.edu/admin/exe/linux.x86_64/twoBitToFa && \
     chmod +x /usr/local/bin/faToTwoBit /usr/local/bin/twoBitToFa
-ARG JBROWSE_VERSION=1.12.3
-RUN curl -LO https://jbrowse.org/releases/JBrowse-${JBROWSE_VERSION}/JBrowse-${JBROWSE_VERSION}.zip && \
-    unzip JBrowse-${JBROWSE_VERSION}.zip && \
-    mv JBrowse-${JBROWSE_VERSION} /var/www/html/jbrowse && \
-    rm JBrowse-${JBROWSE_VERSION}.zip && \
+RUN curl -LO https://github.com/GMOD/jbrowse/releases/download/1.12.5-release/JBrowse-1.12.5.zip && \
+    unzip JBrowse-1.12.5.zip && \
+    mv JBrowse-1.12.5 /var/www/html/jbrowse && \
+    rm JBrowse-1.12.5.zip && \
     cd /var/www/html/jbrowse && ./setup.sh && \
 # Default FORCAST configuration for JBrowse. jbrowse/data/datasets.conf is bind-mounted for editing.
     echo -e "classicMenu = true\ninclude += data/datasets.conf\n\n[aboutThisBrowser]\ntitle = FORCAST" >> /var/www/html/jbrowse/jbrowse.conf
