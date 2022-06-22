@@ -1,17 +1,14 @@
-# Finding, Optimizing, and Reporting Cas Targets (FORCAST): a fully integrated and open source pipeline to design CRISPR mutagenesis experiments
+# Finding, Optimizing, and Reporting Cas Targets (FORCAST)
+
+A fully-integrated and open-source pipeline to design CRISPR mutagenesis experiments.
 
 ## Contents
 
 - [Hardware Requirements](#hardware-requirements)
-
 - [Installing with Docker](#installing-with-docker)
-
 - [Customization](#customization)
-
 - [Migration](#migration)
-
 - [Citation](#citation)
-
 - [Troubleshooting](#troubleshooting)
 
 ## Hardware Requirements
