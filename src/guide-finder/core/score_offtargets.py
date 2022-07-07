@@ -67,9 +67,9 @@ def inDelphiScore(guideDict,genome_fa,twoBitToFa_path,genome_2bit,tempfiles_path
 		print(guide['strand'])
 		#apply strand logic to coordinates before submitting to get_sequence.py
 		if guide['strand'] == "+":
-			coords=str("%s:%s-%s"%(guide['pam_chrom'],guide['guide_genomic_start'],(guide['pam_genomic_start']+cleavePos+20)))
+			coords=str("%s:%s-%s"%(guide['pam_chrom'],(guide['pam_genomic_start']+cleavePos-30),(guide['pam_genomic_start']+cleavePos+29)))
 		elif guide['strand'] == "-":
-			coords=str("%s:%s-%s"%(guide['pam_chrom'],(guide['pam_genomic_start']-len(guide['guide_seq'])+3),(guide['pam_genomic_start']+1+cleavePos+22)))
+			coords=str("%s:%s-%s"%(guide['pam_chrom'],(guide['pam_genomic_start']-cleavePos-29),(guide['pam_genomic_start']-cleavePos+30)))
 #		coords=str("%s:%s-%s"%(guide['pam_chrom'],guide['guide_genomic_start'],(guide['pam_genomic_start']+cleavePos+20)))
 
 		print(coords)
@@ -78,7 +78,8 @@ def inDelphiScore(guideDict,genome_fa,twoBitToFa_path,genome_2bit,tempfiles_path
 		getseq=str(get_sequence.fetch_sequence(twoBitToFa_path, coords, genome_2bit, os.path.join(tempfiles_path,timestr+'_out.fa')))
 		print(os.path.join(tempfiles_path,timestr+'_out.fa'))
 
-		#get 20 bp sequence after PAM
+		#get flanking sequence before and after cutsite
+		fullSeq = ''
 		with open(os.path.join(tempfiles_path, timestr+'_out.fa'), 'r') as f:
 			for line in f:
 				if line.startswith(">"):
@@ -86,7 +87,7 @@ def inDelphiScore(guideDict,genome_fa,twoBitToFa_path,genome_2bit,tempfiles_path
 					location = location[1:] # remove > marker
 					continue
 				else:
-					fullSeq = line.strip() # seq is next line after label
+					fullSeq = fullSeq + line.strip("\n") # seq is next line after label
 
 		#set up strand complementation
 		forward_nuc = 'ATGC'
