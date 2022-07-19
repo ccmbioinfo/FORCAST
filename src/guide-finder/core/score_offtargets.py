@@ -67,9 +67,9 @@ def inDelphiScore(guideDict,genome_fa,twoBitToFa_path,genome_2bit,tempfiles_path
 		print(guide['strand'])
 		#apply strand logic to coordinates before submitting to get_sequence.py
 		if guide['strand'] == "+":
-			coords=str("%s:%s-%s"%(guide['pam_chrom'],(guide['pam_genomic_start']+cleavePos-30),(guide['pam_genomic_start']+cleavePos+29)))
+			coords=str("%s:%s-%s"%(guide['pam_chrom'],guide['guide_genomic_start'],(guide['pam_genomic_start']+cleavePos+20)))
 		elif guide['strand'] == "-":
-			coords=str("%s:%s-%s"%(guide['pam_chrom'],(guide['pam_genomic_start']-cleavePos-29),(guide['pam_genomic_start']-cleavePos+30)))
+			coords=str("%s:%s-%s"%(guide['pam_chrom'],(guide['pam_genomic_start']-len(guide['guide_seq'])+3),(guide['pam_genomic_start']+1+cleavePos+22)))
 #		coords=str("%s:%s-%s"%(guide['pam_chrom'],guide['guide_genomic_start'],(guide['pam_genomic_start']+cleavePos+20)))
 
 		print(coords)
