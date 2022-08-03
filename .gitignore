@@ -24,7 +24,7 @@ src/primer-design/files/**/*_input
 src/primer-design/files/**/*.doc
 
 #temp directories
+score_test/*
 src/guide-finder/old_tempfiles/*
 src/guide-finder/tempfilesget_seq_test.fa
 src/helpers/RGEN_backup/*
-score_test/*
