@@ -5,6 +5,7 @@ import sys
 import os.path 
 import requests
 import json
+sys.path.append(os.path.join(os.path.dirname(os.path.abspath(__file__)), '../helpers'))
 from classes.Gene import Gene
 from classes.Gene import returnError
 from Config import Config
@@ -95,8 +96,9 @@ def main():
 	args = cgi.FieldStorage()
 	geneSymbol = args.getvalue('gene')
 	ENSID = args.getvalue('ENSID')
-	#SINCE THIS IS ONLY CALLED FROM THE musmusculims DATABASE, WE DEFAULT genome TO 'mm10'
-	genome = 'mm10'
+	genome = args.getvalue('genome')
+	if not genome:
+		printError("No genome assembly provided")
 	dbConnection = Config(genome)
 
 	# if ENSID is provided, we always use it to infer the geneSymbol

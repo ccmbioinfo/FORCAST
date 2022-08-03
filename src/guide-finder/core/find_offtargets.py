@@ -59,7 +59,7 @@ def expandSequence(seq):
 	expanded = list(product(*base_options))
 	expanded = map(''.join, expanded) # convert tuples to strings
 
-	return expanded	
+	return expanded
 
 
 def generateAlternateSeqs(guide, offtargetPAMS):
@@ -68,17 +68,17 @@ def generateAlternateSeqs(guide, offtargetPAMS):
 	for PAM in offtargetPAMS:
 		expandedPAMS.extend(expandSequence(PAM))
 	expandedPAMS = list(set(expandedPAMS)) # remove redundancies if they exist
-	
+
 	# now append them to the guide sequence
-	alternateSeqs = [guide + pam for pam in expandedPAMS]	
-	return alternateSeqs		
+	alternateSeqs = [guide + pam for pam in expandedPAMS]
+	return alternateSeqs
 
 def getMotifs(PAMS):
 	""" given a list of potential PAM motifs, generates the list of their expansions """
 	expandedPAMS = []
 	for p in PAMS:
 		expandedPAMS.extend(expandSequence(p))
-	
+
 	return expandedPAMS
 
 def writeFasta(batchID, guides, tempfile_directory):
@@ -89,26 +89,26 @@ def writeFasta(batchID, guides, tempfile_directory):
 			fileString += (">"+str(guideID))
 			fileString += ("\n"+str(guideRecord['guide_seq'])+"\n")
 	fileString = fileString[:-1] # trim trailing newline
-	
+
 	fasta = open(os.path.join(tempfile_directory, str(batchID)+".fa"), "w+")
 	fasta.write(fileString)
 	fasta.close()
-	
+
 	return fasta
 
 def revSeq(seq):
 	""" given a sequence returns the complement (preserving direction, i.e. 5'->3' is converted to 5'->3' on opposite strand) """
 	complement = {'A':'T','C':'G','G':'C','T':'A', 'N':'N', 'a':'t', 'c':'g', 'g':'c', 't':'a'}
 	return ''.join([complement[base] for base in seq[::-1]])
-	
+
 def hasMotif(offTargetMotifs, pamLocation, strand, sequence):
 	"""
 	given a potential off target (location and sequence), and information about the PAM,
-	determine if the sequence contains a PAM, return True if so, False otherwise	
+	determine if the sequence contains a PAM, return True if so, False otherwise
 	"""
 	if strand == "-":
 		sequence = revSeq(sequence)
-	
+
 	if pamLocation == 'upstream':
 		for motif in offTargetMotifs:
 			if sequence.startswith(motif):
@@ -117,7 +117,7 @@ def hasMotif(offTargetMotifs, pamLocation, strand, sequence):
 		for motif in offTargetMotifs:
 			if sequence.endswith(motif):
 				return True
-	
+
 	return False
 
 def countMismatches(guideDict, seedRegion, offTargetGuide):
@@ -129,16 +129,16 @@ def countMismatches(guideDict, seedRegion, offTargetGuide):
 	"""
 	mismatches = 0
 	exactMatchSeed = True
-	
+
 	# throw the guide sequence in a string variable, and do a double check of their lengths
 	guideSequence = str(guideDict['guide_seq'])
 	assert (len(offTargetGuide) == len(guideSequence)), "off-target length does not match length of guide"+str(offTargetGuide)+"!"
-	
+
 	# get direction and length of seed
 	seedDirection, seedIndex = seedRegion[0], int(seedRegion[1:])
 	# flip index if seed is at end of sequence
 	seedIndex = (len(guideSequence) - seedIndex) if seedDirection == "-" else seedIndex
-	
+
 	for i in range(0, len(offTargetGuide)):
 		if guideSequence[i].upper() != offTargetGuide[i].upper() and offTargetGuide[i].upper() != 'N':
 			mismatches += 1
@@ -146,13 +146,13 @@ def countMismatches(guideDict, seedRegion, offTargetGuide):
 				exactMatchSeed = False
 			elif seedDirection == "-" and i >= seedIndex:
 				exactMatchSeed = False
-	
+
 	return mismatches, exactMatchSeed
 
 def initializeMismatchCount(mismatches):
 	"""
 	initialize a list of length 5 to represent 0-1-2-3-4 mismatches and
-	increment the count in position 'mismatches' by one	
+	increment the count in position 'mismatches' by one
 	"""
 	result = [0]*5
 	result[mismatches] = result[mismatches] + 1
@@ -162,36 +162,36 @@ def incrementMismatchCount(counts, mismatches):
 	""" increment the list that tracks the count of mismatches """
 	if mismatches <= 4:
 		counts[mismatches] += 1
-	
+
 	return counts
 
 def processOffTarget(guideDict, rgen, offTargetLoc, offTargetSeq):
 	"""
 	given a dictionary representing a potential guide, info about the rgen used to find it,
-	and the location and sequence of an off-target for the guide, 
+	and the location and sequence of an off-target for the guide,
 	count the number of mismatches that the off-target has (both within the seed region and not)
 	and modify the guideDict to incorporate the information about this off-target
-	""" 
-	
+	"""
+
 	# annoyingly, the bed to fasta program requires different chromosomal coordinates than everything else (0 based indexing)
 	# now that we've grabbed everything we need, can switch it back to 1 based coordinates
 	chm, pos, strand = offTargetLoc.split(':')
 	start, end = pos.split("-")
-	offTargetLoc = chm+":"+start+"-"+end+":"+strand		
+	offTargetLoc = chm+":"+start+"-"+end+":"+strand
 
 	# if the offtarget is on the reverse strand, reverse complement it
 	offTargetSeq = revSeq(offTargetSeq) if strand == '-' else offTargetSeq
 
-	# split into sequence and PAM 
+	# split into sequence and PAM
 	if rgen['PamLocation'] == 'downstream':
-		offTargetGuide = offTargetSeq[0:(len(offTargetSeq)-len(guideDict['pam_seq']))] 
-		offTargetPAM = offTargetSeq[len(offTargetGuide):]	
-		leftStart = guideDict['guide_genomic_start'] # track the 'leftmost' coordinate of the guide 
+		offTargetGuide = offTargetSeq[0:(len(offTargetSeq)-len(guideDict['pam_seq']))]
+		offTargetPAM = offTargetSeq[len(offTargetGuide):]
+		leftStart = guideDict['guide_genomic_start'] # track the 'leftmost' coordinate of the guide
 	elif rgen['PamLocation'] == 'upstream':
 		offTargetGuide = offTargetSeq[len(guideDict['pam_seq']):]
 		offTargetPAM = offTargetSeq[0:len(guideDict['pam_seq'])]
 		leftStart = guideDict['pam_genomic_start'] # track the 'leftmost' coordinate of the guide
-	
+
 	# check that the "off-target" is not actually the guide itself
 	if (offTargetGuide == guideDict['guide_seq']):
 		if (guideDict['strand'] == '+' and int(leftStart)-1 == int(start)) or (guideDict['strand'] == '-' and int(leftStart) == int(end)):
@@ -201,7 +201,7 @@ def processOffTarget(guideDict, rgen, offTargetLoc, offTargetSeq):
 	# first count the number of mismatches to the off target (in seed region too)
 	mismatches, noneInSeed = countMismatches(guideDict, rgen['SeedRegion'], offTargetGuide)
 
-	# update the guideDict to reflect the new off target		
+	# update the guideDict to reflect the new off target
 	try:
 		guideDict['offtarget_counts'] =  initializeMismatchCount(mismatches) if 'offtarget_counts' not in guideDict else incrementMismatchCount(guideDict['offtarget_counts'], mismatches)
 		if noneInSeed:
@@ -213,9 +213,9 @@ def processOffTarget(guideDict, rgen, offTargetLoc, offTargetSeq):
 	offTargetGuide = changeCase(guideDict['guide_seq'], offTargetGuide)
 	# add the off-target attributes to the guide dict
 	if 'offtargets' not in guideDict:
-		guideDict['offtargets'] = []	
+		guideDict['offtargets'] = []
 	guideDict['offtargets'].append({"seq": offTargetGuide, "pam": offTargetPAM, "loc": offTargetLoc})
-	
+
 	return guideDict
 
 """
@@ -274,11 +274,11 @@ def countOffTargets(batchID, potentialGuides, rgen, maxOffTargets, tempfile_dire
 				if hasMotif(offTargetMotifs, pamLocation, strand, seq):
 					if maxOffTargets and sum(potentialGuides[guideID]['offtarget_counts']) >= int(maxOffTargets):
 						# don't track any more
-						potentialGuides[guideID]['max_exceeded'] = True 
+						potentialGuides[guideID]['max_exceeded'] = True
 					else:
 						potentialGuides[guideID] = processOffTarget(potentialGuides[guideID], rgen, location, seq)
-			
-	return potentialGuides		
+
+	return potentialGuides
 
 def convertExtendedBedToFasta(batchID, genome, genome_fa, tempfile_directory):
 	""" uses bedtools to convert the extended bed to fasta """
@@ -296,7 +296,7 @@ def convertExtendedBedToFasta(batchID, genome, genome_fa, tempfile_directory):
 		raise Exception("Error in bedtools getfasta command: " + str(p.stderr))
 
 	"""
-	twoBitTwoFaCommand = [os.path.join(dir_path,"../../../bin/twoBitToFa"), os.path.join(dir_path,"../../../jbrowse/data.mm10/downloads/mm10.2bit"),"-bed="+extendedBed, extendedFasta]
+	twoBitTwoFaCommand = ["twoBitToFa", os.path.join(dir_path,"../../../jbrowse/data/mm10/processed/mm10.2bit"),"-bed="+extendedBed, extendedFasta]
 	p = run(twoBitTwoFaCommand,stderr=PIPE)
 	if p.stderr:
 		raise Exception("Error in twoBitToFa: "+str(p.stderr))
@@ -328,7 +328,7 @@ def extendBed(batchID, potentialGuides, genome, rgen, tempfile_directory):
 				skipped_guides.append(label)
 			start, end = (map(int,[start,end]))
 			assert (start < end), str(bedFile)+" chr locations out of order"
-			# calculate extension	
+			# calculate extension
 			if (pamLocation == 'downstream' and strand == '+') or (pamLocation == 'upstream' and strand == '-'):
 				end = int(end) + pamLength
 			elif (pamLocation == 'downstream' and strand == '-') or (pamLocation == 'upstream' and strand == '+'):
@@ -343,14 +343,14 @@ def extendBed(batchID, potentialGuides, genome, rgen, tempfile_directory):
 			# rewrite the line, and put the location in the label (for use in fasta)
 			newLabel = label.split('_')[0]+"_"+chm+":"+str(start)+"-"+str(end)+":"+strand
 			extendedBed.write('\t'.join(map(str,[chm, start, end, newLabel, score, strand]))+"\n")
-		
+
 		originalBed.close()
 		extendedBed.close()
 	else:
 		raise FileNotFoundError("Extended Bed File Not Found")
-	
+
 	return extendedBed
-	
+
 def runAlignment(genome, fastaFile, genome_fa, tempfile_directory):
 	""" execute a shell script to perform bwa alignment on a fasta file """
 	# if troubleshooting the bwa step, replace the stdout and stderr variables with PIPE to see output
@@ -358,7 +358,7 @@ def runAlignment(genome, fastaFile, genome_fa, tempfile_directory):
 	out, err = p.communicate()
 	if err:
 		print(err)
-	
+
 	return
 
 def screenRepetetive(batchID, potentialGuides, tempfile_directory):
@@ -401,7 +401,7 @@ def findOffTargets(potentialGuides, rgenID, genome, maxOffTargets, batchID, geno
 	potentialGuides = countOffTargets(batchID, potentialGuides, rgen, maxOffTargets, tempfile_directory)
 
 	return potentialGuides
-	
+
 def main():
 	"""
 	uses bwa aln to find the potential off-targets for a dictionary of guides given:
@@ -416,7 +416,7 @@ def main():
 		batchID = binascii.b2a_hex(os.urandom(9)).decode('utf-8')
 		#guides, rgenID, genome, genome_fa, tempfile_directory = sys.argv[1:]
 		result = findOffTargets(guides, rgenID, genome, batchID, genome_fa, tempfile_directory)
-		print(result)	
+		print(result)
 
 if __name__ == "__main__":
     main()

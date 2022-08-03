@@ -1,21 +1,24 @@
-version: '2'
-
+version: "3.9"
 services:
-    webserver:
-        image: helrick/forcast
-        expose:
-            - ${APACHE2_PORT}
-        ports:
-            - ${APACHE2_PORT}:${APACHE2_PORT}
-        volumes:
-            - ./mongodb:/data/db
-            - ./src:/var/www/html/src
-            - ./jbrowse:/var/www/html/jbrowse
-        command: >
-            bash -c "sudo mongod --fork --logpath /var/log/mongodb.log
-            && cd /var/www/html/jbrowse
-            && ./setup.sh
-            && python3 /var/www/html/src/setup/setup.py -r /var/www/html -g ${ORGANISM} -v ${ASSEMBLY} -fa2bit /var/www/html/bin/faToTwoBit -b /var/www/html/bin/ncbi-blast-2.7.1+/bin
-            && /var/www/html/src/setup/enable_dicey.sh ${ORGANISM} ${ASSEMBLY}
-            && sudo service apache2 start
-            && tail -f /dev/null"
+  forcast:
+    build: .
+    image: ghcr.io/ccmbioinfo/forcast
+    ports:
+      - 80:80
+    tmpfs:
+      - /run/apache2
+      - /run/mongodb
+      - /run/lock
+      - /tmp
+    volumes:
+      - ./sites-enabled:/etc/apache2/sites-enabled
+      - ./docs:/var/www/html/docs
+      - ./src:/var/www/html/src
+      - ./jbrowse/data:/var/www/html/jbrowse/data
+      - ./jbrowse/plugins/ColorByCDS:/var/www/html/jbrowse/plugins/ColorByCDS
+      - ./jbrowse/plugins/ExportSequence:/var/www/html/jbrowse/plugins/ExportSequence
+      - mongodb:/var/lib/mongodb
+volumes:
+  mongodb:
+
+# docker-compose exec forcast ./src/setup/setup.sh 106 Saccharomyces_cerevisiae R64-1-1

@@ -1,6 +1,6 @@
 #!/usr/bin/python2.7
 '''
-Functions for adding a guide to the mongo database and generating GFF files 
+Functions for adding a guide to the mongo database and generating GFF files
 based on the current database
 '''
 import cgi
@@ -27,7 +27,7 @@ def insertgRNAintoMongo(guideDict, gRNACollection):
 	insert_id = gRNACollection.insert_one(guideDict).inserted_id
 	if insert_id == -1 :
 		sys.exit("Cannot insert this record into database. Please contact CCM!")
-	
+
 	print "Successfully inserted this gRNA record into database."
 	return
 
@@ -46,7 +46,7 @@ def fetchNotesfromMongo(pamGenomicStart, pamSeq, gRNACollection):
 
 def fetchLabelfromMongo(pamGenomicStart, pamSeq, gRNACollection):
 	"This function fetches the label of a gRNA record from the MongoDB"
-	
+
 	ResultObject = gRNACollection.find_one({"pamGenomicStart": pamGenomicStart, "pamSeq": pamSeq},{'label':1})
 	print ResultObject['label']
 
@@ -67,9 +67,9 @@ def noOptionFound():
 	print("Invalid string in GET request")
 
 def getENSID(geneName, geneCollection):
-	ENSID = ''	
+	ENSID = ''
 	# get the stable ensembl id from gene name
-	ensResult=geneCollection.find_one({'Name': geneName},{'ENSID':1,'_id':0})	
+	ensResult=geneCollection.find_one({'Name': geneName},{'ENSID':1,'_id':0})
 	if ensResult is not None:
 		ENSID=ensResult['ENSID']
 
@@ -78,9 +78,9 @@ def getENSID(geneName, geneCollection):
 def writePrimerGFF(dbConnection, org):
 	idCounter = 1
 	gffString = []
-	
+
 	primerCollection = dbConnection.primerCollection
-	
+
 	# create a line in the gff file for every pair of accepted primers in the database
 	for primerRecord in primerCollection.find({'status' : 'Accepted'}):
 		# see if the gene is + or -
@@ -89,7 +89,7 @@ def writePrimerGFF(dbConnection, org):
 		except ValueError as e:
 			print("Skipping writing primer record associated with "+str(primerRecord['batchName'])+" ("+str(primerRecord['ENSID'])+") as it cannot be found in the database")
 			continue
-		
+
 		if strand == '+':
 			fwdStart = primerRecord['left_genomicLocation']
 			# subtract 1 from length to account for 'cap' jbrowse puts on exon features
@@ -107,7 +107,7 @@ def writePrimerGFF(dbConnection, org):
 			revStrand = '+'
 		else:
 			print("Invalid strand property of '"+str(strand)+"' for gene '"+str(primerRecord['ENSID'])+"'")
-			
+
 		# make the left/fwd primer's line first
 		colNine = 'ID=exon_' + str(idCounter) + ';Name=' + primerRecord['type'] + '_forward ' + primerRecord['leftprimer'] + ';batchName=' + primerRecord['batchName']
 		colNine += ';ensid=' + primerRecord['ENSID'] + ';pair_notes=' + primerRecord['notes'] + ';pair_id=' + str(primerRecord['_id'])
@@ -115,22 +115,22 @@ def writePrimerGFF(dbConnection, org):
 		gffLine = "\t".join([primerRecord['chr'],'.','exon', str(fwdStart), str(fwdEnd), '.', fwdStrand, '.', colNine])
 		gffString.append(gffLine)
 		idCounter += 1
-		
+
 		# now the right/rev primer line
 		colNine = 'ID=exon_' + str(idCounter) + ';Name=' + primerRecord['type'] + "_reverse " + primerRecord['rightprimer'] + ';batchName=' + primerRecord['batchName']
 		colNine += ';ensid=' + primerRecord['ENSID'] + ';pair_notes=' + primerRecord['notes'] + ';pair_id=' + str(primerRecord['_id'])
 		colNine += ';tm=' + str(primerRecord['rightTM']) + ';gc=' + str(primerRecord['rightGC']) + ';length=' + str(primerRecord['rightlen'])
 		gffLine = "\t".join([primerRecord['chr'],'.','exon', str(revStart), str(revEnd), '.', revStrand, '.', colNine])
 		gffString.append(gffLine)
-		idCounter += 1	
+		idCounter += 1
 
 	try:
-		primerGFF = os.path.join(dbConnection.ROOT_PATH, str("jbrowse/data."+org+"/acceptedPrimers.gff"))
+		primerGFF = os.path.join(dbConnection.ROOT_PATH, str("jbrowse/data/"+org+"/acceptedPrimers.gff"))
 		gffFile = open(primerGFF, "w")
 		gffFile.write("\n".join(gffString))
 		gffFile.close()
 	except Exception, e:
-		print("Problem writing primer gff file: " + str(e))						
+		print("Problem writing primer gff file: " + str(e))
 
 def writeGuideGFF(dbConnection, org):
 	# initialize the strings
@@ -141,7 +141,7 @@ def writeGuideGFF(dbConnection, org):
 
 	gRNACollection = dbConnection.guideCollection
 
-	for gRNARecord in gRNACollection.find({}) :  #get all gRNA records from the database	
+	for gRNARecord in gRNACollection.find({}) :  #get all gRNA records from the database
 		mRNAstart = -1
 		mRNAend = -1
 		# parse out elements of location
@@ -161,19 +161,19 @@ def writeGuideGFF(dbConnection, org):
 		sortedCoordinates = list(sortedGuideCoordinates)
 		sortedCoordinates.extend([pamStart,pamEnd])
 		sortedCoordinates.sort()
-	
+
 		mRNAID = "mRNA"+"_"+str(mRNAIDCounter)
 		mRNAIDCounter = mRNAIDCounter+1
-				
+
 		if gRNARecord['guideScore'] == '' or int(gRNARecord['guideScore']) == -1:
 			gRNARecord['guideScore'] = 'NA'
-			
+
 		otHits = re.findall(r'\d+',gRNARecord['otDesc'])
-		gRNARecord['otDesc'] = "-".join(otHits) 
+		gRNARecord['otDesc'] = "-".join(otHits)
 		mRNAcolumn9 = "ID="+mRNAID+";Name="+mRNAName+";guideScore="+gRNARecord['guideScore']+";otDesc="+gRNARecord['otDesc']
 		if 'label' in gRNARecord:
 			mRNAcolumn9 += ";label="+gRNARecord['label']
-		if 'Notes' in gRNARecord:			
+		if 'Notes' in gRNARecord:
 			mRNAcolumn9 += ";Notes="+gRNARecord['Notes']
 		if 'batchName' in gRNARecord:
 			mRNAcolumn9 += ";batchName="+gRNARecord['batchName']
@@ -181,31 +181,31 @@ def writeGuideGFF(dbConnection, org):
 			mRNAcolumn9 += ";status="+gRNARecord['status']
 		if 'ENSID' in gRNARecord:
 			mRNAcolumn9 += ";ensid="+gRNARecord['ENSID']
-	
-		# the entire feature including arrow	
-		mRNAGFF3str += "\t".join([chrom,".","mRNA", str(sortedCoordinates[0]), str(sortedCoordinates[-1]),".",strand,".",mRNAcolumn9])	
-		mRNAGFF3str += "\n"		
-		
+
+		# the entire feature including arrow
+		mRNAGFF3str += "\t".join([chrom,".","mRNA", str(sortedCoordinates[0]), str(sortedCoordinates[-1]),".",strand,".",mRNAcolumn9])
+		mRNAGFF3str += "\n"
+
 		# just the PAM feature
 		PAMcolumn9 = "ID="+chrom+":"+str(gRNARecord['pamGenomicStart'])+"_"+gRNARecord['pamSeq']+";Name="+gRNARecord['pamSeq']+";Parent="+mRNAID
 		PAMGFF3str += "\t".join([chrom,".","three_prime_UTR", str(pamStart), str(pamEnd),".",strand,"-1",PAMcolumn9])
 		PAMGFF3str += "\n"
-	
+
 		# the coloured part of the guide feature (not PAM)
 		gRNAcolumn9 = "ID="+chrom+":"+str(sortedGuideCoordinates[0])+"_"+gRNARecord['guideSeq']+";Name="+gRNARecord['guideSeq']+";Parent="+mRNAID
 		guideGFF3str += "\t".join([chrom,".","CDS", str(sortedGuideCoordinates[0]), str(sortedGuideCoordinates[1]),".",strand,"0",gRNAcolumn9])
 		guideGFF3str += "\n"
 
 	try:
-		guideGFF = os.path.join(dbConnection.ROOT_PATH, str("jbrowse/data."+org+"/gRNA_CRISPR.gff"))
+		guideGFF = os.path.join(dbConnection.ROOT_PATH, str("jbrowse/data/"+org+"/gRNA_CRISPR.gff"))
 		gffFile = open(guideGFF, "w")
 		gffFile.write(mRNAGFF3str)
 		gffFile.write(PAMGFF3str)
 		gffFile.write(guideGFF3str)
 		gffFile.close()
 	except Exception, e:
-		print("Problem writing guide gff file: " + str(e))						
-	
+		print("Problem writing guide gff file: " + str(e))
+
 
 def modifyDatabase(action, guideDict, geneCollection, gRNACollection):
 	# to get the chromosomal location of guideStart and pamStart, we need to add the pamStart variable to the start of inputSearchCoordinates
@@ -214,7 +214,7 @@ def modifyDatabase(action, guideDict, geneCollection, gRNACollection):
 	if 'inputSearchCoordinates' in guideDict:
 		genomicMatchObj = re.match( r'^(.+?:(\d+))\-\d+', guideDict['inputSearchCoordinates'])
 		guideDict['chromSearchStart'] = genomicMatchObj.group(1) #ex: chr10:12345
-		genomicSearchStart = int(genomicMatchObj.group(2)) 
+		genomicSearchStart = int(genomicMatchObj.group(2))
 	else:
 		sys.exit('Error! Input genomic coordinates werent captured. Please contact CCM!')
 
@@ -228,9 +228,9 @@ def modifyDatabase(action, guideDict, geneCollection, gRNACollection):
 
 	if action == "insert":
 		# get the stable ENSID based on the gene name (batchName)
-		guideDict['ENSID'] = getENSID(guideDict['batchName'], geneCollection)	
+		guideDict['ENSID'] = getENSID(guideDict['batchName'], geneCollection)
 
-		if checkPAMinMongo(guideDict['pamGenomicStart'],guideDict['pamSeq'],gRNACollection) == 0:	 
+		if checkPAMinMongo(guideDict['pamGenomicStart'],guideDict['pamSeq'],gRNACollection) == 0:
 			#if a PAM sequence doesnt exist at a particular genomic location
 			insertgRNAintoMongo(guideDict,gRNACollection)
 		else:
@@ -240,9 +240,9 @@ def modifyDatabase(action, guideDict, geneCollection, gRNACollection):
 			fetchNotesfromMongo(guideDict['pamGenomicStart'],guideDict['pamSeq'],gRNACollection)
 	elif action == "fetchLabel":
 		if checkPAMinMongo(guideDict['pamGenomicStart'],guideDict['pamSeq'],gRNACollection) != 0:
-			fetchLabelfromMongo(guideDict['pamGenomicStart'], guideDict['pamSeq'],gRNACollection)	
+			fetchLabelfromMongo(guideDict['pamGenomicStart'], guideDict['pamSeq'],gRNACollection)
 	else:
-		noOptionFound()	
+		noOptionFound()
 
 def writeGFF(org):
 	# connect to the organism's db
@@ -257,13 +257,13 @@ def addGenomicLocation(org, guideDict):
 	# get the location from blast using the gRNA sequence (and PAM)
 	guideSeq = guideDict['guideSeq']
 	pamSeq = guideDict['pamSeq']
-	
+
 	# THIS IS A TEMPORARY FIX FOR CPF1 (PAM before guide)
         if pamSeq[:3] == 'TTT':
                 searchSeq = pamSeq + guideSeq
         else:
                 searchSeq = guideSeq + pamSeq
-		
+
 	seqSearch = BlastDB(org, searchSeq, True)  # true indicates that the matches should be identical only
 	hits = seqSearch.returnLocations()
 	if len(hits) > 1:
@@ -273,11 +273,11 @@ def addGenomicLocation(org, guideDict):
 	else:
 		try:
 			# check to make sure there's only only location for the identical hit
-			if len(hits) == 1:	
+			if len(hits) == 1:
 				# get the location
 				location = hits[0][1]
 			else:
-				print("Unable to definitively place gRNA") 
+				print("Unable to definitively place gRNA")
 				sys.exit()
 		except Exception, e:
 			print("BLAST search for sequence " + str(searchSeq) + " did not return a location")
@@ -303,8 +303,8 @@ def addGenomicLocation(org, guideDict):
 	# record in dict
 	guideDict['guideLocation'] = guideLocation
 	guideDict['pamLocation'] = pamLocation
-	guideDict['pamGenomicStart'] = pamGenomicStart			
-		
+	guideDict['pamGenomicStart'] = pamGenomicStart
+
 	return
 
 def main():
@@ -312,51 +312,51 @@ def main():
 	Determines if the script is being called from a web browser or command line.
 	If from the web browser, updates the database according to values passed in the
 	cgi arguments. If from the command line, no changes are made to the database
-	but the primer and guide GFF files are rewritten. This is useful for when an 
-	entry in the database is manually changed (i.e. via interacting with the 
+	but the primer and guide GFF files are rewritten. This is useful for when an
+	entry in the database is manually changed (i.e. via interacting with the
 	mongo shell) but the changes aren't reflected in the tracks on JBrowse since
 	no GFF rewrite was performed.
-	'''	
+	'''
 	try:
 		# determine if running from web or commandline
 		ajaxForm = cgi.FieldStorage()
 		cgi_arguments = ajaxForm.getvalue('inputData').split(",")
-		# if we get here we're running from a web browser		
-		print "Content-type:text/plain\n"	
+		# if we get here we're running from a web browser
+		print "Content-type:text/plain\n"
 		try:
 			guideDict = {}  # store the guide attributes
 			for arg in cgi_arguments:
 				tmpKey, tmpValue = arg.split(':', 1)  # the cgi arguments are in json format
 				guideDict[tmpKey] = tmpValue
-		
-			# sample guide dict during insert (for debugging)	
+
+			# sample guide dict during insert (for debugging)
 			'''
-			guideDict = {'batchName': 'Aasdh', 
-			'status': 'Accepted', 
-			'oof': '62', 
-			'guideScore': '84', 
-			'guideSeq': 'GTAACTGAGCAATTAGATCC', 
-			'Notes': 'Test%20BLAST%20search%20April%209th', 
-			'inputSearchCoordinates': 'chr5:76896027-76896237:+', 
-			'pamSeq': 'AGG', 
-			'label': 'test_Aasdh_D', 
-			'guideStart': '111', 
-			'org': 'mm10', 
-			'pamId': 's108-', 
+			guideDict = {'batchName': 'Aasdh',
+			'status': 'Accepted',
+			'oof': '62',
+			'guideScore': '84',
+			'guideSeq': 'GTAACTGAGCAATTAGATCC',
+			'Notes': 'Test%20BLAST%20search%20April%209th',
+			'inputSearchCoordinates': 'chr5:76896027-76896237:+',
+			'pamSeq': 'AGG',
+			'label': 'test_Aasdh_D',
+			'guideStart': '111',
+			'org': 'mm10',
+			'pamId': 's108-',
 			'otDesc': '0\xe2\x80\x89-\xe2\x80\x890\xe2\x80\x89-\xe2\x80\x890\xe2\x80\x89-\xe2\x80\x895\xe2\x80\x89-\xe2\x80\x89107',
-			'crisprScan': '33', 
-			'pamStart': '108', 
+			'crisprScan': '33',
+			'pamStart': '108',
 			'fusi': '53'}
-			'''				
-			action = ajaxForm.getvalue('action') # insert, fetch or update	
+			'''
+			action = ajaxForm.getvalue('action') # insert, fetch or update
 
 			# based on the org in the ajax form, connect to the right database via the Config class
-			org = guideDict['org']		
+			org = guideDict['org']
 			dbConnection = Config(org)
 			gRNACollection = dbConnection.guideCollection
-			geneCollection = dbConnection.curr_geneCollection		
+			geneCollection = dbConnection.curr_geneCollection
 			primerCollection = dbConnection.primerCollection
-			
+
 			if action == "insert":
 				# when adding a gRNA, several fields are required. Ensure they are defined
 				essentialFields = ["inputSearchCoordinates", "pamStart", "pamSeq", "guideSeq", "org", "batchName"]
@@ -366,17 +366,17 @@ def main():
 						return
 				# add the genomic coordinates for PAM and guide via blast
 				addGenomicLocation(org, guideDict)
-		
+
 			# modify the database based on the action passed and guide info
 			modifyDatabase(action, guideDict, geneCollection, gRNACollection)
-			# after database changes, rewrite GFF			
-			writeGFF(org)	
-			
-			return		
-		
+			# after database changes, rewrite GFF
+			writeGFF(org)
+
+			return
+
 		except Exception, e:
 			print("Error occurred while updating database: " + str(e))
-	
+
 	except AttributeError, att_err:
 		# no cgi arguments, will see if command-line arguments exist
 		try:

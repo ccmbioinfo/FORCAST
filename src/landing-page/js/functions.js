@@ -1,10 +1,12 @@
 $(document).ready(function() {
-    $('.js-example-basic-single').select2();
-});
+    $('#genomeSelector').select2();
 
-function navigateToGenome() {
-	genome = $("#genomeSelector option:selected").val();	
-	jbrowseURL = window.location.protocol + "//" + window.location.host;
-	jbrowseURL += "/jbrowse/index.html?data=data." + genome;
-	window.open(jbrowseURL,"_self");
-}
+	$.post("../primer-design/web/ajaxCalls/fetchInstalledGenomes.py", function(data) {
+		$("#genomeSelector").html(data);
+	});
+
+	$("#goButton").click(function () {
+		var genome = $("#genomeSelector option:selected").val();
+		location = "/jbrowse/index.html?data=data/" + genome;
+	});
+});

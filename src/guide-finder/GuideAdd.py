@@ -8,7 +8,7 @@ Requires: batch id, guideID, label, and notes
 
 """
 
-import os, sys, json, cgi, git, datetime
+import os, sys, json, cgi, datetime
 from subprocess import Popen, PIPE, DEVNULL
 
 dir_path = os.path.dirname(os.path.abspath(__file__))
@@ -22,21 +22,21 @@ cgitb.enable()
 class GuideAdd:
     def __init__(self, **kwargs):
         """ class for interfacing to the guide collection """
-        # check required inputs set 
+        # check required inputs set
         for parameter in ['batchID', 'guideID', 'label']:
             if parameter not in kwargs:
-                self.sendErrorHTML("'{parameter}' not set".format(**locals())) 
+                self.sendErrorHTML("'{parameter}' not set".format(**locals()))
         self.dbConnection = Config()
         self.batchID = kwargs['batchID']
         self.guideID = kwargs['guideID']
         self.label = kwargs['label']
         self.notes = kwargs['notes'] if 'notes' in kwargs else ''
-        
+
         # fetch the stored guide info
         self.metadata, self.guide = self.parseJSON()
         self.rgen = self.getRGEN(str(self.metadata['rgenID']))
         # redefine the connection to the database based on the genome
-        self.dbConnection = Config(self.metadata['genome']) 
+        self.dbConnection = Config(self.metadata['genome'])
         # determine if the guide already exists
         self.existingGuide = self.existingGuideInDatabase()
 
@@ -46,12 +46,12 @@ class GuideAdd:
             self.rewriteGFF()
             print("Successfully Updated Guide")
         else:
-            # insert the guide into the database 
+            # insert the guide into the database
             self.insertGuide()
             self.rewriteGFF()
             print("Successfully Inserted Guide")
 
-    
+
     def rewriteGFF(self):
         """ rewrite the gff file """
         # intialize the strings
@@ -65,7 +65,7 @@ class GuideAdd:
             sortedGuideCoordinates = sorted([int(x) for x in guideCoordinates.split('-')])
             # calculate the pam coordinates
             rgen = self.getRGEN(guideRecord['rgenID'])
-            pamLocation = rgen['PamLocation'] 
+            pamLocation = rgen['PamLocation']
             if (pamLocation == 'downstream' and strand == '+') or (pamLocation == 'upstream' and strand == '-'):
                 pamStart = sortedGuideCoordinates[-1]
                 pamEnd = int(pamStart) + len(guideRecord['pamSeq'])
@@ -107,9 +107,9 @@ class GuideAdd:
 
             # increment the count
             idCounter += 1
-            
+
         #try:
-        guideGFF = os.path.join(self.dbConnection.ROOT_PATH, str('jbrowse/data.'+self.metadata['genome']+"/gRNA_CRISPR.gff"))
+        guideGFF = os.path.join(self.dbConnection.ROOT_PATH, str('jbrowse/data/'+self.metadata['genome']+"/gRNA_CRISPR.gff"))
         gffFile = open(guideGFF, 'wb')
         gffFile.write(featureStr.encode('utf-8'))
         gffFile.write(pamStr.encode('utf-8'))
@@ -118,7 +118,7 @@ class GuideAdd:
         #except Exception as e:
         #    self.sendErrorHTML(str(e))
 
-            
+
     def getRGEN(self, rgenID):
         # fetch the correct rgen record using the rgenID attribute
         rgenCollection = self.dbConnection.rgenCollection
@@ -133,25 +133,16 @@ class GuideAdd:
         if rgen['PamLocation'] == 'downstream':
             return guideSeq.upper() + ", " + pamSeq
         elif rgen['PamLocation'] == 'upstream':
-            return pamSeq.upper() + ", " + guideSeq.upper() 
+            return pamSeq.upper() + ", " + guideSeq.upper()
         else:
             sendErrorHMTL("Unrecognized PAM Location for RGEN: " + str(self.rgen['PamLocation']))
-    
+
     def insertGuide(self):
         """ create a new record in the database for the guide """
-
-        # get the current git commit hash
-        try:
-            repo = git.Repo(search_parent_directories=True)
-            git_hash = repo.head.object.hexsha
-        except Exception as e:
-            # don't prevent guide from being added
-            git_hash = ''
-        # build the dict
         newGuideRecord = {
             'batchName': self.metadata['gene'],
             'status': 'Accepted',
-            'guideScore': self.guide['MIT'] if 'MIT' in self.guide else '', 
+            'guideScore': self.guide['MIT'] if 'MIT' in self.guide else '',
             'guideSeq': self.guide['guide_seq'],
             'Notes': self.notes,
             'inputSearchCoordinates': self.metadata['inputSearchCoordinates'],
@@ -164,7 +155,6 @@ class GuideAdd:
             'ENSID': self.metadata['ENSID'],
             'guideLocation': self.guide['guideLocation'],
             'rgenID': self.metadata['rgenID'],
-            'commitHash': git_hash,
             'dateAdded': datetime.datetime.utcnow()
         }
         # TODO: think about how best to display the scores -> on primer end need to allow for possibility of no score
@@ -173,7 +163,7 @@ class GuideAdd:
         result = self.dbConnection.guideCollection.insert_one(newGuideRecord)
         if not result:
             self.sendErrorHTML("Problem inserting record into Database")
-    
+
     def updateGuide(self):
         """ find the existing guide and update its notes and label"""
         existing_id = self.existingGuide['_id']
@@ -186,7 +176,7 @@ class GuideAdd:
         searchQuery = {
             "guideSeq": self.guide['guide_seq'],
             "pamSeq": self.guide['pam_seq'],
-            "guideLocation": self.guide['guideLocation'] 
+            "guideLocation": self.guide['guideLocation']
         }
         if self.dbConnection.guideCollection.find(searchQuery).count() > 0:
             existingGuide = self.dbConnection.guideCollection.find_one(searchQuery)
@@ -208,7 +198,7 @@ class GuideAdd:
             self.sendErrorHTML("Batch JSON file is misconfigured; no metadata found")
 
     def sendErrorHTML(self, errorString):
-        """ write error and exit the program """ 
+        """ write error and exit the program """
         print(errorString)
         sys.exit()
 
@@ -231,7 +221,7 @@ def main():
                 print(traceback.format_exc())
     else:
         #parameters = {'guideID': '92+', 'label': 'TestLabel', 'batchID': 'dda41408f7b56fcb3b', 'notes': 'nospecialcharacters'}
-        #parameters = {'notes': "Le'sfjkd%20fsj#%20s", 'batchID': 'bfd5911343bde9a7cd', 'label': 'Testing%20Update', 'guideID': '6-'} 
+        #parameters = {'notes': "Le'sfjkd%20fsj#%20s", 'batchID': 'bfd5911343bde9a7cd', 'label': 'Testing%20Update', 'guideID': '6-'}
         #{'label': 'testinglabel', 'guideID': '6-', 'notes': 'testing notes', 'batchID': '6aa1c0912c773384c7'}
         try:
             GuideAdd(**parameters)

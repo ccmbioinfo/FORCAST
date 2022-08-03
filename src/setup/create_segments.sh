@@ -1,3 +1,7 @@
+#!/usr/bin/env bash
+
+set -euo pipefail
+
 fai_file=$1
 gff3_file=$2
 org=$3
@@ -20,7 +24,7 @@ awk 'BEGIN{OFS="\t";} {split($9,i,"Name="); print $1,$4-1,$5,"pseudogene:"i[2]}'
 # combine and sort all the genomic regions
 cat ${work_dir}/genes.bed ${work_dir}/ncRNA_genes.bed ${work_dir}/pseudogenes.bed | sort -k1,1 -k2,2n > ${work_dir}/genomic_regions.bed
 # complement genomic regions with the genome to get intergenic regions (need to merge features 1bp away to prevent bedtools from making malformed complementary regions)
-bedtools merge -i ${work_dir}/genomic_regions.bed -d 1 | bedtools complement -i - -g ${work_dir}/${org}.genome | awk '{print $0"\tintergenic"}' > ${work_dir}/intergenic.bed 
+bedtools merge -i ${work_dir}/genomic_regions.bed -d 1 | bedtools complement -i - -g ${work_dir}/${org}.genome | awk '{print $0"\tintergenic"}' > ${work_dir}/intergenic.bed
 
 # get exons
 grep -oP "(chr\S+)\s+\S+\s+exon\s+\d+\s+\d+.+Parent=[^;]+" $gff3_file | grep -Ff ${work_dir}/${org}.chr >${work_dir}/exons.gff3
@@ -32,7 +36,3 @@ bedtools subtract -a ${work_dir}/genomic_regions.bed -b ${work_dir}/exons.bed | 
 # to self: maybe should just cat the exons, introns, and intergenic? this will mean that the exons won't have a gene, just a transcript id
 # cat the genomic regions with the everything else together and sort
 cat ${work_dir}/genomic_regions.bed ${work_dir}/exons.bed ${work_dir}/introns.bed ${work_dir}/intergenic.bed | sort -k1,1 -k2,2n > ${work_dir}/${org}.segments.bed
-
-
-
-

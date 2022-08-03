@@ -19,20 +19,20 @@ class BlastDB:
 	"""
 	BlastDB is used for PrimerQA, Guide Insertion, and Manual Primer Entry
 	Manages the functionality for interatcting with installed blast database.
-	When creating a BlastDB object, the organism 'code' (i.e. mm10) and a list of sequence 
-	strings or single sequence is required. Optional parameters include the evalue cutoff 
-	for a search (default is 0.01), and whether identity values should be returned (default is 
+	When creating a BlastDB object, the organism 'code' (i.e. mm10) and a list of sequence
+	strings or single sequence is required. Optional parameters include the evalue cutoff
+	for a search (default is 0.01), and whether identity values should be returned (default is
 	that they aren't, i.e. False).
 	"""
 	def __init__(self, org, sequences, evalue='0.01', identity=False):
 		# ensure that the organism has been defined
 		assert org, "An organism (i.e. genome) must be defined to connect to the BLAST db"
 		self.org = org
-		
+
 		# BLAST is picky about its PATH and os variables
 		self.Config = Config()
-		os.environ["BLASTDB"] = os.path.join(self.Config.ROOT_PATH, ("jbrowse/data." + str(org) + "/blastdb/"))
-		
+		os.environ["BLASTDB"] = os.path.join(self.Config.ROOT_PATH, ("jbrowse/data/" + str(org) + "/blastdb/"))
+
 		# store attributes
 		self.evalue = evalue
 		self.identity = identity
@@ -43,15 +43,15 @@ class BlastDB:
 		# quick check before assigning
 		assert len(sequences) > 0, "At least one input sequence must be defined"
 		self.sequences = sequences
-		
+
 		# construct blast command
 		self.blastCommand = self.constructBlastCommand()
-	
-	
+
+
 	def constructBlastCommand(self):
 		"""
 		Returns BLAST command for mm10 optimized for primer sequences that will only return
-		hits below the class' evalue threshold. Uses the evalue and identity class attributes		
+		hits below the class' evalue threshold. Uses the evalue and identity class attributes
 		"""
 		#global ROOT_PATH
 		# base shell command with path
@@ -72,10 +72,10 @@ class BlastDB:
 		# specify output format
 		blastCommand.append('-outfmt')
 		blastCommand.append('7 qseqid sseqid sseq evalue nident sstrand sstart send')
-		
+
 		return blastCommand
 
-		
+
 	def locationSearchCommand(self):
 		"""
 		Returns BLAST command for mm10 optimized for parsing the location from a search.
@@ -90,13 +90,13 @@ class BlastDB:
 
 		# since the primers are short, need to pass this argument or no hits will be found
 		blastCommand.append('blastn-short')
-	
+
 		# specify output format (just need location and nident)
 		blastCommand.append('-outfmt')
-		blastCommand.append('7 qseqid sseqid nident sstrand sstart send')	
-		
+		blastCommand.append('7 qseqid sseqid nident sstrand sstart send')
+
 		return blastCommand
-		
+
 
 	def blastSequences(self):
 		"""
@@ -124,8 +124,8 @@ class BlastDB:
 			hitDicts.append(hitDict)
 
 		return hitDicts
-	
-	
+
+
 	def returnLocations(self):
 		"""
 		When the BLAST searches are only being used to find
@@ -137,7 +137,7 @@ class BlastDB:
 		result = []
 		blastLocation = self.locationSearchCommand()
 		hitSearch = re.compile("^primerBLAST[\s]([^\s]+)\s([0-9]*)[\s]*(minus|plus)[\s]*([0-9]*)[\s]*([0-9]*)")
-		
+
 		for seq in self.sequences:
 			# convert sequence to fasta format
 			printfCommand = ['printf', ">primerBLAST\n " + str(seq)]
@@ -150,14 +150,14 @@ class BlastDB:
 				print("Error running BLAST: " + str(e))
 			if blastErr:
 				print blastErr
-	
-			numIdentical = 0	
+
+			numIdentical = 0
 			hits = [str(seq)] # to store locations
-			seqLength = len(str(seq))	
+			seqLength = len(str(seq))
 			for line in blastOut.splitlines():
 				hitMatch = hitSearch.search(line)
 				if hitMatch:
-					identLength = int(hitMatch.group(2))	
+					identLength = int(hitMatch.group(2))
 					if seqLength == identLength:
 						numIdentical += 1
 						location = hitMatch.group(1) + ":"
@@ -167,28 +167,28 @@ class BlastDB:
 						elif hitMatch.group(3) == "minus":
 							location += ":-"
 						else:
-							print "Error parsing direction of match: " + str(hitMatch.group(3))	
+							print "Error parsing direction of match: " + str(hitMatch.group(3))
 						hits.append(location)
-						if numIdentical > 1:			
+						if numIdentical > 1:
 							print("Error: more than one identical match for search sequence '{}'".format(str(seq)))
 
 			if numIdentical == 0:
 				print("Error: No identical hits found in genome for input search sequence")
 			result.append(hits)
-		
-		return result					
-						
-		
+
+		return result
+
+
 	def parseResults(self, blastLines, seq):
 		"""
-		Parse the output of the BLAST program & returns 
+		Parse the output of the BLAST program & returns
 		information about the hits in a dictionary
 		"""
 		#hitCount = -1
 		hitDict = {}
 		locationCount = 0
 		hit = re.compile("^primerBLAST[\s]+(chr[\S]*)[\s]+([A|G|T|C|a|g|t|c|N]*)[\s]*([0-9|.|e|\-|+]*)[\s]*([0-9]*)[\s]*(minus|plus)[\s]*([0-9]*)[\s]*([0-9]*)")
-	
+
 		# iterate through every line in output
 		for line in blastLines:
 			# match line containing number of hits
@@ -208,14 +208,14 @@ class BlastDB:
 						hitDict[locationCount]['nident'] = locationHit.group(4)
 						hitDict[locationCount]['strand'] = locationHit.group(5)
 						hitDict[locationCount]['start'] = locationHit.group(6)
-						hitDict[locationCount]['end'] = locationHit.group(7)	
-				
+						hitDict[locationCount]['end'] = locationHit.group(7)
+
 					locationCount += 1
 		if locationCount <= 0:
 			sys.exit("Problem parsing BLAST output, unexpected output")
-		
+
 		hitDict['numHits'] = locationCount
-		
+
 		return hitDict
 
 '''
@@ -231,4 +231,4 @@ if __name__ == "__main__":
 '''
 
 
-			
+

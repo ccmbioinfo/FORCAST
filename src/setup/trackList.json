@@ -33,7 +33,7 @@
             "modify" : "function( track, feature, div ) { setColor='green'; if(feature.get('type') == 'ncRNA_gene'){ setColor='#8F6F8B';} else if(feature.get('type') == 'pseudogene'){setColor='#575256';} div.style.backgroundColor = setColor; }"
          },
          "onClick" : {
-            "url" : "function(){ var genome_match = location.href.match(/data=data\.(.+?)\&/); return location.protocol+'//'+location.hostname+'/src/primer-design/web/geneFeatures.html?gene={Name}&ensid={gene_id}&org='+genome_match[1] }", 
+            "url" : "function(){ var genome_match = location.href.match(/data=data%2F(.+?)\&/); return location.protocol+'//'+location.hostname+'/src/primer-design/web/geneFeatures.html?gene={Name}&ensid={gene_id}&org='+genome_match[1] }",
             "action" : "iframeDialog",
             "label" : "{Name} Info, Guides, and Primers"
          },
@@ -76,7 +76,7 @@
          "onClick" : {
             "action" : "iframeDialog",
             "iconClass" : "dijitIconDatabase",
-            "url" : "function(){ var genome_match = location.href.match(/data=data\.(.+?)\&/); return location.protocol+'//'+location.hostname+'/src/primer-design/web/geneFeatures.html?gene={batchName}&ensid={ensid}&org='+genome_match[1] }", 
+            "url" : "function(){ var genome_match = location.href.match(/data=data%2F(.+?)\&/); return location.protocol+'//'+location.hostname+'/src/primer-design/web/geneFeatures.html?gene={batchName}&ensid={ensid}&org='+genome_match[1] }",
             "title" : "{batchName} Info, Guides and Primers",
             "label": "<b>{label}</b><ul><li>Specificity Score: <b>{guideScore}</b></li><li>Off-targets for 0-1-2-3-4 mismatches:<b> {otDesc}</b>&nbsp&nbsp</li><p><b>{Notes}</b></p></ul>"
          }
@@ -97,10 +97,10 @@
 	"onClick" : {
 		"action" : "iframeDialog",
 		"iconClass" : "dijitIconDatabase",
-		"url" : "function(){ var genome_match = location.href.match(/data=data\.(.+?)\&/); return location.protocol+'//'+location.hostname+'/src/primer-design/web/geneFeatures.html?gene={batchName}&ensid={ensid}&org='+genome_match[1] }", 
+		"url" : "function(){ var genome_match = location.href.match(/data=data%2F(.+?)\&/); return location.protocol+'//'+location.hostname+'/src/primer-design/web/geneFeatures.html?gene={batchName}&ensid={ensid}&org='+genome_match[1] }",
 		"title" : "{batchName} Info, Guides, and Primers",
 		"label" : "<ul><li>Gene: <b>{batchName}&nbsp&nbsp&nbsp</b></li><li>TM: <b>{tm}&nbsp&nbsp&nbsp</b></li><li>GC%: <b>{gc}&nbsp&nbsp&nbsp&nbsp</b></li><p>Notes: {pair_notes}</li></p></ul>"
-	}	
+	}
       },
       {
          "compress" : 0,

@@ -4,7 +4,7 @@
 Hillary Elrick, September 9th, 2019
 
 Class for getting user input to perform a guide search. Given URL variables, returns appropriate HTML page results.
-Prints template for guide searching as well as AJAX calls to the GuideSearchAndScore.py program which is displayed the 
+Prints template for guide searching as well as AJAX calls to the GuideSearchAndScore.py program which is displayed the
 results section of the HTML template.
 
 Requires: initial searchLocation and genome
@@ -41,7 +41,7 @@ class GuideSearch:
             self.sendErrorHTML("Invalid action string sent: " + str(kwargs['action']))
         else:
             self.action = kwargs['action']
-        
+
         if self.action in ['initialize', 'update_input']:
             # validate searchInput
             if 'searchInput' not in kwargs:
@@ -84,8 +84,8 @@ class GuideSearch:
     def inputRowHTML(self):
         """ rebuild the form row for the input region and target gene and return it """
         template_values = {
-            'search_location': self.getInputHTML(), 
-            'available_genes': self.getOverlappingGenesHTML()    
+            'search_location': self.getInputHTML(),
+            'available_genes': self.getOverlappingGenesHTML()
         }
         template_path = os.path.join(self.dbConnection.ROOT_PATH, "src/guide-finder/jinja2-templates/input_region.html")
         region_template = Template(open(template_path, 'rb').read().decode('utf-8'))
@@ -107,25 +107,25 @@ class GuideSearch:
         return html_result
 
     def sendErrorHTML(self, errorString):
-        """ format exceptions in HTML to prevent page from crashing """ 
+        """ format exceptions in HTML to prevent page from crashing """
         if not hasattr(self, 'dbConnection'):
             self.dbConnection = Config()
-        template_path = os.path.join(self.dbConnection.ROOT_PATH, "GuideFinder/templates/error.html")
+        template_path = os.path.join(self.dbConnection.ROOT_PATH, "src/guide-finder/jinja2-templates/error.html")
         error_template = Template(open(template_path, 'rb').read().decode('utf-8'))
         html_result = error_template.render(errorString=errorString)
         print(html_result)
         sys.exit()
-       
+
     def getOrganismHTML(self):
         """ convert underscored org database string to HTML with italicization """
         org = self.dbConnection.organismName
         org = org.replace("_"," ").capitalize()
-        HTML = "<i>{org}</i> ({genome})".format(org=org, genome=self.genome)       
+        HTML = "<i>{org}</i> ({genome})".format(org=org, genome=self.genome)
         return HTML
-   
+
     def getOverlappingGenesHTML(self):
         """ Format the overlapped genes into a selection dropdown or text input if no overlap """
-        
+
         # prevent displaying all genes overlapped in case of large input sequence
         if len(self.overlappedGenes) < 20 and len(self.overlappedGenes) > 0:
             HTML = "<select class='form-control' id='gene' required>"
@@ -135,20 +135,20 @@ class GuideSearch:
                 HTML += "<option value selected='selected'></option>"
                 for gene in self.overlappedGenes:
                     HTML += "<option value='{gene}'>{gene}</option>".format(gene=gene)
-            
-            HTML += "</select>" 
+
+            HTML += "</select>"
         else:
             HTML = "<input class='form-control' id='gene' type='text' required>"
 
         return HTML
-       
+
     def getRgenHTML(self):
         """ returns the available rgens in a preformmatted HTML select tag """
         HTML = '<select class="form-control" id="RGENS" onchange="getProtospacerLengths()">'
         for rgen in self.dbConnection.rgenCollection.find().sort([("rgenID",1)]):
             HTML += '<option value="{rgenID}">{Shortform}</option>'.format_map(rgen)
         HTML += "</select>"
-        
+
         return HTML
 
     def getLengthsHTML(self):
@@ -192,10 +192,10 @@ class GuideSearch:
             length = abs(int(start)-int(end))
         except Exception as e:
             return "N/A"
-        return length 
+        return length
 
     def getOverlappingGenes(self):
-        """ using Teja's query to find genes in the mongodb that overlap the search input """        
+        """ using Teja's query to find genes in the mongodb that overlap the search input """
         try:
             chm, start, end = re.search(r"(chr.+?):(\d+)\-(\d+)", self.searchInput).groups()
         except Exception as e:
@@ -203,7 +203,7 @@ class GuideSearch:
         start = int(start)
         end = int(end)
         searchQuery = {
-        '$or': [ 
+        '$or': [
             {'$and': [
                 {'start':{'$gte':start}},
                 {'start':{'$lte':end}},
@@ -213,7 +213,7 @@ class GuideSearch:
                 {'start':{'$lte':start}},
                 {'end':{'$gte':end}},
                 {'chr':chm}
-            ]}, 
+            ]},
             {'$and': [
                 {'end':{'$gte':start}},
                 {'end':{'$lte':end}},
@@ -225,7 +225,7 @@ class GuideSearch:
             overlappedGenes.append(gene['Name'])
 
         return overlappedGenes
-    
+
     def getRGEN(self):
         # fetch the correct rgen record using the rgenID attribute
         rgenCollection = self.dbConnection.rgenCollection
@@ -235,7 +235,7 @@ class GuideSearch:
         else:
                 raise ValueError("Incorrect number of records returned from RGEN database for rgenID: " + str(rgenID))
                 return
-    
+
 def isValidInput(inputSeq):
     #TODO: code this. some validation done on front end but not for the chr number/letter
     if len(inputSeq) == 0:

@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
-    <link rel="icon" href="../../crispr-icon.png" sizes="100x100">
+    <link rel="icon" href="../../docs/img/crispr-icon.png" sizes="100x100">
     <title>FORCAST Guide Search</title>
     <style>
         .title {
@@ -46,9 +46,9 @@
             border: 1px solid #adadad;
             padding: 0.5rem;
             vertical-align: middle;
-        }	
+        }
         .table-bordered thead th {
-            border: 1px solid #adadad;	
+            border: 1px solid #adadad;
         }
         .popover {
             right: -100%;
@@ -74,7 +74,7 @@
             white-space: nowrap;
         }
         .green {
-            color: #28a745;        
+            color: #28a745;
         }
         .tableTitle {
             font-size: 1.15rem;
@@ -200,7 +200,7 @@
 				<div id="collapseTwo" class="collapse">
 				<div class="card-body">
                     <div class="center top-padding" id="loadingIcon">
-                        <img src="jinja2-templates/img/loading.gif" alt="loading icon" title="Searching for Guides"> 
+                        <img src="jinja2-templates/img/loading.gif" alt="loading icon" title="Searching for Guides">
                     </div>
                     <div id="guideResults"></div>
 				</div>
@@ -315,7 +315,7 @@
                     $("#loadingIcon").hide();
                     $('#guideResults').html('Error: ' + xhr.status + ": " + xhr.statusText);
                 }
-                
+
             })
         }
 
@@ -382,7 +382,7 @@
                 error: function(xhr, status, error){
                     console.log(error);
                 }
-                
+
             })
         }
 
@@ -392,7 +392,7 @@
             $('[data-toggle="popover"]').popover({})
         }
         $(document).ready(enablePopovers());
-        
+
         // enable tooltips
         $(function () {
             $('[data-toggle="tooltip"]').tooltip()
