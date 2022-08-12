@@ -1,6 +1,10 @@
 # program/data folders
 .env
+bin/*
 jbrowse/data*
+jbrowse/Makefile
+jbrowse/setup.log
+jbrowse/jbrowse.conf
 config
 mongodb
 
@@ -19,10 +23,7 @@ src/primer-design/files/**/*.json
 src/primer-design/files/**/*_input
 src/primer-design/files/**/*.doc
 
-
-bin/*
-jbrowse/Makefile
-jbrowse/setup.log
+#temp directories
 score_test/*
 src/guide-finder/old_tempfiles/*
 src/guide-finder/tempfilesget_seq_test.fa

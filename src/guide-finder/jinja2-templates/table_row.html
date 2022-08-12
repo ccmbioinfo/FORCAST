@@ -28,6 +28,17 @@
 		<td>{{ guide["CFD"] }}</td>
 	{% endif %}
 {% endif %}
+{% if 'Precision' in guide %}
+	{% if guide['max_exceeded'] == True or guide['skip'] == True %}
+		<td>-</td>
+		<td>-</td>
+		<td>-</td>
+	{% else %}
+		<td>{{ guide["Precision"] }}</td>
+		<td>{{ guide["Frameshift Frequency"] }}</td>
+		<td>{{ guide["MH Strength"] }}</td>
+	{% endif %}
+{% endif %}
 <td>
 	{{offtargetModal}}	
 </td>
