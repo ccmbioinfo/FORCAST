@@ -8,11 +8,11 @@ RUN ln -sf /dev/stdout /var/log/apache2/access.log && \
     a2enmod rewrite && \
     # Disable directory listings. This is a core module, which requires --force
     a2dismod --force autoindex
-RUN apt update -y && \
+RUN apt-get update -y && \
     # needed to add deadsnakes/ppa repo for Python 3.5
     apt-get install -y software-properties-common && \
     add-apt-repository -y ppa:deadsnakes/ppa && \
-    apt-get update -y \
+    apt-get update -y && \
     apt install -y \
     # MongoDB 3.6 for storing guides and primers
     mongodb \
