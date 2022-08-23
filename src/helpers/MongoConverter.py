@@ -1,4 +1,4 @@
-#!/usr/bin/python3
+#!/usr/bin/python3.5
 
 """
 Hillary Elrick, October 1st, 2019
@@ -18,7 +18,7 @@ def updateGuideRecords(org):
     """ add the rgen ID to all the records """
     # NOTE: THIS PRESUMES THAT THE DEFAULT RGEN DATABASE IS BEING USED
     dbConnection = Config(org)
-    for guideRecord in dbConnection.guideCollection.find({}): 
+    for guideRecord in dbConnection.guideCollection.find({}):
         if 'pamSeq' not in guideRecord:
             sys.exit("Error: invalid guide record " + str(guideRecord))
         if len(guideRecord['pamSeq']) == 3:
@@ -34,7 +34,7 @@ def updateGuideRecords(org):
         else:
             sys.exit("Error: unrecognized PAM ("+str(guideRecord['pamSeq'])+")")
 
-        dbConnection.guideCollection.update_one({"_id": guideRecord['_id']}, {"$set": {"rgenID": rgenID}}) 
+        dbConnection.guideCollection.update_one({"_id": guideRecord['_id']}, {"$set": {"rgenID": rgenID}})
 
 
 def updateDbs():
@@ -45,6 +45,6 @@ def updateDbs():
 
 def main():
     updateDbs()
-    
+
 if __name__ == "__main__":
     main()

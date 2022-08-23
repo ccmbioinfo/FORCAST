@@ -1,4 +1,4 @@
-#!/usr/bin/python3
+#!/usr/bin/python3.5
 
 #Calculates the Cutting Frequency Determination score
 #Requirements: 1. Pickle file with mismatch scores in working directory

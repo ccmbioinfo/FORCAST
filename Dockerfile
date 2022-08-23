@@ -9,6 +9,10 @@ RUN ln -sf /dev/stdout /var/log/apache2/access.log && \
     # Disable directory listings. This is a core module, which requires --force
     a2dismod --force autoindex
 RUN apt update -y && \
+    # needed to add deadsnakes/ppa repo for Python 3.5
+    apt-get install -y software-properties-common && \
+    add-apt-repository -y ppa:deadsnakes/ppa && \
+    apt-get update -y \
     apt install -y \
     # MongoDB 3.6 for storing guides and primers
     mongodb \
@@ -16,8 +20,9 @@ RUN apt update -y && \
     ca-certificates curl unzip \
     # Convenient downloads for Dicey from GEAR Genomics Tracy
     wget rename \
-    # FORCAST uses both Python 2 and 3 for some reason
-    python python3-pip \
+    # FORCAST uses both Python 2 and 3.5 for some reason
+    # python3.5-venv includes pip
+    python python3.5-venv \
     # Bioinformatics tools used when installing new genomes
     bwa bedtools samtools ncbi-blast+ \
     # FORCAST primer design feature after setup
@@ -44,7 +49,7 @@ RUN curl -LO https://github.com/GMOD/jbrowse/releases/download/1.12.5-release/JB
     sed -i '6i\    <link rel="icon" href="../docs/img/crispr-icon.png" sizes="100x100">' /var/www/html/jbrowse/index.html
 # Dependencies for FORCAST CGI scripts + inDelphi
 RUN pip install --no-cache-dir pymongo==3.12.3 requests==2.27.1 && \
-    pip3 install --no-cache-dir pymongo==3.12.3 requests==2.27.1 Jinja2==3.1.2 pandas==0.23.4 scikit-learn==0.20.0 scipy==1.1.0 numpy==1.15.3
+    python3.5 -m pip install --no-cache-dir pymongo==3.12.3 requests==2.27.1 Jinja2==3.1.2 pandas==0.23.4 scikit-learn==0.20.0 scipy==1.1.0 numpy==1.15.3
 COPY config-template /var/www/html/config
 WORKDIR /var/www/html
 # Replace the /usr/sbin/apachectl script that is called with the Apache master process that respects signals
