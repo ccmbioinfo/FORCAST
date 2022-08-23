@@ -48,8 +48,11 @@ RUN curl -LO https://github.com/GMOD/jbrowse/releases/download/1.12.5-release/JB
     # Add favicon
     sed -i '6i\    <link rel="icon" href="../docs/img/crispr-icon.png" sizes="100x100">' /var/www/html/jbrowse/index.html
 # Dependencies for FORCAST CGI scripts + inDelphi
-RUN pip install --no-cache-dir pymongo==3.12.3 requests==2.27.1 && \
-    python3.5 -m pip install --no-cache-dir pymongo==3.12.3 requests==2.27.1 Jinja2==3.1.2 pandas==0.23.4 scikit-learn==0.20.0 scipy==1.1.0 numpy==1.15.3
+# Python 2
+RUN pip install --no-cache-dir pymongo==3.12.3 requests==2.27.1
+# Python 3.5
+RUN python3.5 -m ensurepip && \
+    python3.5 -m pip install --no-cache-dir pymongo==3.12.3 Jinja2==2.8 pandas==0.23.4 scikit-learn==0.20.0 scipy==1.1.0 numpy==1.15.3
 COPY config-template /var/www/html/config
 WORKDIR /var/www/html
 # Replace the /usr/sbin/apachectl script that is called with the Apache master process that respects signals
