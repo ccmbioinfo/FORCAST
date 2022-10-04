@@ -12,7 +12,7 @@ server = "https://rest.ensembl.org"
 class Gene(object):
 	# where the APE files are written
 	APE_PATH = "files/apeFiles"
-	
+
 	# initialize with gene name
 	def __init__(self, geneName, genome, suppressWarnings=False, ENSID=None):
 		self.genome = genome
@@ -38,20 +38,20 @@ class Gene(object):
 	def checkRelease(self):
 		ext = "/info/data/?"
 		try:
-			releaseRequest = requests.get(server + ext, headers={"Content-Type": "application/json"}, timeout=10)
+			releaseRequest = requests.get(server + ext, headers={"Content-Type": "application/json"}, timeout=30)
 		except requests.exceptions.Timeout:
 			returnError("The Ensembl Rest API is not responding (https://rest.ensembl.org)")
 		if not releaseRequest.ok:
 			releaseRequest.raise_for_status()
 			returnError('Problem fetching gene information from Ensembl')
-		release = releaseRequest.json()['releases']	
-			
+		release = releaseRequest.json()['releases']
+
 		if len(release) != 1:
 			warningString = "The API call to Ensembl for this gene returned multiple releases: "
 			for r in release:
 				warningString += str(r)
 			returnWarning(warningString)
-				
+
 		return release[0]
 
 	'''
@@ -60,7 +60,7 @@ class Gene(object):
 	def getFeatureType(self):
 		ext = '/lookup/id/%s?' % self.ensemblID
 		try:
-			featureRequest = requests.get(server + ext, headers={"Content-Type": "application/json"}, timeout=10)
+			featureRequest = requests.get(server + ext, headers={"Content-Type": "application/json"}, timeout=30)
 		except requests.exceptions.Timeout:
 			returnError("The Ensembl Rest API is not responding (https://rest.ensembl.org)")
 		if not featureRequest.ok:
@@ -79,21 +79,21 @@ class Gene(object):
 	Get the ensembl ID for a gene using the MongoDB that is stored localled
 	'''
 	def dbGetEnsemblID(self):
-		geneCollection = self.Config.curr_geneCollection		
+		geneCollection = self.Config.curr_geneCollection
 		geneQuery = {"Name": self.geneName}
 		geneMatch = geneCollection.find(geneQuery)
-		
+
 		if geneMatch.count() > 1 :
 			returnError("More than one result found in the database for the gene " + str(self.geneName))
 		elif geneMatch.count() < 1 :
 			returnError("No results found in the database for the gene " + str(self.geneName))
-		
+
 		return geneMatch[0]['ENSID'], 'gene'
 
 	def getGeneCoordinates(self):
 		ext = "/overlap/id/%s?feature=%s" % (self.ensemblID, self.featureType)
 		try:
-			geneRequest = requests.get(server + ext, headers={"Content-Type": "application/json"}, timeout=10)
+			geneRequest = requests.get(server + ext, headers={"Content-Type": "application/json"}, timeout=30)
 		except requests.exceptions.Timeout:
 			returnError("The Ensembl Rest API is not responding (https://rest.ensembl.org)")
 		if not geneRequest.ok:
@@ -128,7 +128,7 @@ class Gene(object):
 		ext = "/overlap/region/"+str(self.Config.organismName)+"/%s:%s-%s?;feature=exon;feature=transcript;biotype=protein_coding" % (
 			self.chromosome, self.gene_start, self.gene_end)
 		try:
-			featureRequest = requests.get(server + ext, headers={"Content-Type": "application/json"}, timeout=10)
+			featureRequest = requests.get(server + ext, headers={"Content-Type": "application/json"}, timeout=30)
 		except requests.exceptions.Timeout:
 			returnError("The Ensembl Rest API is not responding (https://rest.ensembl.org).")
 		if not featureRequest.ok:
@@ -184,14 +184,14 @@ class Gene(object):
 			# pad with 1000bp buffer
 			seqStart = seqStart - 1000
 			seqEnd = seqEnd + 1000
-				
+
 			'''
 			since the seqStart and seqEnd are derived from the earliest/lastest protein-coding
 			genes +/- a 1000bp buffer, the potential for the seqEnd or seqStart to be WITHIN
 			the actual gene sequence (instead of outside of it) exists. Need to check if the
-			calculated bounds are within the gene sequence and set the seqStart or seqEnd to 
+			calculated bounds are within the gene sequence and set the seqStart or seqEnd to
 			be the actual gene's start or end.
-			''' 
+			'''
 			if strand == -1:
 				if seqStart > self.gene_end:
 					seqStart = self.gene_end - 100
@@ -204,23 +204,23 @@ class Gene(object):
 					seqEnd = self.gene_end + 100
 		else:
 			# since no exons, need to set strand and sequence limits manually
-			if self.gene_start < self.gene_end:	
+			if self.gene_start < self.gene_end:
 				# forward strand
 				strand = 1
 				seqStart = self.gene_start - 100
-				seqEnd = self.gene_end + 100	
+				seqEnd = self.gene_end + 100
 			elif self.gene_start > self.gene_end:
 				# on reverse strand
 				strand = -1
 				seqStart = self.gene_end - 100
 				seqEnd = self.gene_start + 100
 			else:
-				returnError("No protein-coding exons found, unable to get strand from gene coordinates")	
-				
+				returnError("No protein-coding exons found, unable to get strand from gene coordinates")
+
 		ext = "/sequence/region/%s/%s:%s..%s:%s?content-type=text/plain;mask=soft" % (str(self.Config.organismName),
 			str(self.chromosome), str(seqStart), str(seqEnd), str(strand))
 		try:
-			seqRequest = requests.get(server + ext, timeout=10)
+			seqRequest = requests.get(server + ext, timeout=30)
 		except requests.exceptions.Timeout:
 			returnError("The Ensembl Rest API is not responding (https://rest.ensembl.org)")
 		if not seqRequest.ok:
@@ -239,7 +239,7 @@ class Gene(object):
 		seqLength = abs(seqStart - seqEnd)
 
 		return seq, seqLength, seqStart, seqEnd, strand
-	
+
 	'''
 	Writes the text stored in the self.APE attribute to an APE file.
 	File is labelled by GeneName_ReleaseNumber.ape
@@ -257,7 +257,7 @@ class Gene(object):
 				os.makedirs(apeDir)
 				os.makedirs(apeDir_plain)
 				os.makedirs(apeDir_features)
-				
+
 			apeFile = open(os.path.join(apeDir_plain, filename), 'w')
 			apeFile.write("\n".join(self.APE))
 			apeFile.close()

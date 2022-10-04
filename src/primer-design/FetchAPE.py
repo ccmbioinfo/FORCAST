@@ -2,7 +2,7 @@
 
 import cgi
 import sys
-import os.path 
+import os.path
 import requests
 import json
 sys.path.append(os.path.join(os.path.dirname(os.path.abspath(__file__)), '../helpers'))
@@ -20,7 +20,7 @@ server = "https://rest.ensembl.org"
 Written By Hillary Elrick August 30th, 2018
 Updated September 17th, 2019 to allow for search by ENSID
 
-Purpose of this script is to generate an APE file for a gene given it's gene symbol or ENSID. 
+Purpose of this script is to generate an APE file for a gene given it's gene symbol or ENSID.
 If it's already been generated, a download link to the pre-exisiting file is provided.
 
 HTML page is minimized so it can be called as a popup from FileMaker
@@ -70,7 +70,7 @@ def fetchGeneSymbol(ENSID):
 	ext = "/lookup/id/"+str(ENSID)
 
 	try:
-		symbolRequest = requests.get(server + ext, headers={"Content-Type": "application/json"}, timeout=10)
+		symbolRequest = requests.get(server + ext, headers={"Content-Type": "application/json"}, timeout=30)
 	except requests.exceptions.Timeout as e:
 		printError("The Ensembl Rest API is not responding (https://rest.ensembl.org)")
 	except Exception as e:
@@ -81,9 +81,9 @@ def fetchGeneSymbol(ENSID):
 			symbolRequest.raise_for_status()
 		except Exception as e:
 			printError('Problem fetching gene symbol from Ensembl: '+str(e))
-	
+
 	geneInfo = symbolRequest.json()
-	
+
 	try:
 		symbol = geneInfo['display_name']
 	except Exception as e:
@@ -104,23 +104,23 @@ def main():
 	# if ENSID is provided, we always use it to infer the geneSymbol
 	if ENSID:
 		geneSymbol = fetchGeneSymbol(ENSID)
-	
+
 	if geneSymbol == None:
 		printError("No gene symbol provided")
-	
+
 	# print beginning of html doc
 	printHeader(geneSymbol)
-	
+
 	# check if the file's already been created in the APE directory for the current release
-	
+
 	#global RELEASE
-	global APE_PATH 
-	
+	global APE_PATH
+
 	filename = str(geneSymbol + "_" + dbConnection.release + ".ape")
 	if os.path.isfile(os.path.join(APE_PATH, filename)):
 		# provide a download to the cached file
 		print ("""<a href='""" + str(os.path.join(APE_PATH, genome, 'plain', filename)) + """' download>Download Cached """ + filename + """</a>""")
-	else:		
+	else:
 		# generate a gene object and write its ape
 		try:
 			if ENSID:
@@ -128,7 +128,7 @@ def main():
 			else:
 				geneObject = Gene(geneSymbol, genome)
 
-			geneObject.writeAPE(True)	
+			geneObject.writeAPE(True)
 		except Exception as e:
 			pass
 

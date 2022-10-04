@@ -45,8 +45,8 @@ class Guide(Gene):
 		self.labelGuides()  # add labels to self.gRNAs
 		'''
 			self.gRNAs is an array of the guides with the indices corresponding to the following order and sorted on their start:
-			
-			guideScore(0), guideSeq(1), guideGenomicStart(2), pamSeq(3), pamGenomicStart(4), otDesc(5), Notes(6), 
+
+			guideScore(0), guideSeq(1), guideGenomicStart(2), pamSeq(3), pamGenomicStart(4), otDesc(5), Notes(6),
 			start(7), end(8), direction(9), label(10)
 		'''
 		self.startExcise, self.lengthExcise, self.wtTarget, self.emTarget = self.setTargets()
@@ -59,7 +59,7 @@ class Guide(Gene):
 		self.guideQA
 
 	def guideQA(self):
-		# get the genomic excised sequence location (the guide array is sorted)	
+		# get the genomic excised sequence location (the guide array is sorted)
 		earliestStart = self.gRNAs[0][2]
 		latestEnd = 0
 		for guide in self.gRNAs:
@@ -73,7 +73,7 @@ class Guide(Gene):
 		ext = "/overlap/region/"+self.super.Config.organismName+"/%s:%s-%s?feature=transcript;feature=regulatory;feature=other_regulatory" % (
 			self.super.chromosome, earliestStart, latestEnd)
 		try:
-			regulatoryRequest = requests.get(server + ext, headers={"Content-Type": "application/json"}, timeout=5)
+			regulatoryRequest = requests.get(server + ext, headers={"Content-Type": "application/json"}, timeout=15)
 		except requests.exceptions.Timeout:
 			returnError("The Ensembl Rest API is not responding (https://rest.ensembl.org).")
 		if not regulatoryRequest.ok:
@@ -85,7 +85,7 @@ class Guide(Gene):
 		# connect to the genome's database
 		dbConnection = Config(self.super.genome)
 		curr_geneCollection = dbConnection.curr_geneCollection
-		
+
 		# filter out the transcript that's being targeted (same external name as gene name)
 		filteredElements = []
 		try:
@@ -128,8 +128,8 @@ class Guide(Gene):
 				if e['feature_type'] == 'transcript':
 					try:
 						parent = curr_geneCollection.find_one({"ENSID": e['parentID']})
-						print("<tr><td>" + e['feature_type'] + "</td><td>Transcript of " + 
-							parent['Name'] + "</td><td>chr" + str(e['chr']) + ":" + 
+						print("<tr><td>" + e['feature_type'] + "</td><td>Transcript of " +
+							parent['Name'] + "</td><td>chr" + str(e['chr']) + ":" +
 							str(e['start']) + "-" + str(e['end']) + "</td></tr>")
 					except Exception, e:
 						returnError("Problem fetching name of parent transcript" + str(e))
@@ -152,7 +152,7 @@ class Guide(Gene):
 				self.success = [True, False] # only wt found/written
 			elif len(self.emPrimers) > 0:
 				self.success = [False, True] # only em found/written
-					
+
 	def writeGuideAPE(self):
 		# write every combination to file, labelling with postfix (0-9)_(0-9) to indicate pair
 		for key, apeString in self.fileDictionary.iteritems():
@@ -222,11 +222,11 @@ class Guide(Gene):
 				filepath = os.path.join(csvDir_genome, filename)
 				try:
 					with open(filepath, mode='w') as csv_file:
-						# write Guide Header 
+						# write Guide Header
 						writer = csv.writer(csv_file, delimiter=",")
 						writer.writerow(["Guides:"])
 						writer.writerow(["Sequence", "PAM"])
-						# print guides from dictionary	
+						# print guides from dictionary
 						guideFields = ['sequence', 'PAM']
 						writer = csv.DictWriter(csv_file, fieldnames=guideFields)
 						for g, guide in guideDict.iteritems():
@@ -294,14 +294,14 @@ class Guide(Gene):
 		primersDict["left_genomicLocation"] = str(primer['genomicLeftStart'])
 		primersDict["productSize"] = str(primer['productSize'])
 		primersDict["status"] = "Accepted"  # accepted to begin with
-		primersDict["notes"] = "" # blank to start	
+		primersDict["notes"] = "" # blank to start
 
 		return primersDict
 
 	# write the download buttons for the csv and ape files (pre-set to default (0_0))
 	def writeDownloads(self):
 		if self.success[0] == False and self.success[1] == False:
-			returnError("Unable to design EM or WT guides")	
+			returnError("Unable to design EM or WT guides")
 			return
 
 		self.writeGuideAPE()
@@ -316,7 +316,7 @@ class Guide(Gene):
 			</br>
 
 			<div class="btn-group" role="group" style="float: left;">
-				<button class="btn btn-primary btn-sm bordered-button" type="button" onclick="addPrimersToDatabase()">Add Primers to Database</button>		
+				<button class="btn btn-primary btn-sm bordered-button" type="button" onclick="addPrimersToDatabase()">Add Primers to Database</button>
 				<div class="btn-group" role="group">
 					<button class="btn btn-secondary btn-sm dropdown-toggle bordered-button" type="button" id="dropdownDownloadLinks" data-toggle="dropdown">
 					Download
@@ -326,7 +326,7 @@ class Guide(Gene):
 						<a class="dropdown-item" id="csvDownload" href="''' + os.path.join(genomeCSV, defaultCSV) + '''" download>Selected as CSV</a>
 					</div>
 				</div>
-				
+
 			</div>
 			<br>
 			<br>
@@ -338,7 +338,7 @@ class Guide(Gene):
 		based on these guides. Depending on the number of guides, there
 		are different rules around what's being targeted by the primers
 		"""
-		# check first to make sure the guides don't overlap	
+		# check first to make sure the guides don't overlap
 		self.checkOverlap()
 		# set the preliminary targets and excised start for the wt and em primers
 		startExcise = self.getCut(self.gRNAs[0])
@@ -363,7 +363,7 @@ class Guide(Gene):
 		elif len(self.gRNAs) == 1: # only one guide, only design one set of primers
 			# we'll call the primer a wt primer
 			wtTarget = (self.gRNAs[0][7], self.gRNAs[0][8])
-			emTarget = None			
+			emTarget = None
 			lengthExcise = abs(self.gRNAs[0][7] - self.gRNAs[0][8]) # pretend the excised region is the guide itself
 		else:
 			returnError(str(len(
@@ -381,7 +381,7 @@ class Guide(Gene):
 					sys.exit()
 
 	def fetchGuides(self):
-		# get all accepted guides for this gene via the parent Gene object		
+		# get all accepted guides for this gene via the parent Gene object
 		dbConnection = Config(self.super.genome)
 		gRNACollection = dbConnection.guideCollection
 		geneQuery = {"ENSID": self.super.ensemblID, "status": 'Accepted'}
@@ -421,7 +421,7 @@ class Guide(Gene):
 			guideScore(0), guideSeq(1), guideGenomicStart(2), pamSeq(3), pamGenomicStart(4), otDesc(5), Notes(6)
 			we want to get the start, end,  and direction for the guides relative to the formatted sequence (with 1000bp buffer)
 			they're added to indices 7, 8 and 9 of the array self.gRNAs
-			
+
 			(this is done in parallel to the modification of the guide dict which will replace the guide list)
 		"""
 		for g in self.gRNAs:
@@ -573,12 +573,12 @@ class Guide(Gene):
 								p['rightstart'] = rStart + self.lengthExcise
 							if lStart > self.startExcise:
 								p['leftstart'] = lStart + self.lengthExcise
-					
+
 					self.addGenomicLocation(emPrimers)
-					self.addWtFragments(emPrimers)		
+					self.addWtFragments(emPrimers)
 				if len(primerResult) > 0:
 					# add the results table
-					htmlResult += printPrimers(primerResult, primerType)	
+					htmlResult += printPrimers(primerResult, primerType)
 			else:
 				if retryString:
 					htmlResult += retryString
@@ -589,7 +589,7 @@ class Guide(Gene):
 		htmlResult += ("</div>")
 		return wtPrimers, emPrimers, htmlResult
 
-	# need to add the wt product size to the em primer product size field	
+	# need to add the wt product size to the em primer product size field
 	def addWtFragments(self, emPrimers):
 		for key, primer in emPrimers.iteritems():
 			if primer['genomicRightStart'] > primer['genomicLeftStart']:
@@ -655,8 +655,8 @@ def printPrimers(primerDict, primer):
 	rank = 1
 	idCount = 0
 	for pairNum in sorted(primerDict.iterkeys()):
-		
-		idCountString = str(idCount)	
+
+		idCountString = str(idCount)
 
 		# define html for beginning of first row
 		if rank == 1:
@@ -681,9 +681,9 @@ def printPrimers(primerDict, primer):
 		leftLength = str(primerDict[pairNum]['leftlen'])
 		leftGC_rounded = str(round(float(primerDict[pairNum]['leftGC']), 2))
 		leftTM_rounded = str(round(float(primerDict[pairNum]['leftTM']), 2))
-		productSize = str(primerDict[pairNum]['productSize'])	
+		productSize = str(primerDict[pairNum]['productSize'])
 		htmlTable += """
-		<td rowspan="2" class="align-middle centreCell">{rank}</td>		
+		<td rowspan="2" class="align-middle centreCell">{rank}</td>
 		<td class="align-middle centreCell">Forward</td>
 		<td class="align-middle centreCell">{leftPrimer}</td>
 		<td class="centreCell" style="font-size: 0.75rem;">Length: {leftLength}<br>GC Percent: {leftGC_rounded}<br>TM: {leftTM_rounded}</td>
@@ -707,10 +707,10 @@ def printPrimers(primerDict, primer):
 		<td class="align-middle centreCell" style="background-color: #e9f3fd">Searching <i class="fa fa-spinner fa-spin"></i></td>
 		</tr>
 		""".format(**locals())
-	
+
 		rank = rank + 1
 		idCount = idCount + 2
-	
+
 	htmlTable += """
 	</tbody>
 	</table>
