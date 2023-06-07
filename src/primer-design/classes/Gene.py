@@ -41,6 +41,8 @@ class Gene(object):
 			releaseRequest = requests.get(server + ext, headers={"Content-Type": "application/json"}, timeout=30)
 		except requests.exceptions.Timeout:
 			returnError("The Ensembl Rest API is not responding (https://rest.ensembl.org)")
+		except Exception as e:
+			returnError("Problem with Ensembl Rest API call")
 		if not releaseRequest.ok:
 			releaseRequest.raise_for_status()
 			returnError('Problem fetching gene information from Ensembl')
@@ -62,7 +64,10 @@ class Gene(object):
 		try:
 			featureRequest = requests.get(server + ext, headers={"Content-Type": "application/json"}, timeout=30)
 		except requests.exceptions.Timeout:
-			returnError("The Ensembl Rest API is not responding (https://rest.ensembl.org)")
+			returnError("The Ensembl Rest API is not responding (https://rest.ensembl.org)")	
+		except Exception as e:
+			returnError("Problem with Ensembl Rest API call")
+			
 		if not featureRequest.ok:
 			featureRequest.raise_for_status()
 			returnError("Problem fetching feature type")
@@ -96,6 +101,8 @@ class Gene(object):
 			geneRequest = requests.get(server + ext, headers={"Content-Type": "application/json"}, timeout=30)
 		except requests.exceptions.Timeout:
 			returnError("The Ensembl Rest API is not responding (https://rest.ensembl.org)")
+		except Exception as e:
+			returnError("Problem with Ensembl Rest API call")
 		if not geneRequest.ok:
 			geneRequest.raise_for_status()
 			returnError("Problem fetching gene features")
@@ -131,6 +138,8 @@ class Gene(object):
 			featureRequest = requests.get(server + ext, headers={"Content-Type": "application/json"}, timeout=30)
 		except requests.exceptions.Timeout:
 			returnError("The Ensembl Rest API is not responding (https://rest.ensembl.org).")
+		except Exception as e:
+			returnError("Problem with Ensembl Rest API call")
 		if not featureRequest.ok:
 			featureRequest.raise_for_status()
 			returnError('Problem fetching protein-coding transcripts for this gene')
@@ -223,6 +232,8 @@ class Gene(object):
 			seqRequest = requests.get(server + ext, timeout=30)
 		except requests.exceptions.Timeout:
 			returnError("The Ensembl Rest API is not responding (https://rest.ensembl.org)")
+		except Exception as e:
+			returnError("Problem with Ensembl Rest API call")
 		if not seqRequest.ok:
 			try:
 				seqRequest.raise_for_status()

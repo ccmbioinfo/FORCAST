@@ -1,7 +1,10 @@
 # program/data folders
 .env
-jbrowse/data*
+bin
 config
+jbrowse
+!jbrowse/plugins/ColorByCDS
+!jbrowse/plugins/ExportSequence
 mongodb
 
 # filetypes

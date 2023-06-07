@@ -26,8 +26,8 @@ def process_fasta(input_filename: str) -> None:
 if __name__ == "__main__":
     if len(sys.argv) > 1:
         for file in sys.argv[1:]:
-            print(f"Processing {file}...", file=sys.stderr)
+            print("Processing {}...".format(file), file=sys.stderr)
             process_fasta(file)
     else:
-        print(f"Usage: {sys.argv[0]} <file.fa> [...additional.fa]", file=sys.stderr)
+        print("Usage: {} <file.fa> [...additional.fa]".format(sys.argv[0]), file=sys.stderr)
         exit(1)

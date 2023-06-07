@@ -76,6 +76,8 @@ class Guide(Gene):
 			regulatoryRequest = requests.get(server + ext, headers={"Content-Type": "application/json"}, timeout=15)
 		except requests.exceptions.Timeout:
 			returnError("The Ensembl Rest API is not responding (https://rest.ensembl.org).")
+		except Exception as e:
+			returnError("Problem with Ensembl Rest API call")
 		if not regulatoryRequest.ok:
 			regulatoryRequest.raise_for_status()
 			returnError('Problem fetching the regulatory elements for the excised sequence')

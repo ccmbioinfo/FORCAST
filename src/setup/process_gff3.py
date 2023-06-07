@@ -82,8 +82,8 @@ def process_gff3(input_filename: str) -> None:
 if __name__ == "__main__":
     if len(sys.argv) > 1:
         for file in sys.argv[1:]:
-            print(f"Processing {file}...", file=sys.stderr)
+            print("Processing {}...".format(file), file=sys.stderr)
             process_gff3(file)
     else:
-        print(f"Usage: {sys.argv[0]} <file.gff3> [...additional.gff3]", file=sys.stderr)
+        print("Usage: {} <file.gff3> [...additional.gff3]".format(sys.argv[0]), file=sys.stderr)
         exit(1)
