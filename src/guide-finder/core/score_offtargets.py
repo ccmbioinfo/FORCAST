@@ -75,7 +75,7 @@ def inDelphiScore(guideDict,genome_fa,twoBitToFa_path,genome_2bit,tempfiles_path
 		#print(coords)
 
 		timestr = time.strftime("%Y%m%d-%H%M%S")
-		getseq=str(get_sequence.fetch_sequence(twoBitToFa_path, coords, genome_2bit, os.path.join(tempfiles_path,timestr+'_out.fa')))
+		getseq=str(get_sequence.fetch_sequence(coords, genome_2bit, os.path.join(tempfiles_path,timestr+'_out.fa')))
 		#print(os.path.join(tempfiles_path,timestr+'_out.fa'))
 
 		#get flanking sequence before and after cutsite

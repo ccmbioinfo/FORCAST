@@ -1,4 +1,4 @@
-#!/usr/bin/python3.5
+#!/usr/bin/python3.7
 
 """
 Hillary Elrick, September 16th, 2019
@@ -550,6 +550,7 @@ class GuideSearchAndScore:
 
         genome_fa = os.path.join(self.dbConnection.ROOT_PATH,'jbrowse', 'data', self.genome,"processed",self.genome+".fa")
         genome_2bit = os.path.join(self.dbConnection.ROOT_PATH,'jbrowse', 'data', self.genome,"processed",self.genome+'.2bit')
+        twoBitToFa_path = os.path.join(self.dbConnection.ROOT_PATH,'bin/twoBitToFa')
         tempfiles_path = os.path.join(self.dbConnection.ROOT_PATH,'src/guide-finder/tempfiles')
         if self.cli:
             import time

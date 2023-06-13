@@ -81,5 +81,5 @@ if __name__ == "__main__":
             genome_version=sys.argv[4]
         )
     else:
-        print("Usage: {} <genes.gff3> <Ensembl version> <species> <assembly>".format(sys.argv[0]), file=sys.stderr)
+        print(f"Usage: {sys.argv[0]} <genes.gff3> <Ensembl version> <species> <assembly>", file=sys.stderr)
         exit(1)
