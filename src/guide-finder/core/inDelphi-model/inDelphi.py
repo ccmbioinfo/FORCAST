@@ -240,7 +240,7 @@ def __predict_ins(seq, cutsite, pred_del_df, total_phi_score):
       pred_1bpins_d['Predicted frequency'].append(freq)
 
   pred_1bpins_df = pd.DataFrame(pred_1bpins_d)
-  pred_df = pred_del_df.append(pred_1bpins_df, ignore_index = True)
+  pred_df = pred_del_df.append(pred_1bpins_df, ignore_index = True, sort=True)
   pred_df['Predicted frequency'] /= sum(pred_df['Predicted frequency'])
   return pred_df
 
@@ -458,7 +458,7 @@ def add_mhless_genotypes(pred_df, stats, length_cutoff = None):
 
   # Add MH deletions
   crit = (pred_df['Genotype position'] != 'e') & (pred_df['Category'] == 'del')
-  new_pred_df = new_pred_df.append(pred_df[crit], ignore_index = True)
+  new_pred_df = new_pred_df.append(pred_df[crit], ignore_index = True, sort=True)
 
   # Add MHless deletions by length
   if length_cutoff is None:
@@ -510,7 +510,7 @@ def add_mhless_genotypes(pred_df, stats, length_cutoff = None):
   mhless_df = pd.DataFrame(mhless_dd)
   mhless_df['Category'] = 'del'
   mhless_df['Microhomology length'] = 0
-  new_pred_df = new_pred_df.append(mhless_df, ignore_index = True)
+  new_pred_df = new_pred_df.append(mhless_df, ignore_index = True, sort=True)
 
   return new_pred_df
 

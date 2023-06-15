@@ -199,7 +199,7 @@ class GuideSearchAndScore:
             "pamSeq": self.guideDict[guideID]['pam_seq'],
             "guideLocation": self.calculateLocation(self.guideDict[guideID])
         }
-        if self.dbConnection.guideCollection.find(searchQuery).count() > 0:
+        if self.dbConnection.guideCollection.count_documents(searchQuery) > 0:
             existingGuide = self.dbConnection.guideCollection.find_one(searchQuery, {"label": 1, "Notes": 1})
             return 'Update Guide', existingGuide['label'], existingGuide['Notes']
         else:
@@ -212,7 +212,7 @@ class GuideSearchAndScore:
             "pamSeq": self.guideDict[guideID]['pam_seq'],
             "guideLocation": self.calculateLocation(self.guideDict[guideID])
         }
-        if self.dbConnection.guideCollection.find(searchQuery).count() > 0:
+        if self.dbConnection.guideCollection.count_documents(searchQuery) > 0:
             return True
         else:
             return False
@@ -400,12 +400,12 @@ class GuideSearchAndScore:
     def getRGEN(self):
         # fetch the correct rgen record using the rgenID attribute
         rgenCollection = self.dbConnection.rgenCollection
-        rgenRecord = rgenCollection.find({"rgenID": str(self.rgenID)})
-        if rgenRecord.count() == 1:
-                return rgenRecord.next()
+        rgenQuery = {"rgenID": str(self.rgenID)}
+        if rgenCollection.count_documents(rgenQuery) == 1:
+            return rgenCollection.find_one(rgenQuery)
         else:
-                raise ValueError("Incorrect number of records returned from RGEN database for rgenID: " + str(rgenID))
-                return
+            raise ValueError("Incorrect number of records returned from RGEN database for rgenID: " + str(rgenID))
+            return
 
 
     def writeCsvFiles(self):
@@ -515,15 +515,16 @@ class GuideSearchAndScore:
     def getENSID(self):
         """ given the gene symbol, return the ENSEMBL ID from the stored gene collection """
         geneCollection = self.dbConnection.curr_geneCollection
-        result = geneCollection.find({"Name": self.gene})
-        if result.count() > 1:
+        geneQuery = {"Name": self.gene}
+        geneCount = geneCollection.count_documents(geneQuery)
+        if geneCount > 1:
             self.sendError("More than one result in the database for gene symbol: " + self.gene)
-        elif result.count() < 1:
+        elif geneCount < 1:
             # TODO: need to deal with tracking regions of interest that aren't in a gene region
             # for now, just use a blank ensembl id
             return ''
         else:
-            return result[0]['ENSID']
+            return geneCollection.find_one(geneQuery)['ENSID']
 
     def writeJsonFile(self):
         """ for each run, write a json file of the relevant guide info for adding guides to the database """
