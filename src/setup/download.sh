@@ -64,7 +64,7 @@ fi
 >&2 echo Downloading remaining files...
 curl --cacert ensembl.org.chained.crt --fail-early --fail --parallel ${TARGETS[@]}
 check_sum $FASTA fasta.sum
-if [[ ( $SPECIES == Homo_sapiens || $SPECIES == Mus_musculus ) && $(md5sum ./$FILENAME) != $(grep $FILENAME reg.sum) ]]; then
+if [[ ( $SPECIES == Homo_sapiens || $SPECIES == Mus_musculus ) && $(md5sum ./$FILENAME | awk '{print $1}') != $(grep $FILENAME reg.sum | awk '{print $1}') ]]; then
     >&2 echo "Checksum mismatch for $FILENAME"
     exit 1
 fi
