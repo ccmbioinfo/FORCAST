@@ -174,7 +174,7 @@ def fetchInstalledGenomes():
 
 	genomes = []
 	dbs = sorted(client.database_names(), key=lambda v: v.upper())
-	default_dbs = ['admin', 'local','config']
+	default_dbs = ['admin', 'local', 'config', 'RGEN']
 	for db in dbs:
 		if db not in default_dbs:
 			metadataCollection = client[db]['metadata']

@@ -54,9 +54,9 @@ fi
 TARGETS=(--remote-name https://ftp.ensembl.org/pub/release-$ENSEMBL/fasta/${SPECIES,,}/dna/$FASTA)
 
 if [[ $SPECIES == Homo_sapiens || $SPECIES == Mus_musculus ]]; then
-    # Get the name of the regulatory file without the ./ prefix from md5sum output
-    # Recent mouse builds also have an extraneous checksum for a file that's not there so use END to select the last one
-    FILENAME=$(grep "${SPECIES,,}.$ASSEMBLY.Regulatory_Build.regulatory_features.*.gff.gz" reg.sum | awk 'END{print substr($2, 3)}')
+    # Get the name of the regulatory file without the ./ prefix (if applicable; i.e., for Ensembl release 103-106) from md5sum output
+    # Ensembl release 103-106 mouse builds also have an extraneous checksum for a file that's not there so use END to select the last one
+    FILENAME=$(grep "${SPECIES,,}.$ASSEMBLY.Regulatory_Build.regulatory_features.*.gff.gz" reg.sum | awk 'END{print $2}' | sed "s/^\.\///")
     >&2 echo Found regulatory build $FILENAME
     TARGETS+=(--remote-name https://ftp.ensembl.org/pub/release-$ENSEMBL/regulation/${SPECIES,,}/$FILENAME)
 fi
