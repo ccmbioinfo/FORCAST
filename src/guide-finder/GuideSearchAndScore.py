@@ -556,36 +556,36 @@ class GuideSearchAndScore:
         if self.cli:
             import time
             time_0 = time.time()
-            print("Fetching sequence...")
+            print("[STARTED]\tFetching sequence...")
 
         get_sequence.fetch_sequence(self.searchInput, genome_2bit, os.path.join(tempfiles_path,batchID+'_out.fa'))
         if self.cli:
             time_1 = time.time()
-            print("Finished fetching sequence. " + str(round(time_1-time_0,4)))
-            print("Determining guides in search region...")
+            print(f"[FINISHED]\tFetched sequence in {str(round(time_1-time_0,4))}s")
+            print("[STARTED]\tDetermining guides in search region...")
 
         protospacer_length = getattr(self, 'guideLength', 0) # passing 0 indicates default should be used
         guideDict = find_grna.find_grna(self.rgenID, protospacer_length, os.path.join(tempfiles_path, batchID+'_out.fa'))
 
         if self.cli:
             time_2 = time.time()
-            print("Finished finding gRNAs. " + str(round(time_2-time_1,4)))
-            print("Searching for potential off target sites...")
-        guideDict = find_offtargets.findOffTargets(guideDict, self.rgenID, self.genome, self.maxOffTargets, batchID, genome_fa, tempfiles_path)
+            print(f"[FINISHED]\tFound gRNAs in {str(round(time_2-time_1,4))}s")
+            print("[STARTED]\tSearching for potential off target sites...")
+        guideDict = find_offtargets.findOffTargets(guideDict, self.rgenID, self.genome, self.maxOffTargets, batchID, genome_fa, tempfiles_path, self.cli)
         if self.cli:
             time_3 = time.time()
-            print("Finished finding offtargets. " + str(round(time_3-time_2,4)))
-            print("Scoring potential off target sites and guides...")
+            print(f"[FINISHED]\tFound offtargets in {str(round(time_3-time_2,4))}s")
+            print("[STARTED]\tScoring potential off target sites and guides...")
         guideDict = score_offtargets.scoreOffTargets(guideDict, self.rgenID,genome_fa,twoBitToFa_path,genome_2bit,tempfiles_path)
         if self.cli:
             time_4 = time.time()
-            print("Finished scoring. " + str(round(time_4-time_3,4)))
+            print(f"[FINISHED]\tScored in {str(round(time_4-time_3,4))}s")
             print("Categorizing potential off target sites...")
         guideDict = categorize_offtargets.categorizeOffTargets(guideDict, self.rgenID, self.genome, batchID)
         if self.cli:
             time_5 = time.time()
-            print("Finished categorizing. " + str(round(time_5-time_4,4)))
-            print("TOTAL TIME ELAPSED: " + str(round(time_5-time_0,4)))
+            print(f"[FINISHED]\tCategorized in {str(round(time_5-time_4,4))}s")
+            print(f"TOTAL TIME ELAPSED: {str(round(time_5-time_0,4))}s")
 
         return guideDict, batchID
 

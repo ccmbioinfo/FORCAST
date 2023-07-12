@@ -30,6 +30,10 @@ RUN apt-get update -y && \
     rm -rf /var/lib/apt/lists/* && \
     # python-pip is no longer included in the distribution as Python 2 is out of support
     curl https://bootstrap.pypa.io/pip/2.7/get-pip.py | python
+# Add a dummy sudo script as src/setup/load.sh uses sudo;
+# the Docker container runs as the root user, but sudo is needed for src/setup/load.sh in local FORCAST installations
+RUN echo "#!/bin/bash\n\$@" > /usr/bin/sudo && \
+    chmod +x /usr/bin/sudo
 RUN mkdir -p /var/www/html/bin
 # In-silico PCR tool for primer design
 RUN curl -Lo /var/www/html/bin/dicey https://github.com/gear-genomics/dicey/releases/download/v0.1.8/dicey_v0.1.8_linux_x86_64bit && \

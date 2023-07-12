@@ -42,13 +42,23 @@ def load_geneinfo_RGENs(geneInfo_gff, ensembl_version, genome, genome_version,
     else:
         print("RGEN collection already exists in Mongo database, will not overwrite")
 
-    for collection_name in (gene_info_collection, meta_data_collection):
-        if collection_name in pyMongoClient[mongo_database].collection_names():
-            print(collection_name + " already exists in Mongo database")
-            return True
+    if gene_info_collection in pyMongoClient[mongo_database].list_collection_names():
+        print(gene_info_collection + " already exists in Mongo database")
+        return True
+
+    sys.path.append(os.path.join(dir_path, "../helpers"))
+    from Config3 import fetchCurrentRelease
+
+    curr_release = fetchCurrentRelease(genome_version)
+
+    if int(ensembl_version) <= curr_release:
+        print("Metadata for newer Ensembl release ({curr_release}) already exists in Mongo database")
+        return True
+
+    meta_data_collection_obj = pyMongoClient[mongo_database][meta_data_collection]
+    meta_data_collection_obj.delete_many({})
 
     gene_info_collection_obj = pyMongoClient[mongo_database][gene_info_collection]
-    meta_data_collection_obj = pyMongoClient[mongo_database][meta_data_collection]
     geneDict = {}
     with open(geneInfo_gff,"r") as inp_fh:
         for line in inp_fh:

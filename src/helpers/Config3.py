@@ -105,7 +105,7 @@ class Config:
 			client = MongoClient()
 
 		db = client[self.genome]
-		collections = db.collection_names()
+		collections = db.list_collection_names()
 
 		# get the release we're using from the most recent geneInfo collection
 		curr_release = fetchCurrentRelease(self.genome, collections)
@@ -179,7 +179,7 @@ def getCurrentGeneCollection(genome):
 		client = MongoClient()
 
 	db = client[genome]
-	collections = db.collection_names()
+	collections = db.list_collection_names()
 
 	# get the release we're using from the most recent geneInfo collection
 	curr_release = fetchCurrentRelease(genome, collections)
@@ -201,7 +201,7 @@ def fetchCurrentRelease(genome, collections=None):
 		else:
 			client = MongoClient()
 		db = client[genome]
-		collections = db.collection_names()
+		collections = db.list_collection_names()
 
 	# get the release we're using from the most recent geneInfo collection
 	curr_release = -1
@@ -232,7 +232,8 @@ def fetchInstalledGenomes():
 			if metadataRecords.count() == 1:
 				orgName = str(metadataCollection.find_one({})['org_name'])
 				orgName = orgName.replace("_"," ").capitalize()
-				genomes.append((db, orgName)) # store org code and name in list as tuple
+				ensemblVersion = fetchCurrentRelease(db)
+				genomes.append((db, orgName, ensemblVersion)) # store org code, name, and Ensembl release in list as tuple
 			else:
 				print(("Error: metadata collection for " + str(db) + " is misconfigured"))
 	return genomes

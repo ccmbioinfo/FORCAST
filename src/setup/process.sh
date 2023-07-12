@@ -13,7 +13,7 @@ mkdir -p ../processed
 mv "$FASTA" $GFF ../processed
 cd ../processed
 
-python3 "$SETUP_BIN/process_fasta.py" "$FASTA"
+python3.7 "$SETUP_BIN/process_fasta.py" "$FASTA"
 ln -fs *.processed.fa "$ASSEMBLY.fa"
 bwa index "$ASSEMBLY.fa" # creates $ASSEMBLY.bwt
 faToTwoBit "$ASSEMBLY.fa" $ASSEMBLY.2bit
@@ -25,7 +25,7 @@ ln -s ../downloads/*.fa.gz "$ASSEMBLY.fa.gz"
 dicey index -o $ASSEMBLY.fm9 "$ASSEMBLY.fa.gz"
 # This is for "dicey search -g $ASSEMBLY.fa", which uses the filename stem to find the fm9
 
-python3 "$SETUP_BIN/process_gff3.py" $GFF
+python3.7 "$SETUP_BIN/process_gff3.py" $GFF
 rm "$FASTA" $GFF
 # *.gff3 is always the non-regulatory build that is always present
 "$SETUP_BIN/create_segments.sh" *.fa.fai *.processed.gff3 $ASSEMBLY

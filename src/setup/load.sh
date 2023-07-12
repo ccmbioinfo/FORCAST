@@ -5,8 +5,12 @@ set -euo pipefail
 JBROWSE_BIN="$1"
 SOURCE="$2"
 DESTINATION="$3"
-SPECIES="$4"
-ASSEMBLY="$5"
+ENSEMBL="$4"
+SPECIES="$5"
+ASSEMBLY="$6"
+
+SETUP_BIN=$(dirname $(realpath "$0"))
+FORCAST_ROOT="$SETUP_BIN/../.."
 
 "$JBROWSE_BIN/prepare-refseqs.pl" --fasta "$SOURCE"/*.processed.fa --out "$DESTINATION"
 
@@ -22,10 +26,10 @@ ASSEMBLY="$5"
     --type transcript,pseudogenic_transcript,mRNA,miRNA,ncRNA,scRNA,snoRNA,snRNA,lnc_RNA,rRNA,tRNA \
     --trackType CanvasFeatures \
     --out "$DESTINATION"
-TARGET=src/setup/trackList_no_regulatory.json
+TARGET="$SETUP_BIN/trackList_no_regulatory.json"
 # Regulatory_Build
 if compgen -G "$SOURCE"/*.processed.gff; then
-    TARGET=src/setup/trackList.json
+    TARGET="$SETUP_BIN/trackList.json"
     "$JBROWSE_BIN/flatfile-to-json.pl" \
         --gff "$SOURCE"/*.processed.gff \
         --trackLabel Regulatory_build \
@@ -35,6 +39,11 @@ fi
 cp "$TARGET" "$DESTINATION/trackList.json"
 
 echo -e "[general]\ndataset_id = $ASSEMBLY" > "$DESTINATION/tracks.conf"
-echo -e "[datasets.$ASSEMBLY]\nurl = ?data=data/$ASSEMBLY\nname = $SPECIES ($ASSEMBLY)\n\n" >> jbrowse/jbrowse.conf
+
+MATCH_REGEX="\[datasets\.$ASSEMBLY\]\n+url[\s|\t]*=[\s|\t]*.+\n+name[\s|\t]*=[\s|\t]*.+\n+"
+REPLACEMENT_STRING="[datasets.$ASSEMBLY]\nurl = ?data=data\/$ASSEMBLY\nname = $SPECIES ($ASSEMBLY, Ensembl release $ENSEMBL)\n\n"
+perl -i -0777 -pe "s/$MATCH_REGEX/$REPLACEMENT_STRING/" "$FORCAST_ROOT/jbrowse/jbrowse.conf"
+
+echo -e "[datasets.$ASSEMBLY]\nurl = ?data=data/$ASSEMBLY\nname = $SPECIES ($ASSEMBLY, Ensembl release $ENSEMBL)\n" >> "$FORCAST_ROOT/jbrowse/jbrowse.conf"
 touch "$DESTINATION/gRNA_CRISPR.gff" "$DESTINATION/acceptedPrimers.gff"
-chown www-data:www-data "$DESTINATION/gRNA_CRISPR.gff" "$DESTINATION/acceptedPrimers.gff"
+sudo chown www-data:www-data "$DESTINATION/gRNA_CRISPR.gff" "$DESTINATION/acceptedPrimers.gff"

@@ -29,7 +29,8 @@ def main():
 	for option in result:
 		org = option[0]
 		name = option[1]
-		print """<option value="{org}">{name} ({org})</option>""".format(**locals())
+		ensembl_version = option[2]
+		print """<option value="{org}">{name} ({org}, Ensembl release {ensembl_version})</option>""".format(**locals())
 
 		
 if __name__ == "__main__":

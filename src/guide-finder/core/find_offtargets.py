@@ -382,23 +382,49 @@ def screenRepetetive(batchID, potentialGuides, tempfile_directory):
 				potentialGuides[guideID]['skip'] = False
 
 
-def findOffTargets(potentialGuides, rgenID, genome, maxOffTargets, batchID, genome_fa, tempfile_directory):
+def findOffTargets(potentialGuides, rgenID, genome, maxOffTargets, batchID, genome_fa, tempfile_directory, isCli):
+	if isCli:
+		import time
+		time_0 = time.time()
+		print("[STARTED]\tGetting rgen record...")
 	# connect to database and get rgen variables from id
 	rgen = getRgenRecord(rgenID)
 
 	# write fasta of guides
-	#print("Writing fasta file")
+	if isCli:
+		time_1 = time.time()
+		print(f"[FINISHED]\tGot rgen record in {str(round(time_1-time_0,4))}s")
+		print("[STARTED]\tWriting fasta file...")
 	fastaFile = writeFasta(batchID, potentialGuides, tempfile_directory)
-	#print("Running bwa alignment")
+	if isCli:
+		time_2 = time.time()
+		print(f"[FINISHED]\tWrote fasta file in {str(round(time_2-time_1,4))}s")
+		print("[STARTED]\tRunning bwa alignment...")
 	runAlignment(genome, fastaFile, genome_fa, tempfile_directory)
-	#print("Screening repeats")
+	if isCli:
+		time_3 = time.time()
+		print(f"[FINISHED]\tWrote fasta file in {str(round(time_3-time_2,4))}s")
+		print("[STARTED]\tScreening repeats...")
 	screenRepetetive(batchID, potentialGuides, tempfile_directory)
-	#print("Finished alignment, extending beds")
+	if isCli:
+		time_4 = time.time()
+		print(f"[FINISHED]\tScreened repeats in {str(round(time_4-time_3,4))}s")
+		print("[STARTED]\tExtending beds...")
 	extendBed(batchID, potentialGuides, genome, rgen, tempfile_directory)
-	#print("Converting bed coordinates to fasta")
+	if isCli:
+		time_5 = time.time()
+		print(f"[FINISHED]\tExtended beds in {str(round(time_5-time_4,4))}s")
+		print("[STARTED]\tConverting bed coordinates to fasta...")
 	convertExtendedBedToFasta(batchID, genome, genome_fa, tempfile_directory)
-	#print("Counting off-targets")
+	if isCli:
+		time_6 = time.time()
+		print(f"[FINISHED]\tConverted bed coordinates to fasta in {str(round(time_6-time_5,4))}s")
+		print("[STARTED]\tCounting off-targets...")
 	potentialGuides = countOffTargets(batchID, potentialGuides, rgen, maxOffTargets, tempfile_directory)
+	if isCli:
+		time_7 = time.time()
+		print(f"[FINISHED]\tCounted off-targets in {str(round(time_7-time_6,4))}s")
+		print(f"TOTAL TIME ELAPSED: {str(round(time_7-time_0,4))}s")
 
 	return potentialGuides
 
