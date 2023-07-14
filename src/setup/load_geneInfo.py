@@ -52,7 +52,7 @@ def load_geneinfo_RGENs(geneInfo_gff, ensembl_version, genome, genome_version,
     curr_release = fetchCurrentRelease(genome_version)
 
     if int(ensembl_version) <= curr_release:
-        print("Metadata for newer Ensembl release ({curr_release}) already exists in Mongo database")
+        print(f"Metadata for newer Ensembl release ({curr_release}) already exists in Mongo database")
         return True
 
     meta_data_collection_obj = pyMongoClient[mongo_database][meta_data_collection]
