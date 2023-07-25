@@ -18,12 +18,19 @@ Steps:
 import sys, os, cgi, binascii, re, csv, json, urllib.parse, argparse
 from collections import OrderedDict
 from jinja2 import Template
+import logging
+import time
 # import external classes based on relative file location
 dir_path = os.path.dirname(os.path.abspath(__file__))
 sys.path.append(os.path.join(dir_path, "../helpers"))
 from Config3 import Config
 sys.path.append(os.path.join(dir_path, 'core'))
 import get_sequence, find_grna, find_offtargets, score_offtargets, categorize_offtargets
+
+logging.basicConfig(
+    filename=f"logs/GuideSearchAndScore.log",
+    level=logging.DEBUG
+)
 
 class GuideSearchAndScore:
     def __init__(self, **kwargs):
@@ -84,19 +91,58 @@ class GuideSearchAndScore:
         if 'offtargetPAMS' in kwargs:
             self.offTargetPAMS = kwargs['offtargetPAMS']
 
+        time_0 = time.time()
+        logging.debug("[STARTED]\t\tPerforming guide searches...")
         self.guideDict, self.batchID = self.performGuideSearch()
+
+        time_1 = time.time()
+        logging.debug(f"[FINISHED]\t\tPerformed guide searches in {str(round(time_1-time_0,4))}s")
+
+        time_2 = time.time()
+        logging.debug("[STARTED]\t\tSetting scores...")
+
         self.scores = self.setScores()
 
+        time_3 = time.time()
+        logging.debug(f"[FINISHED]\t\tSet scores in {str(round(time_3-time_2,4))}s")
+
         if len(self.guideDict.keys()) > 0:
+            time_4 = time.time()
+            logging.debug("[STARTED]\t\tWriting CSV files...")
+
             self.writeCsvFiles()
+
+            time_5 = time.time()
+            logging.debug(f"[FINISHED]\t\tWrote CSV files in {str(round(time_5-time_4,4))}s")
+            
             if not self.cli:
+                time_6 = time.time()
+                logging.debug("[STARTED]\t\tWriting JSON file...")
+
                 self.writeJsonFile()
+                
+                time_7 = time.time()
+                logging.debug(f"[FINISHED]\t\tWrote JSON file in {str(round(time_7-time_6,4))}s")
+
+                time_8 = time.time()
+                logging.debug("[STARTED]\t\tSending result HTML...")
+                
                 self.sendResultHTML()
+
+                time_9 = time.time()
+                logging.debug(f"[FINISHED]\t\tSent result HTML in {str(round(time_9-time_8,4))}s")
         else:
             if not self.cli:
+                time_8 = time.time()
+                logging.debug("[STARTED]\t\tSending no result HTML...")
+
                 self.sendNoResultHTML()
+
+                time_9 = time.time()
+                logging.debug(f"[FINISHED]\t\tSent no result HTML in {str(round(time_9-time_8,4))}s")
             else:
                 print("No guides found in input region")
+        logging.debug(f"TOTAL TIME ELAPSED: {round(time_9-time_0,4)}s\n\n")
 
     def setScores(self):
         scores = set({}) # make a set
@@ -553,39 +599,39 @@ class GuideSearchAndScore:
         genome_2bit = os.path.join(self.dbConnection.ROOT_PATH,'jbrowse', 'data', self.genome,"processed",self.genome+'.2bit')
         twoBitToFa_path = os.path.join(self.dbConnection.ROOT_PATH,'bin/twoBitToFa')
         tempfiles_path = os.path.join(self.dbConnection.ROOT_PATH,'src/guide-finder/tempfiles')
-        if self.cli:
-            import time
-            time_0 = time.time()
-            print("[STARTED]\tFetching sequence...")
+
+        time_0 = time.time()
+        logging.debug("\t\t[STARTED]\t\tFetching sequence...")
 
         get_sequence.fetch_sequence(self.searchInput, genome_2bit, os.path.join(tempfiles_path,batchID+'_out.fa'))
-        if self.cli:
-            time_1 = time.time()
-            print(f"[FINISHED]\tFetched sequence in {str(round(time_1-time_0,4))}s")
-            print("[STARTED]\tDetermining guides in search region...")
+
+        time_1 = time.time()
+        logging.debug(f"\t\t[FINISHED]\tFetched sequence in {str(round(time_1-time_0,4))}s")
+        logging.debug("\t\t[STARTED]\t\tDetermining guides in search region...")
 
         protospacer_length = getattr(self, 'guideLength', 0) # passing 0 indicates default should be used
         guideDict = find_grna.find_grna(self.rgenID, protospacer_length, os.path.join(tempfiles_path, batchID+'_out.fa'))
 
-        if self.cli:
-            time_2 = time.time()
-            print(f"[FINISHED]\tFound gRNAs in {str(round(time_2-time_1,4))}s")
-            print("[STARTED]\tSearching for potential off target sites...")
-        guideDict = find_offtargets.findOffTargets(guideDict, self.rgenID, self.genome, self.maxOffTargets, batchID, genome_fa, tempfiles_path, self.cli)
-        if self.cli:
-            time_3 = time.time()
-            print(f"[FINISHED]\tFound offtargets in {str(round(time_3-time_2,4))}s")
-            print("[STARTED]\tScoring potential off target sites and guides...")
+        time_2 = time.time()
+        logging.debug(f"\t\t[FINISHED]\tFound gRNAs in {str(round(time_2-time_1,4))}s")
+        logging.debug("\t\t[STARTED]\t\tSearching for potential off target sites...")
+
+        guideDict = find_offtargets.findOffTargets(guideDict, self.rgenID, self.genome, self.maxOffTargets, batchID, genome_fa, tempfiles_path)
+
+        time_3 = time.time()
+        logging.debug(f"\t\t[FINISHED]\tFound offtargets in {str(round(time_3-time_2,4))}s")
+        logging.debug("\t\t[STARTED]\t\tScoring potential off target sites and guides...")
+        
         guideDict = score_offtargets.scoreOffTargets(guideDict, self.rgenID,genome_fa,twoBitToFa_path,genome_2bit,tempfiles_path)
-        if self.cli:
-            time_4 = time.time()
-            print(f"[FINISHED]\tScored in {str(round(time_4-time_3,4))}s")
-            print("Categorizing potential off target sites...")
+        
+        time_4 = time.time()
+        logging.debug(f"\t\t[FINISHED]\tScored in {str(round(time_4-time_3,4))}s")
+        logging.debug("\t\t[STARTED]\t\tCategorizing potential off target sites...")
+
         guideDict = categorize_offtargets.categorizeOffTargets(guideDict, self.rgenID, self.genome, batchID)
-        if self.cli:
-            time_5 = time.time()
-            print(f"[FINISHED]\tCategorized in {str(round(time_5-time_4,4))}s")
-            print(f"TOTAL TIME ELAPSED: {str(round(time_5-time_0,4))}s")
+        
+        time_5 = time.time()
+        logging.debug(f"\t\t[FINISHED]\tCategorized in {str(round(time_5-time_4,4))}s")
 
         return guideDict, batchID
 
@@ -628,6 +674,9 @@ def main():
         # only use the max if the checkbox is selected
         parameters['maxOffTargets'] = parameters['maxOffTargets'] if parameters['setMax'] == 'true' else None
 
+        logging.debug("[WEB]\t\tRunning guide search and score with parameters:")
+        logging.debug(f"\t\t{parameters}")
+
         GuideSearchAndScore(**parameters)
     else:
         desc = """ The command-line version of GuideSearchAndScore.py will return potential guides along with their scores and off-targets.
@@ -660,6 +709,10 @@ def main():
             'maxOffTargets': None if args.maxOffTargets == -1 else args.maxOffTargets, # convert -1 to False for CLI
             'command-line': True
         }
+        
+        logging.debug("[CLI]\t\tRunning guide search and score with parameters:")
+        logging.debug(f"\t\t{parameters}")
+        
         GuideSearchAndScore(**parameters)
 
 if __name__ == "__main__":

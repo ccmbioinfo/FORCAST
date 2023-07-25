@@ -25,7 +25,7 @@ define( ["dojo/_base/declare", 'dojo/_base/array','dojo/_base/lang','dojo/aspect
                    type: 'dijit/LinkPane',
                    onClick: function() {
 
-			window.open("http://"+location.hostname+"/src/guide-finder/GuideInitialize.py?action=initialize&"+coordStr);
+			window.open(`${location.protocol}//${location.host}/src/guide-finder/GuideInitialize.py?action=initialize&${coordStr}`);
 
                    },
                    iconClass: "dijitIconPackage"

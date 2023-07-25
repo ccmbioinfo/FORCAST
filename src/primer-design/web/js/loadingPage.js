@@ -288,8 +288,7 @@ function updatePrimerNotes(){
 }
 
 function manuallyEnterPrimers(){
-	url = location.protocol + "//" + location.hostname + "/src/primer-design/web/manualPrimerEntry.html?";
-	url += "gene="+geneName+"&ensid="+ENSID+"&org="+GENOME;
+	url = `${location.protocol}//${location.host}/src/primer-design/web/manualPrimerEntry.html?gene=${geneName}&ensid=${ENSID}&org=${GENOME}`;
 	PopupCenter(url, "ManualPrimerEntry", 1200, 350);	
 }
 

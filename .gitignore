@@ -27,3 +27,6 @@ score_test/*
 src/guide-finder/old_tempfiles/*
 src/guide-finder/tempfilesget_seq_test.fa
 src/helpers/RGEN_backup/*
+
+# log files
+src/guide-finder/logs/*.log

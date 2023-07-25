@@ -11,12 +11,19 @@ import sys
 import os
 import binascii
 from subprocess import Popen, run, PIPE, DEVNULL
+import logging
+import time
 dir_path = os.path.dirname(os.path.abspath(__file__))
 sys.path.append(os.path.join(dir_path, "../../helpers"))
 from Config3 import Config
 from itertools import product
 import score_offtargets
 import categorize_offtargets
+
+logging.basicConfig(
+	filename="logs/GuideSearchAndScore.log",
+	level=logging.DEBUG
+)
 
 dir_path = os.path.dirname(os.path.abspath(__file__))
 
@@ -382,49 +389,51 @@ def screenRepetetive(batchID, potentialGuides, tempfile_directory):
 				potentialGuides[guideID]['skip'] = False
 
 
-def findOffTargets(potentialGuides, rgenID, genome, maxOffTargets, batchID, genome_fa, tempfile_directory, isCli):
-	if isCli:
-		import time
-		time_0 = time.time()
-		print("[STARTED]\tGetting rgen record...")
+def findOffTargets(potentialGuides, rgenID, genome, maxOffTargets, batchID, genome_fa, tempfile_directory):
+	time_0 = time.time()
+	logging.debug("\t\t\t\t[STARTED]\t\tGetting rgen record...")
+
 	# connect to database and get rgen variables from id
 	rgen = getRgenRecord(rgenID)
 
 	# write fasta of guides
-	if isCli:
-		time_1 = time.time()
-		print(f"[FINISHED]\tGot rgen record in {str(round(time_1-time_0,4))}s")
-		print("[STARTED]\tWriting fasta file...")
+	time_1 = time.time()
+	logging.debug(f"\t\t\t\t[FINISHED]\tGot rgen record in {str(round(time_1-time_0,4))}s")
+	logging.debug("\t\t\t\t[STARTED]\t\tWriting fasta file...")
+
 	fastaFile = writeFasta(batchID, potentialGuides, tempfile_directory)
-	if isCli:
-		time_2 = time.time()
-		print(f"[FINISHED]\tWrote fasta file in {str(round(time_2-time_1,4))}s")
-		print("[STARTED]\tRunning bwa alignment...")
+
+	time_2 = time.time()
+	logging.debug(f"\t\t\t\t[FINISHED]\tWrote fasta file in {str(round(time_2-time_1,4))}s")
+	logging.debug("\t\t\t\t[STARTED]\t\tRunning bwa alignment...")
+
 	runAlignment(genome, fastaFile, genome_fa, tempfile_directory)
-	if isCli:
-		time_3 = time.time()
-		print(f"[FINISHED]\tWrote fasta file in {str(round(time_3-time_2,4))}s")
-		print("[STARTED]\tScreening repeats...")
+
+	time_3 = time.time()
+	logging.debug(f"\t\t\t\t[FINISHED]\tRan bwa alignment in {str(round(time_3-time_2,4))}s")
+	logging.debug("\t\t\t\t[STARTED]\t\tScreening repeats...")
+
 	screenRepetetive(batchID, potentialGuides, tempfile_directory)
-	if isCli:
-		time_4 = time.time()
-		print(f"[FINISHED]\tScreened repeats in {str(round(time_4-time_3,4))}s")
-		print("[STARTED]\tExtending beds...")
+
+	time_4 = time.time()
+	logging.debug(f"\t\t\t\t[FINISHED]\tScreened repeats in {str(round(time_4-time_3,4))}s")
+	logging.debug("\t\t\t\t[STARTED]\t\tExtending beds...")
 	extendBed(batchID, potentialGuides, genome, rgen, tempfile_directory)
-	if isCli:
-		time_5 = time.time()
-		print(f"[FINISHED]\tExtended beds in {str(round(time_5-time_4,4))}s")
-		print("[STARTED]\tConverting bed coordinates to fasta...")
+
+	time_5 = time.time()
+	logging.debug(f"\t\t\t\t[FINISHED]\tExtended beds in {str(round(time_5-time_4,4))}s")
+	logging.debug("\t\t\t\t[STARTED]\t\tConverting bed coordinates to fasta...")
+	
 	convertExtendedBedToFasta(batchID, genome, genome_fa, tempfile_directory)
-	if isCli:
-		time_6 = time.time()
-		print(f"[FINISHED]\tConverted bed coordinates to fasta in {str(round(time_6-time_5,4))}s")
-		print("[STARTED]\tCounting off-targets...")
+
+	time_6 = time.time()
+	logging.debug(f"\t\t\t\t[FINISHED]\tConverted bed coordinates to fasta in {str(round(time_6-time_5,4))}s")
+	logging.debug("\t\t\t\t[STARTED]\t\tCounting off-targets...")
+
 	potentialGuides = countOffTargets(batchID, potentialGuides, rgen, maxOffTargets, tempfile_directory)
-	if isCli:
-		time_7 = time.time()
-		print(f"[FINISHED]\tCounted off-targets in {str(round(time_7-time_6,4))}s")
-		print(f"TOTAL TIME ELAPSED: {str(round(time_7-time_0,4))}s")
+
+	time_7 = time.time()
+	logging.debug(f"\t\t\t\t[FINISHED]\tCounted off-targets in {str(round(time_7-time_6,4))}s")
 
 	return potentialGuides
 

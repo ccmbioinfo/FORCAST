@@ -65,4 +65,6 @@ COPY config-template /var/www/html/config
 WORKDIR /var/www/html
 # Replace the /usr/sbin/apachectl script that is called with the Apache master process that respects signals
 ENV APACHE_HTTPD exec /usr/sbin/apache2
-CMD mongod --fork --logpath /var/log/mongodb/mongod.log --dbpath /var/lib/mongodb && exec apache2-foreground
+CMD chmod 777 ./src/guide-finder/core ./src/guide-finder/logs ./src/guide-finder/tempfiles ./src/primer-design/files/* && \
+    mongod --fork --logpath /var/log/mongodb/mongod.log --dbpath /var/lib/mongodb && \
+    exec apache2-foreground
