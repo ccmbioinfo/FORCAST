@@ -19,8 +19,7 @@ Storage should expand as needed to store however many genome assemblies you wish
 
 ## Installing with Docker
 
-On the host computer or server, install the [Docker Engine](https://docs.docker.com/install/) and additionally
-[Docker Compose](https://docs.docker.com/compose/install/) on Linux. Note the licensing requirements for
+On the host computer or server, install the [Docker Engine](https://docs.docker.com/engine/install/) and, if you are not using Docker Desktop, [Docker Compose](https://docs.docker.com/compose/install/linux/) on Linux. Note the licensing requirements for
 Docker Desktop, though the Docker Engine and Compose for Linux remain free and open source.
 
 Clone this repository. Note: an image will be provided at a later date, and cloning will not be required.
@@ -32,7 +31,7 @@ git clone https://github.com/ccmbioinfo/FORCAST.git
 Navigate to the cloned repository folder, build the Docker image, and start the service container.
 
 ```bash
-docker-compose up
+docker compose up
 ```
 
 FORCAST should now be available on `localhost:80`, or port 80 of the hosting machine.
@@ -45,16 +44,16 @@ assemblies and load tracks into JBrowse. Depending on the size of the genome, th
 several hours to complete.
 
 ```bash
-docker-compose exec forcast ./src/setup/setup.sh ENSEMBL_RELEASE Organism_name ASSEMBLY
+docker compose exec forcast ./src/setup/setup.sh ENSEMBL_RELEASE Organism_name ASSEMBLY
 ```
 
 **Tested examples**
 
 ```bash
-docker-compose exec forcast ./src/setup/setup.sh 106 Saccharomyces_cerevisiae R64-1-1
-docker-compose exec forcast ./src/setup/setup.sh 102 Mus_musculus GRCm38
-docker-compose exec forcast ./src/setup/setup.sh 106 Mus_musculus GRCm39
-docker-compose exec forcast ./src/setup/setup.sh 106 Homo_sapiens GRCh38
+docker compose exec forcast ./src/setup/setup.sh 106 Saccharomyces_cerevisiae R64-1-1
+docker compose exec forcast ./src/setup/setup.sh 102 Mus_musculus GRCm38
+docker compose exec forcast ./src/setup/setup.sh 109 Mus_musculus GRCm39
+docker compose exec forcast ./src/setup/setup.sh 106 Homo_sapiens GRCh38
 ```
 
 _Drosophila melanogaster_ is known to not install properly due to using a different naming scheme.
