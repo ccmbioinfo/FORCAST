@@ -387,7 +387,7 @@
         function enablePopovers() {
             const customWhiteList = $.fn.tooltip.Constructor.Default.whiteList;
             customWhiteList['*'].push('style');
-            customWhiteList.button = ['onclick'];
+            customWhiteList.button = ['onclick', 'type'];
             customWhiteList.form = [];
             customWhiteList.input = ['type', 'value'];
             customWhiteList.label = ['for'];
