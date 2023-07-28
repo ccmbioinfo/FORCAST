@@ -385,7 +385,15 @@
         // init
         // enable popovers
         function enablePopovers() {
-            $('[data-toggle="popover"]').popover({})
+            const customWhiteList = $.fn.tooltip.Constructor.Default.whiteList;
+            customWhiteList['*'].push('style');
+            customWhiteList.button = ['onclick'];
+            customWhiteList.form = [];
+            customWhiteList.input = ['type', 'value'];
+            customWhiteList.label = ['for'];
+            customWhiteList.textarea = ['rows'];
+
+            $('[data-toggle="popover"]').popover();
         }
         $(document).ready(enablePopovers());
 
