@@ -35,7 +35,7 @@ def load_geneinfo_RGENs(geneInfo_gff, ensembl_version, genome, genome_version,
             with open(os.path.join(dir_path,'rgens.json')) as json_file:
                 rgenJSON = json.load(json_file)
                 collection = rgenDB['rgenCollection']
-                collection.insert(rgenJSON)
+                collection.insert_many(rgenJSON)
                 print("Successfully inserted RGENs into Mongo database")
         except Exception as e:
             print("Error inserting RGENs into Mongo database: "+ str(e))
