@@ -2,7 +2,9 @@
 .env
 bin
 config
-jbrowse
+jbrowse/*
+!jbrowse/plugins
+jbrowse/plugins/*
 !jbrowse/plugins/ColorByCDS
 !jbrowse/plugins/ExportSequence
 mongodb

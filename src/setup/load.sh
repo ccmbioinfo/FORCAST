@@ -41,9 +41,8 @@ cp "$TARGET" "$DESTINATION/trackList.json"
 echo -e "[general]\ndataset_id = $ASSEMBLY" > "$DESTINATION/tracks.conf"
 
 MATCH_REGEX="\[datasets\.$ASSEMBLY\]\n+url[\s|\t]*=[\s|\t]*.+\n+name[\s|\t]*=[\s|\t]*.+\n+"
-REPLACEMENT_STRING="[datasets.$ASSEMBLY]\nurl = ?data=data\/$ASSEMBLY\nname = $SPECIES ($ASSEMBLY, Ensembl release $ENSEMBL)\n\n"
-perl -i -0777 -pe "s/$MATCH_REGEX/$REPLACEMENT_STRING/" "$FORCAST_ROOT/jbrowse/jbrowse.conf"
+perl -i -0777 -pe "s/$MATCH_REGEX//g" "$FORCAST_ROOT/jbrowse/data/datasets.conf"
 
-echo -e "[datasets.$ASSEMBLY]\nurl = ?data=data/$ASSEMBLY\nname = $SPECIES ($ASSEMBLY, Ensembl release $ENSEMBL)\n" >> "$FORCAST_ROOT/jbrowse/jbrowse.conf"
+bash -c "echo -e '[datasets.$ASSEMBLY]\nurl = ?data=data/$ASSEMBLY\nname = $SPECIES ($ASSEMBLY, Ensembl release $ENSEMBL)\n' >> '$FORCAST_ROOT/jbrowse/data/datasets.conf'"
 touch "$DESTINATION/gRNA_CRISPR.gff" "$DESTINATION/acceptedPrimers.gff"
 sudo chown www-data:www-data "$DESTINATION/gRNA_CRISPR.gff" "$DESTINATION/acceptedPrimers.gff"

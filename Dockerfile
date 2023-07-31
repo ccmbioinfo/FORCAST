@@ -50,8 +50,8 @@ RUN curl -LO https://github.com/GMOD/jbrowse/releases/download/1.12.5-release/JB
     mv JBrowse-1.12.5 /var/www/html/jbrowse && \
     rm JBrowse-1.12.5.zip && \
     cd /var/www/html/jbrowse && ./setup.sh && \
-    # Default FORCAST configuration for JBrowse. jbrowse/data/datasets.conf is bind-mounted for editing.
-    echo -e "classicMenu = true\ninclude += data/datasets.conf\n\n[aboutThisBrowser]\ntitle = FORCAST" >> /var/www/html/jbrowse/jbrowse.conf && \
+    # Default FORCAST configuration for JBrowse. jbrowse/data/datasets.conf is mounted as a volume inside docker-compose.yaml for editing.
+    bash -c "echo -e 'classicMenu = true\ninclude += data/datasets.conf\n\n[aboutThisBrowser]\ntitle = FORCAST' >> /var/www/html/jbrowse/jbrowse.conf" && \
     # Add favicon
     sed -i '6i\    <link rel="icon" href="../docs/img/crispr-icon.png" sizes="100x100">' /var/www/html/jbrowse/index.html
 # Dependencies for FORCAST CGI scripts + inDelphi
