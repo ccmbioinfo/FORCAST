@@ -61,7 +61,6 @@ RUN pip install --upgrade pip && \
 # Python 3.7
 RUN python3.7 -m pip install --upgrade pip && \
     python3.7 -m pip install --no-cache-dir pymongo==3.12.3 Jinja2==2.8 markupsafe==2.0.1 pandas==0.23.4 scikit-learn==0.20.0 scipy==1.1.0 numpy==1.15.3
-COPY config-template /var/www/html/config
 WORKDIR /var/www/html
 # Replace the /usr/sbin/apachectl script that is called with the Apache master process that respects signals
 ENV APACHE_HTTPD exec /usr/sbin/apache2
