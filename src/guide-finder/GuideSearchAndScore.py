@@ -20,6 +20,7 @@ from collections import OrderedDict
 from jinja2 import Template
 import logging
 import time
+import tempfile
 # import external classes based on relative file location
 dir_path = os.path.dirname(os.path.abspath(__file__))
 sys.path.append(os.path.join(dir_path, "../helpers"))
@@ -288,7 +289,7 @@ class GuideSearchAndScore:
             'guide': guide,
             'offtargetCounts': self.offtargetCountsHTML(guideID, guide),
             'offtargetModals': self.offtargetModalHTML(guideID, guide),
-            'csvFile': os.path.join('../guide-finder/tempfiles', self.batchID+"_"+guideID+".csv"),
+            'csvFile': os.path.join(tempfile.gettempdir(), self.batchID+"_"+guideID+".csv"),
             'totalCount': str(sum(guide['offtarget_counts']))
         }
         return self.renderTemplate("offtarget_cell.html", template_values)
@@ -455,7 +456,7 @@ class GuideSearchAndScore:
 
 
     def writeCsvFiles(self):
-        """ for each guide, write a csv file of its off-targets to the tempfiles directory """
+        """ for each guide, write a csv file of its off-targets to the OS temporary file directory """
         if self.cli:
             # if cli, put all guides into same csv
             if self.output_file: # skip if none
@@ -502,7 +503,7 @@ class GuideSearchAndScore:
                     """
         else:
             for guideID, guide in self.guideDict.items():
-                csv_path = os.path.join(self.dbConnection.ROOT_PATH,'src/guide-finder/tempfiles', self.batchID+"_"+guideID+".csv")
+                csv_path = os.path.join(tempfile.gettempdir(), self.batchID+"_"+guideID+".csv")
                 try:
                     with open(csv_path, mode='w') as csv_file:
                         writer = csv.writer(csv_file, delimiter=',')
@@ -587,7 +588,7 @@ class GuideSearchAndScore:
             'rgenID': self.rgenID,
             'inputSearchCoordinates': self.searchInput
         }
-        with open(os.path.join(self.dbConnection.ROOT_PATH, 'src/guide-finder/tempfiles', self.batchID+'.json'), 'w') as json_file:
+        with open(os.path.join(tempfile.gettempdir(), self.batchID+'.json'), 'w') as json_file:
             json.dump(databaseDict, json_file)
 
     def performGuideSearch(self):
@@ -598,19 +599,19 @@ class GuideSearchAndScore:
         genome_fa = os.path.join(self.dbConnection.ROOT_PATH,'jbrowse', 'data', self.genome,"processed",self.genome+".fa")
         genome_2bit = os.path.join(self.dbConnection.ROOT_PATH,'jbrowse', 'data', self.genome,"processed",self.genome+'.2bit')
         twoBitToFa_path = os.path.join(self.dbConnection.ROOT_PATH,'bin/twoBitToFa')
-        tempfiles_path = os.path.join(self.dbConnection.ROOT_PATH,'src/guide-finder/tempfiles')
+        tempfiles_path = tempfile.gettempdir()
 
         time_0 = time.time()
         logging.debug("\t\t[STARTED]\t\tFetching sequence...")
 
-        get_sequence.fetch_sequence(self.searchInput, genome_2bit, os.path.join(tempfiles_path,batchID+'_out.fa'))
+        get_sequence.fetch_sequence(self.searchInput, genome_2bit, os.path.join(tempfile.gettempdir(),batchID+'_out.fa'))
 
         time_1 = time.time()
         logging.debug(f"\t\t[FINISHED]\tFetched sequence in {str(round(time_1-time_0,4))}s")
         logging.debug("\t\t[STARTED]\t\tDetermining guides in search region...")
 
         protospacer_length = getattr(self, 'guideLength', 0) # passing 0 indicates default should be used
-        guideDict = find_grna.find_grna(self.rgenID, protospacer_length, os.path.join(tempfiles_path, batchID+'_out.fa'))
+        guideDict = find_grna.find_grna(self.rgenID, protospacer_length, os.path.join(tempfile.gettempdir(), batchID+'_out.fa'))
 
         time_2 = time.time()
         logging.debug(f"\t\t[FINISHED]\tFound gRNAs in {str(round(time_2-time_1,4))}s")

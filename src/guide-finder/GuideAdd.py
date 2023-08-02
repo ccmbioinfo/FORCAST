@@ -10,6 +10,7 @@ Requires: batch id, guideID, label, and notes
 
 import os, sys, json, cgi, datetime
 from subprocess import Popen, PIPE, DEVNULL
+import tempfile
 
 dir_path = os.path.dirname(os.path.abspath(__file__))
 sys.path.append(os.path.join(dir_path, "../helpers"))
@@ -186,7 +187,7 @@ class GuideAdd:
 
     def parseJSON(self):
         """ access the batch's json file, parse the metadata for the run as well as the details of the guide of interest """
-        with open(os.path.join(self.dbConnection.ROOT_PATH, 'src/guide-finder/tempfiles', self.batchID+'.json'), 'r') as json_file:
+        with open(os.path.join(tempfile.gettempdir(), self.batchID+'.json'), 'r') as json_file:
             jsonData = json.load(json_file)
 
         if 'metadata' in jsonData:

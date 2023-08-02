@@ -10,6 +10,7 @@ Categorizes the off-targets into intergenic, intronic, and exonic using the segm
 import os, sys, re
 from subprocess import Popen, PIPE, DEVNULL
 from itertools import product
+import tempfile
 dir_path = os.path.dirname(os.path.abspath(__file__))
 sys.path.append(os.path.join(dir_path, "../../helpers"))
 from Config3 import Config
@@ -39,7 +40,7 @@ def categorizeOffTargets(guideDict, rgenID, genome, batchID):
 	rgen = getRgenRecord(rgenID, dbConnection)
 	# construct bed intersect command
 	segmentsFile = os.path.join(dbConnection.ROOT_PATH, "jbrowse/data/"+genome, "processed", genome+".segments.bed")
-	extendedBed = os.path.join(dbConnection.ROOT_PATH, "src/guide-finder/tempfiles", str(batchID)+"_extended.bed")
+	extendedBed = os.path.join(tempfile.gettempdir(), str(batchID)+"_extended.bed")
 	bedCommand = ["bedtools", "intersect", "-a", extendedBed, "-b", segmentsFile, "-wb"]
 	p = Popen(bedCommand, stdin=PIPE, stdout=PIPE, stderr=PIPE)
 	out, err = p.communicate()
