@@ -298,7 +298,7 @@ class GuideSearchAndScore:
         """ formats the links to the off-target modals """
         off_target_counts = "<div style='color: #2676ff; font-weight: bold'>"
         for num_mismatches, num_offtargets in enumerate(guide['offtarget_counts']):
-            off_target_counts += "<button class='btn btn-link no-padding' data-toggle='modal' data-target='#{guideID}_{num_mismatches}'>{num_offtargets}</button>-".format(**locals())
+            off_target_counts += "<button class='btn btn-link no-padding' data-toggle='modal' data-target='#mismatch_{guideID}_{num_mismatches}'>{num_offtargets}</button>-".format(**locals())
         off_target_counts = off_target_counts[:-1] # remove trailing dash
         off_target_counts += "</div>"
 
