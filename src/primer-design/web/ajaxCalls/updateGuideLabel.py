@@ -1,4 +1,5 @@
-#!/usr/bin/python
+#!/usr/bin/python3.7
+
 '''
 Hillary Elrick
 
@@ -19,7 +20,6 @@ sys.path.append(os.path.join(dir_path, '../../../helpers'))
 from Config import Config
 
 def updateDB(guideID, genome, newLabel, dbConnection):
-	
 	guideCollection = dbConnection.guideCollection
 	
 	if newLabel is None:
@@ -35,11 +35,9 @@ def updateDB(guideID, genome, newLabel, dbConnection):
 			import MongoHandler
 			MongoHandler.writeGFF(genome)
 		except Exception as e:
-			print("Problem writing gff file: " + str(e))
+			print(f"Problem writing gff file: {e}")
 			return
 		print("Successfully Updated Guide Label")
-	return
-
 
 def main():
 	arg = cgi.FieldStorage()
@@ -50,16 +48,14 @@ def main():
 		newLabel = arg.getvalue("newValue")
 		genome = arg.getvalue("genome")
 	except Exception as e:
-		print("Incorrect information passed to script: " + str(e))
+		print(f"Incorrect information passed to script: {e}")
 		return	
 
 	if not guideID or not genome:
 		print("Required parameters not passed to script (guideID and/or genome)")
-		return 
 
 	dbConnection = Config(genome)
 	updateDB(guideID, genome, newLabel, dbConnection)
-
 
 if __name__ == "__main__":
 	main()

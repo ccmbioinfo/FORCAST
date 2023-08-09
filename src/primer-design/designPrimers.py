@@ -1,4 +1,4 @@
-#!/usr/bin/python
+#!/usr/bin/python3.7
 
 """
 	Hillary Elrick September 2018
@@ -12,7 +12,7 @@
 import cgi
 import os
 import sys
-import cPickle as pickle
+import pickle
 
 # import external classes based on relative file location
 dir_path = os.path.dirname(os.path.abspath(__file__))
@@ -24,15 +24,14 @@ from classes.Guide import Guide
 from classes.Gene import returnError
 
 def main():
-
 	if 'REQUEST_METHOD' in os.environ:
-		print "Content-Type: text/html\n"	
+		print("Content-Type: text/html\n")	
 		args = cgi.FieldStorage()
 		try:
 			geneName = args.getvalue('gene')
 			genome = args.getvalue('genome')
-		except Exception, e:
-			returnError(str(e))
+		except Exception as e:
+			returnError(e)
 			return
 	else:
 		if len(sys.argv) != 3:

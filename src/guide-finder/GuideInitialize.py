@@ -24,7 +24,7 @@ import sys, os, cgi, binascii, re
 from jinja2 import Template
 dir_path = os.path.dirname(os.path.abspath(__file__))
 sys.path.append(os.path.join(dir_path, "../helpers"))
-from Config3 import Config
+from Config import Config
 
 # cgi debug module
 import cgitb

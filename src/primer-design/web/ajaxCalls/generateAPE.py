@@ -1,4 +1,5 @@
-#!/usr/bin/python
+#!/usr/bin/python3.7
+
 import cgi
 import sys
 import os
@@ -55,8 +56,8 @@ def main():
 				count = str(int(count) + 1)
 			else:
 				found_all = True
-	except Exception, e:
-		print("Problem with calls to script " + str(e))
+	except Exception as e:
+		print(f"Problem with calls to script: {e}")
 
 	'''	
 	geneName = 'Jak1'
@@ -82,10 +83,10 @@ def main():
 		try:
 			APEString = APEObj.addFeaturesMongo()
 			filePath = APEObj.writeMongoAPE(APEString)
-		except Exception, e:
-			print str(e)
+		except Exception as e:
+			print(e)
 
-		print filePath
+		print(filePath)
 			
 	else:
 		print("Missing values passed to script: ") 
@@ -93,9 +94,6 @@ def main():
 			print("No Gene Name")
 		if not found_all:
 			print("Error parsing guides")
-		return	
-	return	
-
 
 if __name__ == "__main__":
 	main()

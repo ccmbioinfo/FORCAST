@@ -1,4 +1,5 @@
-#!/usr/bin/python
+#!/usr/bin/python3.7
+
 '''
 Hillary Elrick
 
@@ -19,7 +20,6 @@ sys.path.append(os.path.join(dir_path, '../../../helpers'))
 from Config import Config
 
 def updateDB(guideID, genome, newNote, dbConnection):
-	
 	guideCollection = dbConnection.guideCollection
 
 	if newNote is None:
@@ -34,23 +34,20 @@ def updateDB(guideID, genome, newNote, dbConnection):
 			sys.path.insert(0,os.path.join(dbConnection.ROOT_PATH,'customPython/'))
 			import MongoHandler			
 			MongoHandler.writeGFF(genome)
+			print("Successfully Updated Guide Note")
 		except Exception as e:
-			print("Problem writing gff file: " + str(e))
-			return
-		print("Successfully Updated Guide Note")
-	return
-
+			print(f"Problem writing gff file: {e}")\
 
 def main():
 	arg = cgi.FieldStorage()
-	print ('Content-Type: text/html\n')
+	print('Content-Type: text/html\n')
 	
 	try:
 		guideID = arg.getvalue("recordID")
 		newNote = arg.getvalue("newValue")
 		genome = arg.getvalue("genome")
 	except Exception as e:
-		print("Incorrect information passed to script: " + str(e))
+		print(f"Incorrect information passed to script: {e}")
 		return	
 
 	if genome:
@@ -58,8 +55,6 @@ def main():
 		updateDB(guideID, genome, newNote, dbConnection)
 	else:
 		print("No genome passed to script")
-
-	return
 
 if __name__ == "__main__":
 	main()

@@ -1,10 +1,8 @@
-#!/usr/bin/env python3
+#!/usr/bin/python3.7
 
 import json, os, sys
 from urllib.parse import quote_plus
-
 from pymongo import MongoClient
-
 
 dir_path = os.path.dirname(os.path.abspath(__file__))
 
@@ -38,16 +36,16 @@ def load_geneinfo_RGENs(geneInfo_gff, ensembl_version, genome, genome_version,
                 collection.insert_many(rgenJSON)
                 print("Successfully inserted RGENs into Mongo database")
         except Exception as e:
-            print("Error inserting RGENs into Mongo database: "+ str(e))
+            print(f"Error inserting RGENs into Mongo database: {e}")
     else:
         print("RGEN collection already exists in Mongo database, will not overwrite")
 
     if gene_info_collection in pyMongoClient[mongo_database].list_collection_names():
-        print(gene_info_collection + " already exists in Mongo database")
+        print(f"{gene_info_collection} already exists in Mongo database")
         return True
 
     sys.path.append(os.path.join(dir_path, "../helpers"))
-    from Config3 import fetchCurrentRelease
+    from Config import fetchCurrentRelease
 
     curr_release = fetchCurrentRelease(genome_version)
 
@@ -80,7 +78,6 @@ def load_geneinfo_RGENs(geneInfo_gff, ensembl_version, genome, genome_version,
 
     print("Succesfully inserted gene annotations and RGENs into Mongo database.")
     return True
-
 
 if __name__ == "__main__":
     if len(sys.argv) > 4:

@@ -1,4 +1,4 @@
-#!/usr/bin/python
+#!/usr/bin/python3.7
 
 """
 Hillary Elrick December 28th, 2018
@@ -111,13 +111,13 @@ class BlastDB:
 			try:
 				# bash command pipes the print command in fasta format to blast
 				printfProcess = subprocess.Popen(printfCommand, stdout=subprocess.PIPE)
-				blastProcess = subprocess.Popen(self.blastCommand, stdin=printfProcess.stdout, stdout=subprocess.PIPE)
+				blastProcess = subprocess.Popen(self.blastCommand, stdin=printfProcess.stdout, stdout=subprocess.PIPE, encoding="utf-8")
 				(blastOut, blastErr) = blastProcess.communicate()
-			except Exception, e:
+			except Exception as e:
 				print("Error running BLAST: " + str(e))
 				return
 			if blastErr:
-				print blastErr
+				print(blastErr)
 
 			# parse the results of blastOut and store the hit dictionary
 			hitDict = self.parseResults(blastOut.splitlines(), seq)
@@ -144,12 +144,12 @@ class BlastDB:
 			try:
 				# bash command pipes the print command in fasta format to blast
 				printfProcess = subprocess.Popen(printfCommand, stdout=subprocess.PIPE)
-				blastProcess = subprocess.Popen(blastLocation, stdin=printfProcess.stdout, stdout=subprocess.PIPE)
+				blastProcess = subprocess.Popen(blastLocation, stdin=printfProcess.stdout, stdout=subprocess.PIPE, encoding="utf-8")
 				(blastOut, blastErr) = blastProcess.communicate()
-			except Exception, e:
+			except Exception as e:
 				print("Error running BLAST: " + str(e))
 			if blastErr:
-				print blastErr
+				print(blastErr)
 
 			numIdentical = 0
 			hits = [str(seq)] # to store locations
@@ -167,7 +167,7 @@ class BlastDB:
 						elif hitMatch.group(3) == "minus":
 							location += ":-"
 						else:
-							print "Error parsing direction of match: " + str(hitMatch.group(3))
+							print("Error parsing direction of match: " + str(hitMatch.group(3)))
 						hits.append(location)
 						if numIdentical > 1:
 							print("Error: more than one identical match for search sequence '{}'".format(str(seq)))

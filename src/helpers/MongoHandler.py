@@ -1,4 +1,4 @@
-#!/usr/bin/python2.7
+#!/usr/bin/python3.7
 '''
 Functions for adding a guide to the mongo database and generating GFF files
 based on the current database
@@ -28,7 +28,7 @@ def insertgRNAintoMongo(guideDict, gRNACollection):
 	if insert_id == -1 :
 		sys.exit("Cannot insert this record into database. Please contact CCM!")
 
-	print "Successfully inserted this gRNA record into database."
+	print("Successfully inserted this gRNA record into database.")
 	return
 
 def checkPAMinMongo(pamGenomicStart, pamSeq, gRNACollection):
@@ -42,13 +42,13 @@ def fetchNotesfromMongo(pamGenomicStart, pamSeq, gRNACollection):
 	"This function fetches notes for a particular gRNA record from MongoDB"
 
 	ResultObject = gRNACollection.find_one({"pamGenomicStart": pamGenomicStart, "pamSeq": pamSeq},{'Notes':1})
-	print ResultObject['Notes']
+	print(ResultObject['Notes'])
 
 def fetchLabelfromMongo(pamGenomicStart, pamSeq, gRNACollection):
 	"This function fetches the label of a gRNA record from the MongoDB"
 
 	ResultObject = gRNACollection.find_one({"pamGenomicStart": pamGenomicStart, "pamSeq": pamSeq},{'label':1})
-	print ResultObject['label']
+	print(ResultObject['label'])
 
 def updategRNAinMongo(guideDict, gRNACollection):
         "This function updates the record of a particular gRNA in MongoDB"
@@ -59,7 +59,7 @@ def updategRNAinMongo(guideDict, gRNACollection):
         if ResultObject.modified_count !=1:
                 sys.exit("Cannot update. Please contact CCM!")
 
-        print "Successfully inserted/updated this gRNA record."
+        print("Successfully inserted/updated this gRNA record.")
         return
 
 def noOptionFound():
@@ -129,7 +129,7 @@ def writePrimerGFF(dbConnection, org):
 		gffFile = open(primerGFF, "w")
 		gffFile.write("\n".join(gffString))
 		gffFile.close()
-	except Exception, e:
+	except Exception as e:
 		print("Problem writing primer gff file: " + str(e))
 
 def writeGuideGFF(dbConnection, org):
@@ -203,7 +203,7 @@ def writeGuideGFF(dbConnection, org):
 		gffFile.write(PAMGFF3str)
 		gffFile.write(guideGFF3str)
 		gffFile.close()
-	except Exception, e:
+	except Exception as e:
 		print("Problem writing guide gff file: " + str(e))
 
 
@@ -279,7 +279,7 @@ def addGenomicLocation(org, guideDict):
 			else:
 				print("Unable to definitively place gRNA")
 				sys.exit()
-		except Exception, e:
+		except Exception as e:
 			print("BLAST search for sequence " + str(searchSeq) + " did not return a location")
 			sys.exit()
 
@@ -322,7 +322,7 @@ def main():
 		ajaxForm = cgi.FieldStorage()
 		cgi_arguments = ajaxForm.getvalue('inputData').split(",")
 		# if we get here we're running from a web browser
-		print "Content-type:text/plain\n"
+		print("Content-type:text/plain\n")
 		try:
 			guideDict = {}  # store the guide attributes
 			for arg in cgi_arguments:
@@ -374,10 +374,10 @@ def main():
 
 			return
 
-		except Exception, e:
+		except Exception as e:
 			print("Error occurred while updating database: " + str(e))
 
-	except AttributeError, att_err:
+	except AttributeError as att_err:
 		# no cgi arguments, will see if command-line arguments exist
 		try:
 			cli_arguments = sys.argv  # list of script and its arguments
@@ -393,7 +393,7 @@ def main():
 				writeGFF(org)
 				print("GFF files rewritten")
 				return
-		except IOError, io_err:
+		except IOError as io_err:
 			print("Unable to write GFF files. The script may need to be run with sudo privileges")
 			return
 	return

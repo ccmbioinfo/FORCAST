@@ -1,4 +1,5 @@
-#!/usr/bin/python
+#!/usr/bin/python3.7
+
 '''
 Hillary Elrick
 
@@ -23,15 +24,13 @@ def getRelease():
 
 	# check if the release matches what is currently stored in Mongo
 	if len(release) != 1:
-		return ("Problem with call to Ensembl, multiple releases returned: " + str(",".join(map(str, release))))
+		return f"Problem with call to Ensembl, multiple releases returned: {','.join(map(str, release))}"
 
 	return str(release[0])
 
-
 def main():
-
-	print ('Content-Type: text/html\n')
-	print getRelease()
+	print('Content-Type: text/html\n')
+	print(getRelease())
 
 if __name__ == "__main__":
 	main()

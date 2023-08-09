@@ -1,4 +1,4 @@
-#!/usr/bin/python
+#!/usr/bin/python3.7
 
 """
 Hillary Elrick June 20th, 2019
@@ -18,7 +18,7 @@ sys.path.append(os.path.join(dir_path,'../..'))
 from classes.BlastDB import BlastDB
 
 def main():
-	print "Content-type: application/json\n\n"
+	print("Content-type: application/json\n\n")
 	
 	try:
 		# get the ajax values	
@@ -26,7 +26,7 @@ def main():
 		genome = args.getvalue('genome')
 		# single primer passed using 'primer' arg	
 		primer = [args.getvalue('primer')]
-	except Exception, e:
+	except:
 		sys.exit("Problem with variables passed to function")
 		
 	if genome and primer:

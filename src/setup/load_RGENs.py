@@ -1,4 +1,4 @@
-#!/user/bin/python3
+#!/usr/bin/python3.7
 
 """
 Hillary Elrick October 29th, 2019
@@ -24,7 +24,7 @@ from pymongo import MongoClient
 import json
 dir_path = os.path.dirname(os.path.abspath(__file__))
 sys.path.append(os.path.join(dir_path, "../helpers"))
-from Config3 import Config
+from Config import Config
 
 def load_RGENs_into_Mongo(action):
 
@@ -51,10 +51,10 @@ def load_RGENs_into_Mongo(action):
         try:
             with open(os.path.join(dir_path,'rgens.json')) as json_file:
                 collection = rgenDB['rgenCollection']
-                collection.insert(rgenJSON)
+                collection.insertMany(rgenJSON)
                 return True
         except Exception as e:
-            print("Error inserting RGENs into Mongo database: "+ str(e))
+            print(f"Error inserting RGENs into Mongo database: {e}")
             return False
     else:
         # database already exists, perform user-specified action
@@ -68,7 +68,6 @@ def load_RGENs_into_Mongo(action):
             num_inserted = len(insert_result.inserted_ids)
             print("Inserted " + str(num_inserted) + " new RGEN records")
             return True
-
         elif action == 'update':
             # update/insert records into the rgenCollection using the rgenID+PAM to determine which to update
             inserted_count = 0
@@ -84,7 +83,6 @@ def load_RGENs_into_Mongo(action):
                 else:
                     updated_count += result.modified_count
             print(str(inserted_count) + " records inserted, " + str(updated_count) + " updated")
-        
         else:
             # this is hypothetically unreachable...
             print("UNRECOGNIZED ACTION " + str(action))
@@ -105,7 +103,6 @@ def main():
         success = load_RGENs_into_Mongo(action)
         if success:
             print("Successfully " + action + "d RGEN database")
-
 
 if __name__=="__main__":
     main()

@@ -1,4 +1,4 @@
-#!/usr/bin/python
+#!/usr/bin/python3.7
 import cgi
 import sys
 import os
@@ -30,15 +30,15 @@ def getGuides(ids, dbConnection):
 	return guideResults
 
 def findPrimers(ids, dbConnection):
-        """
-        Gets primers from Mongo database that have been designed with this specific
-        set of guides
-        """
-        primerCollection = dbConnection.primerCollection
-        primerResults = []
-        primers = primerCollection.find({"guides.ids" : { "$size" : len(ids), "$all": ids }, "status" : "Accepted"})
-        for primer in primers:
-                primerResults.append(primer)
+	"""
+	Gets primers from Mongo database that have been designed with this specific
+	set of guides
+	"""
+	primerCollection = dbConnection.primerCollection
+	primerResults = []
+	primers = primerCollection.find({"guides.ids" : { "$size" : len(ids), "$all": ids }, "status" : "Accepted"})
+	for primer in primers:
+		primerResults.append(primer)
         
 	return primerResults
 
@@ -49,12 +49,9 @@ def setGeneStrand(ensid, dbConnection):
 	
 	try:
 		STRAND = gene['strand']
-	except Exception, e:
-		print("Error, unable to get strand information for gene with ENSID: " + str(ensid))
+	except:
+		print(f"Error, unable to get strand information for gene with ENSID: {ensid}")
 		sys.exit()
-	
-	return
-	
 
 def setupDocument():
 	setupHTML = '''
@@ -67,9 +64,7 @@ def setupDocument():
 	'''
 	return setupHTML
 
-
 def writeGuideTable(guideResults):
-	
 	tableHTML = '''
 	<table border="1" style="border-collapse: collapse; text-align: center;" color="#000000">
 			<thead>
@@ -93,13 +88,13 @@ def writeGuideTable(guideResults):
 			# not url encoded
 			sumOffTargets = sum([int(x) for x in str(guide['otDesc']).split("-")])
 		formatOffTargets = str(sumOffTargets) + " {" + (" - ").join(offTargets)  + "}"
-		tableHTML += '''
+		tableHTML += f'''
 		<tr>
 		<td>{guide[label]}</td>
 		<td>{guide[guideSeq]}</td>
 		<td>{guide[guideLocation]}</td> 
 		<td>{guide[guideScore]}</td> 
-		<td>{formatOffTargets}</td>'''.format(**locals())
+		<td>{formatOffTargets}</td>'''
 
 	tableHTML += '''
 	</tr></tbody></table>
@@ -107,7 +102,6 @@ def writeGuideTable(guideResults):
 	return tableHTML
 
 def writePrimerTable(primerResults):
-	
 	tableHTML = '''
 	<br>
 	<table border="1" style="border-collapse: collapse; text-align: center;" color="#000000">
@@ -139,8 +133,8 @@ def writePrimerTable(primerResults):
 			rightLocation = int(primer['right_genomicLocation'])
 			rightLocation = chrm + ":" + str(rightLocation) + "-" + str(rightLocation-int(primer['rightlen'])) + "(+1)"	
 		else:
-			print("Error: invalid strand for gene. '" + str(STRAND) + "'")	
-		tableHTML += '''
+			print(f"Error: invalid strand for gene '{STRAND}'")	
+		tableHTML += f'''
 		<tr>
 		<td rowspan="2">{primer[type]}</td>
 		<td>Forward</td>
@@ -157,7 +151,7 @@ def writePrimerTable(primerResults):
 		<td>{rightTM}</td>
 		<td>{rightLocation}</td>
 		</tr>
-		'''.format(**locals())
+		'''
 	
 	tableHTML += '''
 	</tr></tbody></table>
@@ -169,9 +163,9 @@ def writePrimerTable(primerResults):
 def writeDOC(geneName, genome, ROOT_PATH, guideResults, primerResults):
 	filename = str(geneName) + "_gRNAs-and-primers.doc"
 	doc_genomeDir = os.path.join(ROOT_PATH, fileDir, genome)
-        # check that the genome has a csv dir
-        if not os.path.exists(doc_genomeDir):
-                os.makedirs(doc_genomeDir)
+	# check that the genome has a csv dir
+	if not os.path.exists(doc_genomeDir):
+		os.makedirs(doc_genomeDir)
 	
 	filepath = os.path.join(doc_genomeDir, filename)
 	try:
@@ -179,13 +173,13 @@ def writeDOC(geneName, genome, ROOT_PATH, guideResults, primerResults):
 		fileString += writeGuideTable(guideResults)
 		fileString += writePrimerTable(primerResults)
 		fileString += "</body></html>" # closing tags
-	except Exception, e:
-		print str(e)
+	except Exception as e:
+		print(str(e))
 	try:
 		with open(filepath, mode='w') as docfile:
 			docfile.write(fileString)
-	except Exception, e:
-		print("Error: " + str(e))
+	except Exception as e:
+		print(f"Error: {e}")
 	
 	return filename	
 
@@ -206,8 +200,8 @@ def main():
 				count = str(int(count) + 1)
 			else:
 				found_all = True	
-	except Exception, e:
-		print("Problem with calls to script " + str(e))
+	except Exception as e:
+		print(f"Problem with calls to script: {e}")
 
 	if genome:
 		try:
@@ -217,13 +211,11 @@ def main():
 			guideResults = getGuides(ids, dbConnection)
 			primerResults = findPrimers(ids, dbConnection)
 			filename = writeDOC(geneName, genome, dbConnection.ROOT_PATH,  guideResults, primerResults)
-			print os.path.join("../files/docFiles", genome, filename)
-		except Exception, e:
-			print str(e)
+			print(os.path.join("../files/docFiles", genome, filename))
+		except Exception as e:
+			print(e)
 	else:
 		print("No genome passed to script")
-	
-	return
 
 if __name__ == "__main__":
 	main()

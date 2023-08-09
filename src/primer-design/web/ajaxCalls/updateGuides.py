@@ -1,4 +1,5 @@
-#!/usr/bin/python
+#!/usr/bin/python3.7
+
 '''
 Hillary Elrick
 
@@ -17,7 +18,6 @@ sys.path.append(os.path.join(dir_path, '../../../helpers'))
 from Config import Config
 
 def updateDB(genome, recordID, newStatus, dbConnection):
-
 	guideCollection = dbConnection.guideCollection	
 	update_result = guideCollection.update_one({"_id": ObjectId(recordID)}, {'$set': {'status': newStatus}})
 	
@@ -28,12 +28,9 @@ def updateDB(genome, recordID, newStatus, dbConnection):
 			sys.path.insert(0,os.path.join(dbConnection.ROOT_PATH,'customPython/'))
 			import MongoHandler			
 			MongoHandler.writeGFF(genome)
+			print("Successfully updated the record")
 		except Exception as e:
-			print("Problem writing gff file: " + str(e))
-			return
-		print("Successfully updated the record")
-	return
-
+			print(f"Problem writing gff file: {e}")
 
 def main():
 	arg = cgi.FieldStorage()
@@ -44,7 +41,7 @@ def main():
 		status = arg.getvalue("newstatus")
 		genome = arg.getvalue("genome")
 	except Exception as e:
-		print("Incorrect information passed to script: " + str(e))
+		print(f"Incorrect information passed to script: {e}")
 		return	
 
 	if not recordID or not status or not genome:
@@ -55,9 +52,7 @@ def main():
 		dbConnection = Config(genome)	
 		updateDB(genome, recordID, status, dbConnection)
 	except Exception as e:
-		print("Error updating guide records: " + str(e))
-		return
-
+		print(f"Error updating guide records: {e}")
 
 if __name__ == "__main__":
 	main()

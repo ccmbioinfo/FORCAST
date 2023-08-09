@@ -7,12 +7,11 @@ SCRIPT FOR MIGRATING FROM INITIAL BETA RELEASE OF CASCADE (now FORCAST) TO VERSI
 """
 
 import os, sys, json, cgi
-from subprocess import Popen, PIPE, DEVNULL
 
 dir_path = os.path.dirname(os.path.abspath(__file__))
 sys.path.append(dir_path)
-from Config3 import Config
-from Config3 import fetchInstalledGenomes
+from Config import Config
+from Config import fetchInstalledGenomes
 
 def updateGuideRecords(org):
     """ add the rgen ID to all the records """

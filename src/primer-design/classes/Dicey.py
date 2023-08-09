@@ -12,7 +12,7 @@ from typing import Any, Dict, List, Optional
 
 # get the global root path from the Config object
 sys.path.append(os.path.realpath(os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "..", "helpers")))
-from Config3 import Config
+from Config import Config
 
 
 class Dicey:

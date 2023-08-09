@@ -1,4 +1,4 @@
-#!/usr/bin/python
+#!/usr/bin/python3.7
 
 import cgi
 import sys
@@ -32,10 +32,10 @@ APE_PATH = "files/apeFiles"
 # print the opening tags for the html and title for page
 def printHeader(geneSymbol):
 	print('Content-type: text/html\r\n\r')
-	print '''
+	print(f'''
 		<html>
 		<head>
-			<title>''' + str(geneSymbol) + ''' - APE</title>
+			<title>{geneSymbol} - APE</title>
 			<link rel="stylesheet" href="bootstrap-4.1.3/dist/css/bootstrap.min.css" as="style">
 			<style>
 			body {text-align: center;}
@@ -44,12 +44,11 @@ def printHeader(geneSymbol):
 		</head>
 		<body>
 		</br>
-		<h3>Fetching APE for ''' + str(geneSymbol) + '''</h3>'''
-
+		<h3>Fetching APE for {geneSymbol}</h3>''')
 
 def printError(errorString):
 	print('Content-type: text/html\r\n\r')
-	print '''
+	print('''
 	<html>
 	<head>
 		<title>Error Fetching APE</title>
@@ -61,10 +60,9 @@ def printError(errorString):
 	</head>
 	<body>
 	</br>
-	'''
+	''')
 	returnError(errorString)
 	sys.exit()
-
 
 def fetchGeneSymbol(ENSID):
 	ext = "/lookup/id/"+str(ENSID)
@@ -80,14 +78,14 @@ def fetchGeneSymbol(ENSID):
 		try:
 			symbolRequest.raise_for_status()
 		except Exception as e:
-			printError('Problem fetching gene symbol from Ensembl: '+str(e))
+			printError(f"Problem fetching gene symbol from Ensembl: {e}")
 
 	geneInfo = symbolRequest.json()
 
 	try:
 		symbol = geneInfo['display_name']
-	except Exception as e:
-		printError("Problem parsing result from Ensembl for ENSID: " + str(ENSID))
+	except:
+		printError(f"Problem parsing result from Ensembl for ENSID: {ENSID}")
 
 	return symbol
 
@@ -119,7 +117,7 @@ def main():
 	filename = str(geneSymbol + "_" + dbConnection.release + ".ape")
 	if os.path.isfile(os.path.join(APE_PATH, filename)):
 		# provide a download to the cached file
-		print ("""<a href='""" + str(os.path.join(APE_PATH, genome, 'plain', filename)) + """' download>Download Cached """ + filename + """</a>""")
+		print(f'''<a href="{os.path.join(APE_PATH, genome, 'plain', filename)}" download>Download Cached {filename}</a>''')
 	else:
 		# generate a gene object and write its ape
 		try:
@@ -129,9 +127,8 @@ def main():
 				geneObject = Gene(geneSymbol, genome)
 
 			geneObject.writeAPE(True)
-		except Exception as e:
+		except:
 			pass
-
 
 if __name__ == "__main__":
 	main()

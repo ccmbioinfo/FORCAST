@@ -1,4 +1,5 @@
-#!/usr/bin/python
+#!/usr/bin/python3.7
+
 '''
 Hillary Elrick, May 10th
 Fetch the genomes currently installed on the server and format them to be used as html select element options
@@ -14,14 +15,13 @@ sys.path.append(os.path.join(dir_path, '../../../helpers'))
 from Config import Config
 
 def main():
-	
 	print ('Content-Type: text/html\n')
-        try:
+	try:
 		arg = cgi.FieldStorage()
-                genome = arg.getvalue("genome")
-        except Exception as e:
-                print("Incorrect information passed to script: " + str(e))
-                return
+		genome = arg.getvalue("genome")
+	except Exception as e:
+		print(f"Incorrect information passed to script: {e}")
+		return
 	
 	from Config import fetchInstalledGenomes
 	result = fetchInstalledGenomes()
@@ -30,7 +30,7 @@ def main():
 		org = option[0]
 		name = option[1]
 		ensembl_version = option[2]
-		print """<option value="{org}">{name} ({org}, Ensembl release {ensembl_version})</option>""".format(**locals())
+		print(f'''<option value="{org}">{name} ({org}, Ensembl release {ensembl_version})</option>''')
 
 		
 if __name__ == "__main__":

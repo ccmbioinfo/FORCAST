@@ -9,12 +9,11 @@ Requires: batch id, guideID, label, and notes
 """
 
 import os, sys, json, cgi, datetime
-from subprocess import Popen, PIPE, DEVNULL
 import tempfile
 
 dir_path = os.path.dirname(os.path.abspath(__file__))
 sys.path.append(os.path.join(dir_path, "../helpers"))
-from Config3 import Config
+from Config import Config
 
 # for debugging:
 import cgitb

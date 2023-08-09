@@ -1,4 +1,5 @@
-#!/usr/bin/python
+#!/usr/bin/python3.7
+
 '''
 Hillary Elrick
 
@@ -25,13 +26,13 @@ jsonDir = "../../files/jsonFiles"
 def addToDatabase(dbConnection, geneName, release, primerPairs):
 	primerCollection = dbConnection.primerCollection
 	# iterate through dict of primer selections
-	for key, value in primerPairs.iteritems():
+	for key, value in primerPairs.items():
 		if key == 'wtPair':
 			primerType = "WT"
 		elif key == 'emPair':
 			primerType = "EM"
 		else:
-			print "Problem with primer selection"
+			print("Problem with primer selection")
 
 		count = 0
 
@@ -51,7 +52,7 @@ def addToDatabase(dbConnection, geneName, release, primerPairs):
 			try:
 				fh = open(path, 'r')	
 				fileFound = True
-			except Exception, e:
+			except:
 				release = str(int(release) + 1)	
 
 		with open((path), 'r') as primerJSON:
@@ -63,9 +64,7 @@ def addToDatabase(dbConnection, geneName, release, primerPairs):
 			print("Error: " + primerType + " Primer Already Exists in the Database")
 		if recordStatus == 0:
 			print(primerType + " Primer Successfully Added to Database")
-	return
-		
-	
+
 # uses the dict to see if it's already been inserted		
 def addPrimerMongo(primerCollection, primerRecord):
 	'''
@@ -79,7 +78,7 @@ def addPrimerMongo(primerCollection, primerRecord):
 	del core_record['ENSID']
 	try:
 		del core_record['notes']
-	except Exception, e:
+	except:
 		# this is ok, it's just because the primer doesn't have notes
 		# we should add them to the base record though
 		primerRecord["notes"] = ""
@@ -98,8 +97,8 @@ def rewriteGFF(dbConnection, genome):
 		sys.path.insert(0, os.path.join(dbConnection.ROOT_PATH,'customPython/'))
 		import MongoHandler
 		MongoHandler.writeGFF(genome)
-	except Exception, e:
-		print("Problem updating the gff file: " + str(e))		
+	except Exception as e:
+		print(f"Problem updating the gff file: {e}")		
 
 
 def main():	
@@ -114,8 +113,8 @@ def main():
 		for pair in ['wtPair', 'emPair']:
 			if args.getvalue(pair) and args.getvalue(pair) != 'NaN':
 				primerPairs[pair] = args.getvalue(pair)
-	except Exception, e:
-		print("Problem with calls to script " + str(e))
+	except Exception as e:
+		print(f"Problem with calls to script {e}")
 
 	# example of how input variables should be formatted
 	'''
@@ -132,13 +131,13 @@ def main():
 			try:
 				addToDatabase(dbConnection, geneName, release, primerPairs)			
 				rewriteGFF(dbConnection, genome)
-			except Exception, e:
-				print("Error adding to Database: " + str(e))
+			except Exception as e:
+				print(f"Error adding to Database: {e}")
 			
 		else:
 			print("Missing values passed to script")
-	except Exception, e:
-		print str(e)
+	except Exception as e:
+		print(e)
 			
 	return
 

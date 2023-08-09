@@ -1,4 +1,4 @@
-#!/usr/bin/python
+#!/usr/bin/python3.7
 
 """
 Hillary Elrick February 13th, 2018
@@ -17,15 +17,14 @@ from Config import Config
 sys.path.append(os.path.join(dir_path,'../..'))
 
 def main():
-
-	print "Content-type: application/html\n"
+	print("Content-type: application/html\n")
 
 	try:
 		# get the ajax values
 		args = cgi.FieldStorage()
 		# get genome variable
 		genome = args.getvalue('genome')
-	except Exception, e:
+	except:
 		sys.exit("Problem fetching genome variable passed to function")
 
 	if not genome:
@@ -34,11 +33,9 @@ def main():
 
 	dbConnection = Config(genome)
 	if os.path.isfile(os.path.join(dbConnection.ROOT_PATH, "jbrowse", "data", genome, "processed", genome + ".fm9")):
-		print "1"
+		print("1")
 	else:
-		print "0"
-	return
-
+		print("0")
 
 if __name__ == "__main__":
 	main()

@@ -1,4 +1,5 @@
-#!/usr/bin/python
+#!/usr/bin/python3.7
+
 '''
 Hillary Elrick
 
@@ -37,7 +38,6 @@ def getAcceptedGuideIDs(ensid, dbConnection):
 
 	return guideIDs
 
-
 # format all the fields for the primer record
 def formatRecord(primerRecord, genome):
 	# add the accepted guides
@@ -51,7 +51,6 @@ def formatRecord(primerRecord, genome):
 	# add blank notes and default status
 	primerRecord["notes"] = ""
 	primerRecord["status"] = "Accepted"
-
 
 def parseLocation(primerRecord):
 	# get the strand and chromosome from the left primer
@@ -79,12 +78,9 @@ def parseLocation(primerRecord):
 			sys.exit()
 		# TODO: Calculate 2nd product size for the EM primer
 		primerRecord["productSize"] = str(abs(int(primerRecord["right_genomicLocation"]) - int(primerRecord["left_genomicLocation"])))
-	except Exception, e:
-		print("Problem calculating product size" + str(e))
+	except Exception as e:
+		print(f"Problem calculating product size: {e}")
 		sys.exit()
-
-	return
-
 
 def addPrimerMongo(primerRecord, dbConnection):
 	# get the primer collection from the connection to the db
@@ -99,16 +95,13 @@ def addPrimerMongo(primerRecord, dbConnection):
 		#insert the record into the database
 		primerCollection.insert(primerRecord)
 		print("Successfully Added Primer Pair")
-
-	return
-
 def rewriteGFF(dbConnection, genome):
-        try:
-                sys.path.insert(0, os.path.join(dbConnection.ROOT_PATH,'customPython/'))
-                import MongoHandler
-                MongoHandler.writeGFF(genome)
-        except Exception, e:
-                print("Problem updating the gff file: " + str(e))
+	try:
+		sys.path.insert(0, os.path.join(dbConnection.ROOT_PATH,'customPython/'))
+		import MongoHandler
+		MongoHandler.writeGFF(genome)
+	except Exception as e:
+		print(f"Problem updating the gff file: {e}")
 
 '''
 #TODO: this will throw an error, need to get the genome argument
@@ -117,7 +110,7 @@ def rewriteGFF():
 		sys.path.insert(0, os.path.join(Config.ROOT_PATH, 'customPython/'))
 		import MongoHandler
 		MongoHandler.writeGFF()
-	except Exception, e:
+	except Exception as e:
 		print("Problem updating the gff file: " + str(e))
 '''
 
@@ -157,28 +150,26 @@ def main():
 		primerRecord['rightlen'] = args.getvalue('rightlen')
 		primerRecord['right_genomicLocation'] = args.getvalue('right_genomicLocation')
 		genome = args.getvalue('genome')
-	except Exception, e:
-		print("Problem with calls to script " + str(e))
+	except Exception as e:
+		print(f"Problem with calls to script: {e}")
 
-	for key, value in primerRecord.iteritems():
+	for key, value in primerRecord.items():
 		if value is None:
 			if key in KEY_MAPPING:
-				print("Please define the property: " + KEY_MAPPING[key] + " before inserting primer record")
+				print(f"Please define the property: {KEY_MAPPING[key]} before inserting primer record")
 			else:
-				print("Problem with call to script. Contact support. Value for " + key + " not defined by function")
+				print(f"Problem with call to script. Contact support. Value for {key} not defined by function")
 			sys.exit()
 
 	#format and then add the record
 	try:
 		# initialize db connection to the correct genome
-                dbConnection = Config(genome)	
+		dbConnection = Config(genome)	
 		formatRecord(primerRecord, dbConnection)
 		addPrimerMongo(primerRecord, dbConnection)
 		rewriteGFF(dbConnection, genome)
-	except Exception, e:
-		print("Error: " + str(e))
-
-	return
+	except Exception as e:
+		print(f"Error: {e}")
 
 if __name__ == "__main__":
 	main()

@@ -1,4 +1,5 @@
-#!/usr/bin/python
+#!/usr/bin/python3.7
+
 '''
 Hillary Elrick
 
@@ -27,11 +28,9 @@ def updateDB(recordID, genome, newStatus, dbConnection):
 	else:
 		try:
 			MongoHandler.writeGFF(genome)
+			print("Successfully updated the record")
 		except Exception as e:
-			print("Problem writing gff file: " + str(e))
-			return
-		print("Successfully updated the record")
-	return
+			print(f"Problem writing gff file: {e}")
 
 def main():
 	arg = cgi.FieldStorage()
@@ -42,7 +41,7 @@ def main():
 		status = arg.getvalue("newstatus")
 		genome = arg.getvalue("genome")
 	except Exception as e:
-		print("Incorrect information passed to script: " + str(e))
+		print(f"Incorrect information passed to script: {e}")
 		return	
 
 	if not recordID or not status or not genome:
@@ -51,7 +50,6 @@ def main():
 
 	dbConnection = Config(genome)	
 	updateDB(recordID, genome, status, dbConnection)
-
 
 if __name__ == "__main__":
 	main()

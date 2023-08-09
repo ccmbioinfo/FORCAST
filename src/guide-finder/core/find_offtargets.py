@@ -15,7 +15,7 @@ import logging
 import time
 dir_path = os.path.dirname(os.path.abspath(__file__))
 sys.path.append(os.path.join(dir_path, "../../helpers"))
-from Config3 import Config
+from Config import Config
 from itertools import product
 import score_offtargets
 import categorize_offtargets
@@ -361,7 +361,7 @@ def extendBed(batchID, potentialGuides, genome, rgen, tempfile_directory):
 def runAlignment(genome, fastaFile, genome_fa, tempfile_directory):
 	""" execute a shell script to perform bwa alignment on a fasta file """
 	# if troubleshooting the bwa step, replace the stdout and stderr variables with PIPE to see output
-	p = Popen([os.path.join(dir_path, "bwa_align.sh"), genome_fa, os.path.basename(fastaFile.name), tempfile_directory], stdin=PIPE, stdout=DEVNULL, stderr=DEVNULL)
+	p = Popen([os.path.join(dir_path, "bwa_align.sh"), genome_fa, os.path.basename(fastaFile.name), tempfile_directory], stdin=PIPE, stdout=DEVNULL, stderr=DEVNULL, encoding="utf-8")
 	out, err = p.communicate()
 	if err:
 		print(err)

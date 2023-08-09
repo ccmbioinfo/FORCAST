@@ -13,7 +13,7 @@ from itertools import product
 import tempfile
 dir_path = os.path.dirname(os.path.abspath(__file__))
 sys.path.append(os.path.join(dir_path, "../../helpers"))
-from Config3 import Config
+from Config import Config
 
 
 def getRgenRecord(rgenID, dbConnection):
@@ -42,7 +42,7 @@ def categorizeOffTargets(guideDict, rgenID, genome, batchID):
 	segmentsFile = os.path.join(dbConnection.ROOT_PATH, "jbrowse/data/"+genome, "processed", genome+".segments.bed")
 	extendedBed = os.path.join(tempfile.gettempdir(), str(batchID)+"_extended.bed")
 	bedCommand = ["bedtools", "intersect", "-a", extendedBed, "-b", segmentsFile, "-wb"]
-	p = Popen(bedCommand, stdin=PIPE, stdout=PIPE, stderr=PIPE)
+	p = Popen(bedCommand, stdin=PIPE, stdout=PIPE, stderr=PIPE, encoding="utf-8")
 	out, err = p.communicate()
 	if err:
 		sys.exit(err)
@@ -50,7 +50,7 @@ def categorizeOffTargets(guideDict, rgenID, genome, batchID):
 	categorized = []
 	for line in out.splitlines():
 		# assign every intersection to its off-target
-		intersect = line.decode("utf-8").split("\t")
+		intersect = line.split("\t")
 		guideID, location = intersect[3].split("_")
 		if guideDict[guideID]['max_exceeded']:
 			# don't care about categorizing these

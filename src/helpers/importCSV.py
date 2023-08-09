@@ -4,7 +4,7 @@ import csv, sys
 from pprint import pprint
 from typing import Dict
 from pymongo.errors import BulkWriteError
-from Config3 import Config
+from Config import Config
 
 
 def pop(d: Dict[str, str]) -> Dict[str, str]:

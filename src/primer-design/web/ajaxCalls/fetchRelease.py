@@ -1,4 +1,4 @@
-#!/usr/bin/python
+#!/usr/bin/python3.7
 
 import sys
 import cgi
@@ -10,7 +10,6 @@ sys.path.append(os.path.join(dir_path, '../../../helpers'))
 from Config import Config
 
 def main():
-	
 	print ('Content-Type: text/html\n')
 	try:
 		arg = cgi.FieldStorage()
@@ -22,11 +21,9 @@ def main():
 	if genome:
 		from Config import fetchCurrentRelease	
 		release = str(fetchCurrentRelease(genome))
-		print release
+		print(release)
 	else:
 		print("No genome passed to script")
 
-	return	
-		
 if __name__ == "__main__":
 	main()

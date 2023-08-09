@@ -11,10 +11,9 @@ The code to calculate the CFD score (for Cas9 RGEN) is contained within the cfd_
 
 import sys
 import os
-from subprocess import Popen, PIPE, DEVNULL
 dir_path = os.path.dirname(os.path.abspath(__file__))
 sys.path.append(os.path.join(dir_path, "../../helpers"))
-from Config3 import Config
+from Config import Config
 from itertools import product
 import cfd_code.cfd_score_calculator3 as cfd
 sys.path.append(os.path.join(dir_path,"inDelphi-model"))

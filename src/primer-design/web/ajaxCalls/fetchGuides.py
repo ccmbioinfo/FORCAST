@@ -1,7 +1,7 @@
-#!/usr/bin/python
+#!/usr/bin/python3.7
 
 import cgi
-import urllib
+from urllib.parse import unquote
 import sys
 import os
 from pymongo import MongoClient
@@ -20,7 +20,7 @@ def printGuides(guides, geneName):
 	
 	# only print table if there are guides
 	if guides.count() > 0:
-		print '''
+		print('''
 		<table class="table table-bordered">
 			<thead>
 			<tr>
@@ -34,14 +34,14 @@ def printGuides(guides, geneName):
 			</tr>
 			</thead>
 			<tbody>
-		'''
+		''')
 		for guideResult in guides:
 			try:
-				decodedNotes = urllib.unquote(guideResult['Notes']).decode("utf-8")
-				decodedLabel = urllib.unquote(guideResult['label']).decode("utf-8")
+				decodedNotes = unquote(guideResult['Notes'])
+				decodedLabel = unquote(guideResult['label'])
 				guideID, guideSeq, guideLocation, guideScore = str(guideResult['_id']), str(guideResult['guideSeq']), str(guideResult['guideLocation']), str(guideResult['guideScore'])
-				encodedOffTarget = guideResult['otDesc'].encode("utf=8")
-				print '''
+				encodedOffTarget = guideResult['otDesc']
+				print(f'''
 				<tr id={guideID}>
 				<td contenteditable="false" class="guideLabels" spellcheck="false" onblur="updateGuideLabel(this, '{guideID}')">{decodedLabel}</td>
 				<td>{guideSeq}</td>
@@ -51,19 +51,18 @@ def printGuides(guides, geneName):
 				<td style="padding: 0px;">
 					<textarea disabled class="guideNotes" style="border:none; width: 100%; height: 75px; padding: 0px; vertical-align: middle;" onblur="updateGuideNote(this, '{guideID}')">{decodedNotes}</textarea>
 				</td>
-				'''.format(**locals())
+				''')
 				if str(guideResult['status']) == 'Accepted':
-					print '''
+					print(f'''
 					<td class="centreCell"><input type="checkbox" checked="checked" onclick="backendUpdateStatus(this, '{guideID}')">
-					</td>'''.format(**locals())
+					</td>''')
 				else:
-					print '''<td class="centreCell"><input type="checkbox" onclick="backendUpdateStatus(this,'{guideID}')"></td>'''.format(**locals())
-			except Exception, e:
-				print str(e)
-		print '''</tr></table>'''
+					print(f'''<td class="centreCell"><input type="checkbox" onclick="backendUpdateStatus(this,'{guideID}')"></td>''')
+			except Exception as e:
+				print(e)
+		print('''</tr></table>''')
 	else:
-		print "<p>No saved guides for " + str(geneName) + "</p>"
-
+		print(f"<p>No saved guides for {geneName}</p>")
 
 def main():
 	print("Content-type: text/html\n")	
@@ -73,8 +72,8 @@ def main():
 		ensid = args.getvalue('ensid')
 		genome = args.getvalue('genome')
 		geneName = args.getvalue('geneName')
-	except Exception, e:
-		print "Error: " + str(e)
+	except Exception as e:
+		print(f"Error: {e}")
 		return
 	
 	if not ensid or not genome:
@@ -83,7 +82,6 @@ def main():
 	
 	guides = getMongoRecord(ensid, genome)
 	printGuides(guides, geneName)
-
 
 if __name__ == "__main__":
 	main()

@@ -20,16 +20,14 @@ RUN apt-get update -y && \
     ca-certificates curl unzip \
     # Convenient downloads for Dicey from GEAR Genomics Tracy
     wget rename \
-    # FORCAST uses both Python 2 and 3.7 for some reason
-    python python3.7 python3-pip python3.7-distutils \
+    # Python 3.7 for FORCAST CGI scripts
+    python3.7 python3-pip python3.7-distutils \
     # Bioinformatics tools used when installing new genomes
     bwa bedtools samtools ncbi-blast+ \
     # FORCAST primer design feature after setup
     primer3 && \
     # Remove lists pulled by apt update for consistent images
-    rm -rf /var/lib/apt/lists/* && \
-    # python-pip is no longer included in the distribution as Python 2 is out of support
-    curl https://bootstrap.pypa.io/pip/2.7/get-pip.py | python
+    rm -rf /var/lib/apt/lists/*
 # Add a dummy sudo script as src/setup/load.sh uses sudo;
 # the Docker container runs as the root user, but sudo is needed for src/setup/load.sh in local FORCAST installations
 RUN echo "#!/bin/bash\n\$@" > /usr/bin/sudo && \
@@ -55,13 +53,11 @@ RUN curl -LO https://github.com/GMOD/jbrowse/releases/download/1.12.5-release/JB
     # Add favicon
     sed -i '6i\    <link rel="icon" href="../docs/img/crispr-icon.png" sizes="100x100">' /var/www/html/jbrowse/index.html
 # Dependencies for FORCAST CGI scripts + inDelphi
-# Python 2
-RUN pip install --upgrade pip && \
-    pip install --no-cache-dir pymongo==3.12.3 requests==2.27.1
-# Python 3.7
 RUN python3.7 -m pip install --upgrade pip && \
     python3.7 -m pip install --no-cache-dir pymongo==3.12.3 Jinja2==2.8 markupsafe==2.0.1 pandas==0.23.4 scikit-learn==0.20.0 scipy==1.1.0 numpy==1.15.3
 WORKDIR /var/www/html
+# Increase Apache timeout
+RUN sed -i 's/^Timeout [[:digit:]]\+/Timeout 1200/g' /etc/apache2/apache2.conf
 # Replace the /usr/sbin/apachectl script that is called with the Apache master process that respects signals
 ENV APACHE_HTTPD exec /usr/sbin/apache2
 CMD chmod 777 ./src/guide-finder/core ./src/guide-finder/logs ./src/primer-design/files/* && \

@@ -1,4 +1,5 @@
-#!/usr/bin/python
+#!/usr/bin/python3.7
+
 '''
 Hillary Elrick
 
@@ -19,7 +20,6 @@ sys.path.append(os.path.join(dir_path, '../../../helpers'))
 from Config import Config
 
 def updateDB(recordID, genome, newNotes, dbConnection):
-
 	# get the primer collection
 	primerCollection = dbConnection.primerCollection
 	
@@ -35,12 +35,9 @@ def updateDB(recordID, genome, newNotes, dbConnection):
 			sys.path.insert(0, os.path.join(dbConnection.ROOT_PATH, 'customPython/'))
 			import MongoHandler
 			MongoHandler.writeGFF(genome)
+			print("Successfully Updated Notes")
 		except Exception as e:
-			print("Problem writing gff file: " + str(e))
-			return
-		print("Successfully Updated Notes")
-	return
-
+			print(f"Problem writing gff file: {e}")
 
 def main():
 	arg = cgi.FieldStorage()
@@ -51,7 +48,7 @@ def main():
 		newNotes = arg.getvalue("newNotes")
 		genome = arg.getvalue("genome")
 	except Exception as e:
-		print("Incorrect information passed to script: " + str(e))
+		print(f"Incorrect information passed to script: {e}")
 		return	
 
 	if not recordID or not genome:
@@ -61,7 +58,6 @@ def main():
 	dbConnection = Config(genome)
 	primerCollection = dbConnection.primerCollection
 	updateDB(recordID, genome, newNotes, dbConnection)
-
 
 if __name__ == "__main__":
 	main()

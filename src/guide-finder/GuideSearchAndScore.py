@@ -24,7 +24,7 @@ import tempfile
 # import external classes based on relative file location
 dir_path = os.path.dirname(os.path.abspath(__file__))
 sys.path.append(os.path.join(dir_path, "../helpers"))
-from Config3 import Config
+from Config import Config
 sys.path.append(os.path.join(dir_path, 'core'))
 import get_sequence, find_grna, find_offtargets, score_offtargets, categorize_offtargets
 

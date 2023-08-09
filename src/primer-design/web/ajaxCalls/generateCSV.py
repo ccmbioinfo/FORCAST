@@ -1,4 +1,4 @@
-#!/usr/bin/python
+#!/usr/bin/python3.7
 import cgi
 import sys
 import os
@@ -27,7 +27,6 @@ def getGuides(ids, dbConnection):
 
 	return guideResults
 
-
 def findPrimers(ids, dbConnection):
 	"""
 	Gets primers from Mongo database that have been designed with this specific
@@ -39,7 +38,6 @@ def findPrimers(ids, dbConnection):
 	for primer in primers:
 		primerResults.append(primer)
 	return primerResults
-
 
 def writeCSV(genome, geneName, ROOT_PATH, guideResults, primerResults):
 	filename = str(geneName) + "-accepted_primers.csv"
@@ -62,12 +60,11 @@ def writeCSV(genome, geneName, ROOT_PATH, guideResults, primerResults):
 			for record in primerResults:					
 				writer.writerow([(str(geneName)+"_"+record['type'].lower()+"_F1"), record['leftprimer'], record['leftTM']])
 				writer.writerow([(str(geneName)+"_"+record['type'].lower()+"_R1"), record['rightprimer'], record['rightTM']])
-	except Exception, e:
-		print("Error: " + str(e))
+	except Exception as e:
+		print(f"Error: {e}")
 	
 	return filename
-				
-		
+
 def main():
 	print("Content-type: text/html\n")	
 	args = cgi.FieldStorage()
@@ -83,8 +80,8 @@ def main():
 				count = str(int(count) + 1)
 			else:
 				found_all = True	
-	except Exception, e:
-		print("Problem with calls to script " + str(e))
+	except Exception as e:
+		print(f"Problem with calls to script: {e}")
 
 	if genome:
 		# get connection to database
@@ -95,8 +92,6 @@ def main():
 		print(os.path.join("../files/csvFiles", genome, filename))
 	else:
 		print("No genome passed to script")
-
-	return
 
 if __name__ == "__main__":
 	main()

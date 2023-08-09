@@ -1,4 +1,4 @@
-#!/usr/bin/python
+#!/usr/bin/python3.7
 
 """
 Hillary Elrick April 22nd, 2019
@@ -56,7 +56,6 @@ class Primer3:
 			#desc_match = re.match(r"(^[^_]+)_ATTEMPT_([0-9]*)_DESC=", line)
 			file_match = re.match(r"^ATTEMPT_([0-9]*)_FILE=", line)
 			desc_match = re.match(r"^ATTEMPT_([0-9]*)_DESC=", line)
-
 			# get the info after the '=' sign (if there is one)
 			if '=' in line:
 				value = line.split('=')[1].strip("\"'\n")
@@ -138,7 +137,7 @@ class Primer3:
 			# store the trim start for later use
 			guideObject.wtTrimStart = trimStart
 		elif primer == 'EM':
-			fileLines.append("SEQUENCE_ID=" + guideObject.super.symbol + "_" + primer)
+			fileLines.append(f"SEQUENCE_ID={guideObject.super.symbol}_{primer}")
 			# remove the target from the excised sequence
 			excisedSequence = sequence[:guideObject.emTarget[0]] + sequence[guideObject.emTarget[1]:]
 
@@ -146,32 +145,31 @@ class Primer3:
 			trimStart = guideObject.emTarget[0] - 1000
 			startTarget = 1000
 			trimEnd = guideObject.emTarget[1] + 1000
-                        if trimStart < 0:
-                                trimStart = 0
-                                startTarget = guideObject.emTarget[0]
-                        if trimEnd > len(excisedSequence):
-                                trimEnd = len(excisedSequence)
+			if trimStart < 0:
+				trimStart = 0
+				startTarget = guideObject.emTarget[0]
+			if trimEnd > len(excisedSequence):
+				trimEnd = len(excisedSequence)
 
-                        trimmed_excisedSequence = excisedSequence[(trimStart): (trimEnd)]
+			trimmed_excisedSequence = excisedSequence[(trimStart): (trimEnd)]
 
-                        fileLines.append("SEQUENCE_TEMPLATE=" + trimmed_excisedSequence)
-                        # add a 150bp buffer on either side of the excised sequence for the target
-                        fileLines.append("SEQUENCE_TARGET=" + str(startTarget - 149) + "," + str(300))
-                        fileLines.append("=")
+			fileLines.append("SEQUENCE_TEMPLATE=" + trimmed_excisedSequence)
+			# add a 150bp buffer on either side of the excised sequence for the target
+			fileLines.append("SEQUENCE_TARGET=" + str(startTarget - 149) + "," + str(300))
+			fileLines.append("=")
 
-                        # store trim start
-                        guideObject.emTrimStart = trimStart
+			# store trim start
+			guideObject.emTrimStart = trimStart
 
-                filepath = os.path.join(self.Config.PRIMER3_DIR, str(primer + "_" + guideObject.super.symbol + "_input"))
-                try:
-                        inputfile = open(filepath, 'w')
-                        for line in fileLines:
-                                print>> inputfile, line
-                        inputfile.close()
-                except Exception, e:
-                        returnError("Problem creating Primer3 input file: " + str(e))
+		filepath = os.path.join(self.Config.PRIMER3_DIR, f"{primer}_{guideObject.super.symbol}_input")
+		try:
+			with open(filepath, 'w') as inputfile:
+				for line in fileLines:
+					print(line, file=inputfile)
+		except Exception as e:
+			returnError("Problem creating Primer3 input file: " + str(e))
 
-                return filepath
+		return filepath
 
 	def attemptDesign(self, guideObject, primerType):
 		"""
@@ -192,7 +190,7 @@ class Primer3:
 			# grab the correct settings file
 			settingsFile = self.settingsDict[str(attemptNumber)]['filepath']
 			# construct the command
-			p = Popen(self.Config.PRIMER3 + ' --p3_settings_file="' + settingsFile + '" < ' + primer3Input, shell=True, stdout=PIPE, stderr=PIPE)
+			p = Popen(self.Config.PRIMER3 + ' --p3_settings_file="' + settingsFile + '" < ' + primer3Input, shell=True, stdout=PIPE, stderr=PIPE, encoding="utf-8")
 			stdout, stderr = p.communicate()
 			if stderr:
 				returnError(stderr)
@@ -212,7 +210,7 @@ class Primer3:
 				 	return primerDict, htmlResult
 				try:
 					retryDesc = str(self.settingsDict[str(attemptNumber)]['desc'])
-				except Exception, e:
+				except Exception as e:
 					# nothing defined, set to blank string
 					retryDesc = ''
 				
@@ -233,7 +231,7 @@ class Primer3:
 		# grab the correct settings file
 		settingsFile = self.settingsDict[str(attemptNumber)]['filepath']
 		# construct the command
-		p = Popen(self.Config.PRIMER3 + ' "--p3_settings_file="' + settingsFile + '" < ' + primer3Input, shell=True, stdout=PIPE, stderr=PIPE)
+		p = Popen(self.Config.PRIMER3 + ' "--p3_settings_file="' + settingsFile + '" < ' + primer3Input, shell=True, stdout=PIPE, stderr=PIPE, encoding="utf-8")
 		stdout, stderr = p.communicate()
 		# parse the result
 		primerDict = self.parsePrimers(stdout, primerType, guideObject)
@@ -242,73 +240,73 @@ class Primer3:
 				
 	
 	# get the primers written to the primer3 outputfile and puts the relevant info into a dictionary
-        def parsePrimers(self, primer3_output, primer, guideObject):
-                primerDict = {}
-                for line in primer3_output.split("\n"):
-                        # perform searches
-                        sequenceSearch = re.search("^PRIMER_(LEFT|RIGHT)_([0-9])_SEQUENCE=(.*)", line)
-                        startSearch = re.search("^PRIMER_(LEFT|RIGHT)_([0-9])=(.*)", line)
-                        tmSearch = re.search("^PRIMER_(LEFT|RIGHT)_([0-9])_TM=(.*)", line)
-                        gcSearch = re.search("^PRIMER_(LEFT|RIGHT)_([0-9])_GC_PERCENT=(.*)", line)
-                        sizeSearch = re.search("PRIMER_PAIR_([0-9])_PRODUCT_SIZE=(.*)", line)
+	def parsePrimers(self, primer3_output, primer, guideObject):
+		primerDict = {}
+		for line in primer3_output.split("\n"):
+			# perform searches
+			sequenceSearch = re.search("^PRIMER_(LEFT|RIGHT)_([0-9])_SEQUENCE=(.*)", line)
+			startSearch = re.search("^PRIMER_(LEFT|RIGHT)_([0-9])=(.*)", line)
+			tmSearch = re.search("^PRIMER_(LEFT|RIGHT)_([0-9])_TM=(.*)", line)
+			gcSearch = re.search("^PRIMER_(LEFT|RIGHT)_([0-9])_GC_PERCENT=(.*)", line)
+			sizeSearch = re.search("PRIMER_PAIR_([0-9])_PRODUCT_SIZE=(.*)", line)
 
-                        # see if line is a sequence line
-                        if sequenceSearch:
-                                pairNum = sequenceSearch.group(2)
-                                if pairNum not in primerDict:
-                                        primerDict[pairNum] = {}
-                                        primerDict[pairNum]['type'] = primer
-                                if sequenceSearch.group(1) == 'LEFT':
-                                        primerDict[pairNum]['leftprimer'] = sequenceSearch.group(3)
-                                elif sequenceSearch.group(1) == 'RIGHT':
-                                        primerDict[pairNum]['rightprimer'] = sequenceSearch.group(3)
+			# see if line is a sequence line
+			if sequenceSearch:
+				pairNum = sequenceSearch.group(2)
+				if pairNum not in primerDict:
+					primerDict[pairNum] = {}
+					primerDict[pairNum]['type'] = primer
+				if sequenceSearch.group(1) == 'LEFT':
+					primerDict[pairNum]['leftprimer'] = sequenceSearch.group(3)
+				elif sequenceSearch.group(1) == 'RIGHT':
+					primerDict[pairNum]['rightprimer'] = sequenceSearch.group(3)
 			# if line matched the start line pattern
-                        elif startSearch:
-                                pairNum = startSearch.group(2)
-                                if pairNum not in primerDict:
-                                        primerDict[pairNum] = {}
-                                        primerDict[pairNum]['type'] = primer
-                                start, length = startSearch.group(3).split(",")
+			elif startSearch:
+				pairNum = startSearch.group(2)
+				if pairNum not in primerDict:
+					primerDict[pairNum] = {}
+					primerDict[pairNum]['type'] = primer
+				start, length = startSearch.group(3).split(",")
 
-                                # convert trimmed start to APE start
-                                if primer == 'WT':
-                                        start = str(guideObject.wtTarget[0] - 1000 + int(start))
-                                elif primer == 'EM':
-                                        start = str(guideObject.emTarget[0] - 1000 + int(start))
+				# convert trimmed start to APE start
+				if primer == 'WT':
+					start = str(guideObject.wtTarget[0] - 1000 + int(start))
+				elif primer == 'EM':
+					start = str(guideObject.emTarget[0] - 1000 + int(start))
 
-                                if startSearch.group(1) == 'LEFT':
-                                        primerDict[pairNum]['leftstart'] = start
-                                        primerDict[pairNum]['leftlen'] = length
-                                elif startSearch.group(1) == 'RIGHT':
-                                        primerDict[pairNum]['rightstart'] = start
-                                        primerDict[pairNum]['rightlen'] = length
-                        # if line matched the temperature line pattern
-                        elif tmSearch:
-                                pairNum = tmSearch.group(2)
-                                if pairNum not in primerDict:
-                                        primerDict[pairNum] = {}
-                                        primerDict[pairNum]['type'] = primer
-                                if tmSearch.group(1) == 'LEFT':
-                                        primerDict[pairNum]['leftTM'] = tmSearch.group(3)
-                                elif tmSearch.group(1) == 'RIGHT':
-                                        primerDict[pairNum]['rightTM'] = tmSearch.group(3)
-                        # if line matched the gc line pattern
-                        elif gcSearch:
-                                pairNum = gcSearch.group(2)
-                                if pairNum not in primerDict:
-                                        primerDict[pairNum] = {}
-                                        primerDict[pairNum]['type'] = primer
-                                if gcSearch.group(1) == 'LEFT':
-                                        primerDict[pairNum]['leftGC'] = gcSearch.group(3)
-                                elif gcSearch.group(1) == 'RIGHT':
-                                        primerDict[pairNum]['rightGC'] = gcSearch.group(3)
-                        # if line matched the product size line pattern	
+				if startSearch.group(1) == 'LEFT':
+					primerDict[pairNum]['leftstart'] = start
+					primerDict[pairNum]['leftlen'] = length
+				elif startSearch.group(1) == 'RIGHT':
+					primerDict[pairNum]['rightstart'] = start
+					primerDict[pairNum]['rightlen'] = length
+			# if line matched the temperature line pattern
+			elif tmSearch:
+				pairNum = tmSearch.group(2)
+				if pairNum not in primerDict:
+					primerDict[pairNum] = {}
+					primerDict[pairNum]['type'] = primer
+				if tmSearch.group(1) == 'LEFT':
+					primerDict[pairNum]['leftTM'] = tmSearch.group(3)
+				elif tmSearch.group(1) == 'RIGHT':
+					primerDict[pairNum]['rightTM'] = tmSearch.group(3)
+			# if line matched the gc line pattern
+			elif gcSearch:
+				pairNum = gcSearch.group(2)
+				if pairNum not in primerDict:
+					primerDict[pairNum] = {}
+					primerDict[pairNum]['type'] = primer
+				if gcSearch.group(1) == 'LEFT':
+					primerDict[pairNum]['leftGC'] = gcSearch.group(3)
+				elif gcSearch.group(1) == 'RIGHT':
+					primerDict[pairNum]['rightGC'] = gcSearch.group(3)
+			# if line matched the product size line pattern	
 			elif sizeSearch:
-                                pairNum = sizeSearch.group(1)
-                                if pairNum not in primerDict:
-                                        primerDict[pairNum] = {}
-                                        primerDict[pairNum]['type'] = primer
-                                primerDict[pairNum]['productSize'] = sizeSearch.group(2)
+				pairNum = sizeSearch.group(1)
+				if pairNum not in primerDict:
+					primerDict[pairNum] = {}
+					primerDict[pairNum]['type'] = primer
+				primerDict[pairNum]['productSize'] = sizeSearch.group(2)
 
-                return primerDict
+		return primerDict
 

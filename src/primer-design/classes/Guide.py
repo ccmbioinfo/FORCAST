@@ -1,3 +1,4 @@
+#!/usr/bin/python3.7
 """
 Hillary Elrick August 2018
 
@@ -13,9 +14,7 @@ import re
 import csv
 import json
 import requests
-
 from collections import OrderedDict
-from subprocess import Popen, PIPE
 
 # import classes based on relative file location
 dir_path = os.path.dirname(os.path.abspath(__file__))
@@ -109,13 +108,12 @@ class Guide(Gene):
 					tempDict['chr'] = e['seq_region_name']
 					tempDict['description'] = e['description']
 					filteredElements.append(tempDict)
-		except Exception, e:
+		except Exception as e:
 			returnError("Problem parsing regulatory elements during QA" + str(e))
 
 		if len(filteredElements) > 0:
-			print(
-				"<div style=\"align-items: center;\"><span class=\"text-warning\"><i class=\"fa fa-exclamation-circle\"></i><p style=\"display: inline;\"> Warning: Guides may overlap with the following features:</p></span>")
-			print '''
+			print("<div style=\"align-items: center;\"><span class=\"text-warning\"><i class=\"fa fa-exclamation-circle\"></i><p style=\"display: inline;\"> Warning: Guides may overlap with the following features:</p></span>")
+			print('''
 			<table class="table table-bordered mt-1" style="max-width: 75%; margin: auto;">
 				<thead>
 				<tr>
@@ -125,7 +123,7 @@ class Guide(Gene):
 				</tr>
 				</thead>
 				<tbody>
-			'''
+			''')
 			for e in filteredElements:
 				if e['feature_type'] == 'transcript':
 					try:
@@ -133,7 +131,7 @@ class Guide(Gene):
 						print("<tr><td>" + e['feature_type'] + "</td><td>Transcript of " +
 							parent['Name'] + "</td><td>chr" + str(e['chr']) + ":" +
 							str(e['start']) + "-" + str(e['end']) + "</td></tr>")
-					except Exception, e:
+					except Exception as e:
 						returnError("Problem fetching name of parent transcript" + str(e))
 				else:
 					print("<tr><td>" + e['feature_type'] + "</td><td>" + e['description'] + "</td><td>chr" + str(
@@ -157,7 +155,7 @@ class Guide(Gene):
 
 	def writeGuideAPE(self):
 		# write every combination to file, labelling with postfix (0-9)_(0-9) to indicate pair
-		for key, apeString in self.fileDictionary.iteritems():
+		for key, apeString in self.fileDictionary.items():
 			try:
 				# name file based on wt/em pair chosen
 				if len(self.wtPrimers) > 0 and len(self.emPrimers) > 0:
@@ -171,7 +169,7 @@ class Guide(Gene):
 				apeFile = open(os.path.join(self.apeDir, self.super.genome, 'features', filename), 'w')
 				apeFile.write(apeString)
 				apeFile.close()
-			except Exception, e:
+			except Exception as e:
 				returnError("Problem writing APE file " + str(e))
 
 	def writePrimerCSV(self):
@@ -191,9 +189,9 @@ class Guide(Gene):
 			# create if it doesn't exist yet
 			os.makedirs(csvDir_genome)
 		# write a csv for every pair of wt and em primers
-		for w, wPrimer in self.wtPrimers.iteritems():
+		for w, wPrimer in self.wtPrimers.items():
 			if len(self.emPrimers) > 0:
-				for e, ePrimer in self.emPrimers.iteritems():
+				for e, ePrimer in self.emPrimers.items():
 					filename = str(self.super.geneName+"_"+str(self.super.release)+"-primers_"+str(w)+"_"+str(e)+".csv")
 					filepath = os.path.join(csvDir_genome, filename)
 					try:
@@ -205,7 +203,7 @@ class Guide(Gene):
 							# print guides from dictionary
 							guideFields = ['sequence', 'PAM']
 							writer = csv.DictWriter(csv_file, fieldnames=guideFields)
-							for g, guide in guideDict.iteritems():
+							for g, guide in guideDict.items():
 								writer.writerow(guide)
 							writer = csv.writer(csv_file, delimiter=",")
 							writer.writerow([])
@@ -217,7 +215,7 @@ class Guide(Gene):
 							writer.writerow([(primerName + "em_F1"), ePrimer['leftprimer'], str(ePrimer['leftTM'])])
 							writer.writerow([(primerName + "em_R1"), ePrimer['rightprimer'], str(ePrimer['rightTM'])])
 						emCounter += 1
-					except Exception, e:
+					except Exception as e:
 						returnError("Problem writing csv file : " + str(e))
 			else:
 				filename = str(self.super.geneName+"_"+str(self.super.release)+"-primers_"+str(w)+"_0.csv")
@@ -231,7 +229,7 @@ class Guide(Gene):
 						# print guides from dictionary
 						guideFields = ['sequence', 'PAM']
 						writer = csv.DictWriter(csv_file, fieldnames=guideFields)
-						for g, guide in guideDict.iteritems():
+						for g, guide in guideDict.items():
 							writer.writerow(guide)
 						writer = csv.writer(csv_file, delimiter=",")
 						writer.writerow([])
@@ -240,7 +238,7 @@ class Guide(Gene):
 						primerName = str(self.super.geneName + "_")
 						writer.writerow([(primerName + "wt_F1"), wPrimer['leftprimer'], str(wPrimer['leftTM'])])
 						writer.writerow([(primerName + "wt_R1"), wPrimer['rightprimer'], str(wPrimer['rightTM'])])
-				except Exception, e:
+				except Exception as e:
 					returnError("Problem writing csv file : " + str(e))
 			wtCounter += 1
 		return
@@ -249,11 +247,11 @@ class Guide(Gene):
 		# get ids of guides used in design
 		guideIDs = []
 
-		for g, guide in self.gRNADict.iteritems():
+		for g, guide in self.gRNADict.items():
 			guideIDs.append(str(guide['_id']))
 
 		# write a json for every wt primer first
-		for w, wPrimer in self.wtPrimers.iteritems():
+		for w, wPrimer in self.wtPrimers.items():
 			filename = str(self.super.geneName + "_" + str(self.super.release) + "_WT-" + str(w) + ".json")
 			filepath = os.path.join(self.jsonDir, filename)
 			primerDict = self.createPrimerDict(wPrimer)
@@ -264,7 +262,7 @@ class Guide(Gene):
 			with open(filepath, 'w') as json_file:
 				json.dump(primerDict, json_file)
 
-		for e, ePrimer in self.emPrimers.iteritems():
+		for e, ePrimer in self.emPrimers.items():
 			filename = str(self.super.geneName + "_" + str(self.super.release) + "_EM-" + str(e) + ".json")
 			filepath = os.path.join(self.jsonDir, filename)
 			primerDict = self.createPrimerDict(ePrimer)
@@ -314,7 +312,7 @@ class Guide(Gene):
 		genomeAPE_features = os.path.join("../files/apeFiles", self.super.genome, 'features')
 		genomeCSV = os.path.join("../files/csvFiles", self.super.genome)
 
-		print '''
+		print('''
 			</br>
 
 			<div class="btn-group" role="group" style="float: left;">
@@ -332,7 +330,7 @@ class Guide(Gene):
 			</div>
 			<br>
 			<br>
-			<br>'''
+			<br>''')
 
 	def setTargets(self):
 		"""
@@ -435,7 +433,7 @@ class Guide(Gene):
 				g.append(start)
 				g.append(start + len(guideSeq))
 				g.append('F')
-			except Exception, e:
+			except Exception as e:
 				# the guide sequence wasn't found
 				# reverse it an search again
 				guideSeq = revSeq(g[1])
@@ -444,17 +442,17 @@ class Guide(Gene):
 					g.append(start)
 					g.append(start + len(guideSeq))
 					g.append('R')
-				except Exception, e:
+				except Exception as e:
 					returnError("Could not find one of the guides in the sequence for the gene")
 
 		# also do for the guide dict (slowly moving towards eliminating the list...)
-		for key, g in self.gRNADict.iteritems():
+		for key, g in self.gRNADict.items():
 			try:
 				start = re.search(g['guideSeq'], self.super.sequence, re.IGNORECASE).start()
 				g['start'] = start
 				g['end'] = int(start) + len(g['guideSeq'])
 				g['direction'] = 'F'
-			except Exception, e:
+			except Exception as e:
 				# guide sequence wasn't found
 				# reverse and search again
 				try:
@@ -462,7 +460,7 @@ class Guide(Gene):
 					g['start'] = start
 					g['end'] = int(start) + len(g['guideSeq'])
 					g['direction'] = 'R'
-				except Exception, e:
+				except Exception as e:
 					returnError("Unable to find one of the guides in the sequence for this gene")
 
 	# TODO: remove the gRNA code once converted to using gRNADict
@@ -479,7 +477,7 @@ class Guide(Gene):
 		self.gRNADict = OrderedDict(sorted(self.gRNADict.items(), key=lambda x: int(x[1]['start'])))
 
 		useManualLabel = True
-		for key, guide in self.gRNADict.iteritems():
+		for key, guide in self.gRNADict.items():
 			if guide['label'] == '' or guide['label'] is None:
 				useManualLabel = False
 
@@ -490,7 +488,7 @@ class Guide(Gene):
 			# add manual label to list of gRNAs
 			# this is annoying but it's a temp fix until code is fully converted to using the guide dict
 			for guide in self.gRNAs:
-				for key, gDict in self.gRNADict.iteritems():
+				for key, gDict in self.gRNADict.items():
 					if gDict['guideSeq'] == guide[1]:
 						guide.append(gDict['label'])
 		else:
@@ -568,7 +566,7 @@ class Guide(Gene):
 					emPrimers = primerResult
 					if len(emPrimers) > 0:
 						# need to rewrite the coordinates because they are relative to the excised sequence
-						for rank, p in primerResult.iteritems():
+						for rank, p in primerResult.items():
 							rStart = int(p['rightstart'])
 							lStart = int(p['leftstart'])
 							if rStart > self.startExcise:
@@ -593,7 +591,7 @@ class Guide(Gene):
 
 	# need to add the wt product size to the em primer product size field
 	def addWtFragments(self, emPrimers):
-		for key, primer in emPrimers.iteritems():
+		for key, primer in emPrimers.items():
 			if primer['genomicRightStart'] > primer['genomicLeftStart']:
 				# we're in a forward gene
 				wtFragementSize = (int(primer['genomicRightStart']) - int(primer['genomicLeftStart'])) + 1
@@ -603,7 +601,7 @@ class Guide(Gene):
 
 	# figure out the genomic locations of the primers (this should match the start that BLAST finds in the QA step later)
 	def addGenomicLocation(self, filteredPrimers):
-		for key, primer in filteredPrimers.iteritems():
+		for key, primer in filteredPrimers.items():
 			'''
 			If the gene is on the reverse strand, the genomic start of a primer is the genomic
 			location for the last base in the APE file minus the start location of the primer
@@ -656,7 +654,7 @@ def printPrimers(primerDict, primer):
 	"""
 	rank = 1
 	idCount = 0
-	for pairNum in sorted(primerDict.iterkeys()):
+	for pairNum in sorted(primerDict.keys()):
 
 		idCountString = str(idCount)
 

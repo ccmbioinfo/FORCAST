@@ -1,3 +1,4 @@
+#!/usr/bin/python3.7
 """
 Hillary Elrick, adapted from Greg Clark's Code
 November 2018
@@ -10,7 +11,7 @@ import time
 import re
 import os
 import sys
-import urllib
+from urllib.parse import unquote
 
 dir_path = os.path.dirname(os.path.abspath(__file__))
 sys.path.append(os.path.join(dir_path, ".."))
@@ -56,7 +57,7 @@ class APE(object):
 			apeFile = open(os.path.join(self.geneObject.Config.ROOT_PATH, 'src/primer-design', filepath), 'w')
 			apeFile.write(APEString)
 			apeFile.close()
-		except Exception, e:
+		except Exception as e:
 			print("Problem writing APE file " + str(e))
 		
 		return os.path.join("..",filepath)
@@ -101,7 +102,7 @@ class APE(object):
 				guide['start'] = int(re.search(guideSeq, self.geneObject.sequence, re.IGNORECASE).start())
 				guide['end'] = guide['start'] + len(guideSeq)
 				guide['direction'] = 'F'
-			except Exception, e:
+			except Exception as e:
 				# guide sequence wasn't found
 				# reverse and search again
 				guideSeq = revSeq(guideSeq)				
@@ -109,7 +110,7 @@ class APE(object):
 					guide['start'] = int(re.search(guideSeq, self.geneObject.sequence, re.IGNORECASE).start())
 					guide['end'] = guide['start'] + len(guideSeq)
 					guide['direction'] = 'R'
-				except Exception, e:
+				except Exception as e:
 					print("Unable to find one of the guides in the gene sequence")
 
 		# sort the list of guides
@@ -125,7 +126,7 @@ class APE(object):
 			start = str(guide['start'] + 1)
 			end = str(guide['end'])
 			direction = guide['direction']
-			label = urllib.unquote(guide['label'])
+			label = unquote(guide['label'])
 			fileToWrite += guideFeatureAPE(start, end, direction, label)
 
 		return fileToWrite
@@ -136,7 +137,7 @@ class APE(object):
 			start = str(guide[7] + 1)
 			end = str(guide[8])
 			direction = guide[9]
-			label = urllib.unquote(guide[10]).decode('utf8')
+			label = unquote(guide[10])
 
 			fileToWrite += guideFeatureAPE(start, end, direction, label)
 
@@ -236,10 +237,10 @@ class APE(object):
 		filedict = {}
 		if len(self.guideObject.wtPrimers) > 0 and len(self.guideObject.emPrimers) > 0:
 			# both em and wt primers were designed
-			for w, wPrimer in self.guideObject.wtPrimers.iteritems():
+			for w, wPrimer in self.guideObject.wtPrimers.items():
 				wtString = fileToWrite
 				wtString += primerFeatureAPE(wPrimer)	
-				for e, ePrimer in self.guideObject.emPrimers.iteritems():
+				for e, ePrimer in self.guideObject.emPrimers.items():
 					dictString = wtString  # string that will be stored in the dict	
 					dictString += primerFeatureAPE(ePrimer)	
 					# find last comment line
@@ -264,14 +265,14 @@ class APE(object):
 
 		elif len(self.guideObject.wtPrimers) > 0:
 			# only wt primers were designed
-			for w, wPrimer in self.guideObject.wtPrimers.iteritems():
+			for w, wPrimer in self.guideObject.wtPrimers.items():
 				wtString = fileToWrite
 				wtString += primerFeatureAPE(wPrimer)
 				filedict[(w,-1)] = (wtString + apeString[lastmatch.end():])
 
 		elif len(self.guideObject.emPrimers) > 0:
 			# only em primers were designed
-			for e, ePrimer in self.guideObject.emPrimers.iteritems():
+			for e, ePrimer in self.guideObject.emPrimers.items():
 				dictString = fileToWrite
 				dictString += primerFeatureAPE(ePrimer)	
 				# find last comment line
@@ -333,7 +334,7 @@ class APE(object):
 		comment = "COMMENT    "
 		filetowrite.append("LOCUS       " + self.geneObject.symbol + "_gDNA\t\t" + str(int(self.geneObject.sequenceLength)+1) + " bp ds-DNA     linear       " + time.strftime("%d-%b-%Y").upper())
 		if self.geneObject.exons:	
-			filetowrite.append("ACCESSION   " + str(",".join(zip(*self.geneObject.exons)[5])))
+			filetowrite.append("ACCESSION   " + str(",".join(list(zip(*self.geneObject.exons))[5])))
 		filetowrite.append("KEYWORDS    ." + (self.geneObject.symbol).upper())
 		filetowrite.append("SOURCE      " + str(self.geneObject.Config.organismName))
 		filetowrite.append(comment + ">dna:chromosome: " + self.geneObject.genome + ":" + self.geneObject.chromosome + "(" + str(self.geneObject.strand) + ")" + ":" + str(self.geneObject.sequenceStart) + "..." + str(self.geneObject.sequenceEnd))

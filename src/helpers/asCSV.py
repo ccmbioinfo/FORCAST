@@ -1,7 +1,7 @@
 #!/usr/bin/python3.7
 
 import csv, sys
-from Config3 import Config
+from Config import Config
 
 
 if __name__ == "__main__":

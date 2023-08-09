@@ -1,3 +1,5 @@
+#!/usr/bin/python3.7
+
 import requests
 import time
 import os
@@ -5,7 +7,7 @@ import sys
 from pymongo import MongoClient
 sys.path.append("..")
 from Config import Config
-from APE import APE
+from classes.APE import APE
 server = "https://rest.ensembl.org"
 
 
@@ -108,7 +110,7 @@ class Gene(object):
 			returnError("Problem fetching gene features")
 		decodedGene = geneRequest.json()
 		try:
-			decodedGene = filter(lambda l: l['gene_id'] == self.ensemblID, decodedGene)
+			decodedGene = list(filter(lambda l: l['gene_id'] == self.ensemblID, decodedGene))
 			if len(decodedGene) > 1:
 				returnError("More than one gene found with the same ensemblID, using first one found")
 			geneInfo = decodedGene[0]
@@ -178,7 +180,7 @@ class Gene(object):
 		[start, end, strand, ensembl_phase, ensembl_end_phase, exon_id]
 		"""
 		if self.sortedExons:
-			strand = zip(*self.sortedExons)[2][0]
+			strand = list(zip(*self.sortedExons))[2][0]
 			self.sortedExons = sorted(self.sortedExons, key=lambda x: int(x[1]))  # sort based on end
 
 			# find the earliest start and latest end sites for the exons
@@ -237,7 +239,7 @@ class Gene(object):
 		if not seqRequest.ok:
 			try:
 				seqRequest.raise_for_status()
-			except Exception, e:
+			except Exception as e:
 				returnError("Problem fetching sequence from ENSEMBL: " + str(e))
 
 		seq = seqRequest.text.strip()
@@ -274,15 +276,15 @@ class Gene(object):
 			apeFile.close()
 			# if the link to the download should be printed
 			if printLink:
-				print ("""<a class="downloadLink" id="initialDownload" href='""" + apeDir_plain + """/""" + filename + """' download>Download APE File for """ + filename + """</a>""")
-		except Exception, e:
+				print("""<a class="downloadLink" id="initialDownload" href='""" + apeDir_plain + """/""" + filename + """' download>Download APE File for """ + filename + """</a>""")
+		except Exception as e:
 			returnError("Problem writing APE file " + str(e))
 
 def returnError(errorString):
-        print("""<p class="text-danger">Error: """ + errorString + """</p>""")
+	print(f'''<p class="text-danger">Error: {errorString}</p>''')
 
 def returnWarning(warningString):
-	print("""<p class="text-warning">Warning: """ + warningString + """</p>""")
+	print(f'''<p class="text-warning">Warning: {warningString}</p>''')
 
 
 

@@ -1,7 +1,7 @@
-#!/usr/bin/python
+#!/usr/bin/python3.7
 
 import cgi
-import urllib
+from urllib.parse import unquote
 import sys
 import os
 import bson
@@ -28,9 +28,9 @@ def getGuideLabel(guideID, dbConnection):
 		label = [(str(guideResult['guideSeq']))]
 		# also, if it has a label, store it
 		if 'label' in guideResult and guideResult['label'] != "":
-			decodedLabel = urllib.unquote(guideResult['label'])
+			decodedLabel = unquote(guideResult['label'])
 			label.append(str(decodedLabel))		
-	except Exception, e:
+	except:
 		# the guide the primer was designed with was not found
 		return ['*Guide Used in Design was Deleted*']
 	
@@ -94,12 +94,12 @@ def printRow(primerResult):
 		dropdownClass = "btn rejected-dropdown dropdown-toggle"
 		statusOption = "Accept"
 		checkFlag = ''
-	decodedNotes = urllib.unquote(primerResult['notes']).decode("utf-8")
+	decodedNotes = unquote(primerResult['notes'])
 	reversePrimer = primerResult['rightprimer']
 	reverseDetails = "Length: " +  primerResult['rightlen'] 
 	reverseDetails += " GC%: " + str(round(float(primerResult['rightGC']),1)) 
 	reverseDetails += " T<sup>m</sup>: " + str(round(float(primerResult['rightTM']),1)) 
-	print '''<tr id="{rowID}">
+	print(f'''<tr id="{rowID}">
 		<td rowspan="2" class="align-middle centreCell">{primerType}</td>
 		<td class="align-middle centreCell">Forward</td>
 		<td nowrap class="align-middle centreCell">{forwardPrimer}</td>
@@ -123,13 +123,12 @@ def printRow(primerResult):
 		<td class="align-middle centreCell">Reverse</td>
 		<td nowrap class="align-middle centreCell">{reversePrimer}</td>
 		<td nowrap class="centreCell" style="font-size: 0.9rem;">{reverseDetails}</td>
-		</tr>'''.format(**locals())
-
+		</tr>''')
 
 def printPrimers(primers, geneName, dbConnection):
-	print ('Content-Type: text/html\n')
+	print('Content-Type: text/html\n')
 	if primers.count() == 0:
-		print "<p>No saved primers for " + str(geneName) + ".</p>"
+		print("<p>No saved primers for " + str(geneName) + ".</p>")
 		return
 
 	'''
@@ -140,8 +139,8 @@ def printPrimers(primers, geneName, dbConnection):
 	'''
 	primerDict = organizePrimers(primers, dbConnection)
 
-	for guideLabel, primerList in primerDict.iteritems():	
-		print '''
+	for guideLabel, primerList in primerDict.items():	
+		print(f'''
 		<p style="float: left; font-weight: bold">For Guides: {guideLabel}</p>
 		<table class="table table-bordered">
 			<thead>
@@ -154,22 +153,20 @@ def printPrimers(primers, geneName, dbConnection):
 			<th class="centreCell" scope="col">Notes</th>
 			</thead>
 			<tbody>
-		'''.format(**locals())
+		''')
 		
 		for primerResult in primerList:
 			printRow(primerResult)
 		
-		print '''</tbody></table>'''
+		print('''</tbody></table>''')
 	
-	print '''		
+	print('''
 	<button class="btn btn-primary btn-sm bordered-button" style="float:right;" title="Update notes of all primers" type="button" onclick="updatePrimerNotes()">
 	<i class="fa fa-spinner fa-spin" id="updateNotesSpinner"></i>
 	Update Notes
 	</button>	
 	<br>
-	'''
-	return			
-	
+	''')
 
 def main():
 	args = cgi.FieldStorage()
@@ -178,8 +175,8 @@ def main():
 		geneName = args.getvalue('gene')
 		ensid = args.getvalue('ensid')
 		genome = args.getvalue('genome')
-	except Exception, e:
-		print "Error: " + str(e)
+	except Exception as e:
+		print(f"Error: {e}")
 		return
 	
 	if geneName and ensid and genome:
@@ -187,11 +184,10 @@ def main():
 			dbConnection = Config(genome)	
 			primers = getMongoRecord(ensid, dbConnection)
 			printPrimers(primers, geneName, dbConnection)
-		except Exception, e:
-			print str(e)
+		except Exception as e:
+			print(e)
 	else:
-		print("Missing values passed to script")
-		
+		print("Missing values passed to script")		
 
 if __name__ == "__main__":
 	main()
