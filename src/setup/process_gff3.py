@@ -1,6 +1,8 @@
 #!/usr/bin/env python3
 
-import os, re, sys
+import os
+import re
+import sys
 
 
 def process_gff3(input_filename: str) -> None:
@@ -27,9 +29,7 @@ def process_gff3(input_filename: str) -> None:
                         all_exons[transcript][fields[3]][fields[4]] = {}
 
                     exon = all_exons[transcript][fields[3]][fields[4]]
-                    ensembl_end_phase = re.search(
-                        "ensembl_end_phase=(.+?);", fields[8]
-                    )
+                    ensembl_end_phase = re.search("ensembl_end_phase=(.+?);", fields[8])
                     if (
                         ensembl_end_phase is not None
                         and len(ensembl_end_phase.groups()) == 1

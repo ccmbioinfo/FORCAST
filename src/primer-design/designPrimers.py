@@ -16,42 +16,49 @@ import sys
 # import external classes based on relative file location
 dir_path = os.path.dirname(os.path.abspath(__file__))
 
-from classes.Gene import Gene
+from classes.Gene import Gene, returnError
 from classes.Guide import Guide
-from classes.Gene import returnError
+
 
 def main():
-	if 'REQUEST_METHOD' in os.environ:
-		print("Content-Type: text/html\n")	
-		args = cgi.FieldStorage()
-		try:
-			geneName = args.getvalue('gene')
-			genome = args.getvalue('genome')
-		except Exception as e:
-			returnError(e)
-			return
-	else:
-		if len(sys.argv) != 3:
-			print("Please provide the genome of interest and a gene to design guides for.")
-			print("The program will attempt a design for all accepted guides for the gene")
-			sys.exit()
-		else:
-			genome = sys.argv[1]
-			geneName = sys.argv[2]
+    if "REQUEST_METHOD" in os.environ:
+        print("Content-Type: text/html\n")
+        args = cgi.FieldStorage()
+        try:
+            geneName = args.getvalue("gene")
+            genome = args.getvalue("genome")
+        except Exception as e:
+            returnError(e)
+            return
+    else:
+        if len(sys.argv) != 3:
+            print(
+                "Please provide the genome of interest and a gene to design guides for."
+            )
+            print(
+                "The program will attempt a design for all accepted guides for the gene"
+            )
+            sys.exit()
+        else:
+            genome = sys.argv[1]
+            geneName = sys.argv[2]
 
-	if not geneName or not genome:
-		returnError("Required parameters not passed to script")	
+    if not geneName or not genome:
+        returnError("Required parameters not passed to script")
 
-	# create a gene object based on the current gene name and genome
-	geneObj = Gene(geneName, genome)
-	geneObj.writeAPE(False)  # creates the blank APE for the gene (False for no download link)
+    # create a gene object based on the current gene name and genome
+    geneObj = Gene(geneName, genome)
+    geneObj.writeAPE(
+        False
+    )  # creates the blank APE for the gene (False for no download link)
 
-	# guide object designs primers for accepted guides stored in the database for a given gene
-	guideObj = Guide(geneObj)
-	guideObj.guideQA()  # preform QA on the guides
-	print(guideObj.resultsTable)
+    # guide object designs primers for accepted guides stored in the database for a given gene
+    guideObj = Guide(geneObj)
+    guideObj.guideQA()  # preform QA on the guides
+    print(guideObj.resultsTable)
 
-	guideObj.writeDownloads()
+    guideObj.writeDownloads()
+
 
 if __name__ == "__main__":
-	main()
+    main()

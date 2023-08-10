@@ -8,36 +8,42 @@ Requires: batch id, guideID, label, and notes
 
 """
 
-import os, sys, json, cgi, datetime
 import argparse
+import cgi
+import datetime
+import json
+import os
+import sys
 import tempfile
 
 dir_path = os.path.dirname(os.path.abspath(__file__))
 sys.path.append(os.path.join(dir_path, "../helpers"))
-from Config import Config
-
 # for debugging:
 import cgitb
+
+from Config import Config
+
 cgitb.enable()
+
 
 class GuideAdd:
     def __init__(self, **kwargs):
-        """ class for interfacing to the guide collection """
+        """class for interfacing to the guide collection"""
         # check required inputs set
-        for parameter in ['batchID', 'guideID', 'label']:
+        for parameter in ["batchID", "guideID", "label"]:
             if parameter not in kwargs:
                 self.sendErrorHTML("'{parameter}' not set".format(**locals()))
         self.dbConnection = Config()
-        self.batchID = kwargs['batchID']
-        self.guideID = kwargs['guideID']
-        self.label = kwargs['label']
-        self.notes = kwargs['notes'] if 'notes' in kwargs else ''
+        self.batchID = kwargs["batchID"]
+        self.guideID = kwargs["guideID"]
+        self.label = kwargs["label"]
+        self.notes = kwargs["notes"] if "notes" in kwargs else ""
 
         # fetch the stored guide info
         self.metadata, self.guide = self.parseJSON()
-        self.rgen = self.getRGEN(str(self.metadata['rgenID']))
+        self.rgen = self.getRGEN(str(self.metadata["rgenID"]))
         # redefine the connection to the database based on the genome
-        self.dbConnection = Config(self.metadata['genome'])
+        self.dbConnection = Config(self.metadata["genome"])
         # determine if the guide already exists
         self.existingGuide = self.existingGuideInDatabase()
 
@@ -52,111 +58,181 @@ class GuideAdd:
             self.rewriteGFF()
             print("Successfully Inserted Guide")
 
-
     def rewriteGFF(self):
-        """ rewrite the gff file """
+        """rewrite the gff file"""
         # intialize the strings
-        featureStr = ''
-        pamStr = ''
-        grnaStr = ''
+        featureStr = ""
+        pamStr = ""
+        grnaStr = ""
         idCounter = 1
         for guideRecord in self.dbConnection.guideCollection.find({}):
             # parse out location
-            chrom, guideCoordinates, strand = guideRecord['guideLocation'].split(':')
-            sortedGuideCoordinates = sorted([int(x) for x in guideCoordinates.split('-')])
+            chrom, guideCoordinates, strand = guideRecord["guideLocation"].split(":")
+            sortedGuideCoordinates = sorted(
+                [int(x) for x in guideCoordinates.split("-")]
+            )
             # calculate the pam coordinates
-            rgen = self.getRGEN(guideRecord['rgenID'])
-            pamLocation = rgen['PamLocation']
-            if (pamLocation == 'downstream' and strand == '+') or (pamLocation == 'upstream' and strand == '-'):
+            rgen = self.getRGEN(guideRecord["rgenID"])
+            pamLocation = rgen["PamLocation"]
+            if (pamLocation == "downstream" and strand == "+") or (
+                pamLocation == "upstream" and strand == "-"
+            ):
                 pamStart = sortedGuideCoordinates[-1]
-                pamEnd = int(pamStart) + len(guideRecord['pamSeq'])
-            elif (pamLocation == 'downstream' and strand == '-') or (pamLocation == 'upstream' and strand == '+'):
+                pamEnd = int(pamStart) + len(guideRecord["pamSeq"])
+            elif (pamLocation == "downstream" and strand == "-") or (
+                pamLocation == "upstream" and strand == "+"
+            ):
                 pamEnd = sortedGuideCoordinates[0]
-                pamStart = int(pamEnd) - len(guideRecord['pamSeq'])
+                pamStart = int(pamEnd) - len(guideRecord["pamSeq"])
             # sort all coordinates
             sortedCoordinates = list(sortedGuideCoordinates)
             sortedCoordinates.extend([pamStart, pamEnd])
             sortedCoordinates.sort()
             # format the entire feature GFF (guide+pam)
-            score = guideRecord['guideScore'] if 'guideScore' in guideRecord else ''
+            score = guideRecord["guideScore"] if "guideScore" in guideRecord else ""
             gffDict = {
-                'featureID': idCounter,
-                'featureName': self.combineSequence(rgen, guideRecord['guideSeq'], guideRecord['pamSeq']),
-                'score': score,
-                'otDesc': guideRecord['otDesc'],
-                'batchName': guideRecord['batchName'] if 'batchName' in guideRecord else '',
-                'ENSID': guideRecord['ENSID'] if 'ENSID' in guideRecord else '',
-                'status': guideRecord['status'] if 'status' in guideRecord else '',
-                'notes': guideRecord['Notes'] if 'Notes' in guideRecord else '',
-                'label': guideRecord['label'] if 'label' in guideRecord else ''
+                "featureID": idCounter,
+                "featureName": self.combineSequence(
+                    rgen, guideRecord["guideSeq"], guideRecord["pamSeq"]
+                ),
+                "score": score,
+                "otDesc": guideRecord["otDesc"],
+                "batchName": guideRecord["batchName"]
+                if "batchName" in guideRecord
+                else "",
+                "ENSID": guideRecord["ENSID"] if "ENSID" in guideRecord else "",
+                "status": guideRecord["status"] if "status" in guideRecord else "",
+                "notes": guideRecord["Notes"] if "Notes" in guideRecord else "",
+                "label": guideRecord["label"] if "label" in guideRecord else "",
             }
-            featureCol9 = "ID={featureID};Name={featureName};guideScore={score};otDesc={otDesc};batchName={batchName};ENSID={ENSID};status={status};Notes={notes};label={label}".format(**gffDict)
-            featureStr += "\t".join([chrom,'.','mRNA',str(sortedCoordinates[0]), str(sortedCoordinates[-1]),'.',strand,'.',featureCol9])
-            featureStr += '\n'
+            featureCol9 = "ID={featureID};Name={featureName};guideScore={score};otDesc={otDesc};batchName={batchName};ENSID={ENSID};status={status};Notes={notes};label={label}".format(
+                **gffDict
+            )
+            featureStr += "\t".join(
+                [
+                    chrom,
+                    ".",
+                    "mRNA",
+                    str(sortedCoordinates[0]),
+                    str(sortedCoordinates[-1]),
+                    ".",
+                    strand,
+                    ".",
+                    featureCol9,
+                ]
+            )
+            featureStr += "\n"
 
             # now just the PAM feature
-            pamID = chrom+":"+str(guideRecord['pamGenomicStart'])+"_"+guideRecord['pamSeq']
-            pamCol9 = "ID={ID};Name={Name};Parent={Parent}".format(ID=pamID,Name=guideRecord['pamSeq'],Parent=idCounter)
-            pamStr += "\t".join([chrom,'.','three_prime_UTR',str(pamStart),str(pamEnd),'.',strand,'-1', pamCol9])
-            pamStr += '\n'
+            pamID = (
+                chrom
+                + ":"
+                + str(guideRecord["pamGenomicStart"])
+                + "_"
+                + guideRecord["pamSeq"]
+            )
+            pamCol9 = "ID={ID};Name={Name};Parent={Parent}".format(
+                ID=pamID, Name=guideRecord["pamSeq"], Parent=idCounter
+            )
+            pamStr += "\t".join(
+                [
+                    chrom,
+                    ".",
+                    "three_prime_UTR",
+                    str(pamStart),
+                    str(pamEnd),
+                    ".",
+                    strand,
+                    "-1",
+                    pamCol9,
+                ]
+            )
+            pamStr += "\n"
 
             # finally, the guide itself
-            grnaID = chrom+":"+str(sortedGuideCoordinates[0])+"_"+guideRecord['guideSeq']
-            grnaCol9 = "ID={ID};Name={Name};Parent={Parent}".format(ID=grnaID, Name=guideRecord['guideSeq'],Parent=idCounter)
-            grnaStr += "\t".join([chrom,'.','CDS',str(sortedGuideCoordinates[0]), str(sortedGuideCoordinates[1]),'.',strand,'0',grnaCol9])
-            grnaStr += '\n'
+            grnaID = (
+                chrom
+                + ":"
+                + str(sortedGuideCoordinates[0])
+                + "_"
+                + guideRecord["guideSeq"]
+            )
+            grnaCol9 = "ID={ID};Name={Name};Parent={Parent}".format(
+                ID=grnaID, Name=guideRecord["guideSeq"], Parent=idCounter
+            )
+            grnaStr += "\t".join(
+                [
+                    chrom,
+                    ".",
+                    "CDS",
+                    str(sortedGuideCoordinates[0]),
+                    str(sortedGuideCoordinates[1]),
+                    ".",
+                    strand,
+                    "0",
+                    grnaCol9,
+                ]
+            )
+            grnaStr += "\n"
 
             # increment the count
             idCounter += 1
 
-        #try:
-        guideGFF = os.path.join(self.dbConnection.ROOT_PATH, str('jbrowse/data/'+self.metadata['genome']+"/gRNA_CRISPR.gff"))
-        gffFile = open(guideGFF, 'wb')
-        gffFile.write(featureStr.encode('utf-8'))
-        gffFile.write(pamStr.encode('utf-8'))
-        gffFile.write(grnaStr.encode('utf-8'))
+        # try:
+        guideGFF = os.path.join(
+            self.dbConnection.ROOT_PATH,
+            str("jbrowse/data/" + self.metadata["genome"] + "/gRNA_CRISPR.gff"),
+        )
+        gffFile = open(guideGFF, "wb")
+        gffFile.write(featureStr.encode("utf-8"))
+        gffFile.write(pamStr.encode("utf-8"))
+        gffFile.write(grnaStr.encode("utf-8"))
         gffFile.close()
-        #except Exception as e:
+        # except Exception as e:
         #    self.sendErrorHTML(str(e))
-
 
     def getRGEN(self, rgenID):
         # fetch the correct rgen record using the rgenID attribute
         rgenCollection = self.dbConnection.rgenCollection
         rgenRecord = rgenCollection.find({"rgenID": rgenID})
         if rgenRecord.count() == 1:
-                return rgenRecord.next()
+            return rgenRecord.next()
         else:
-            self.sendErrorHTML("Invalid number of records returned for rgenID: "+str(self.metadata['rgenID']))
+            self.sendErrorHTML(
+                "Invalid number of records returned for rgenID: "
+                + str(self.metadata["rgenID"])
+            )
 
     def combineSequence(self, rgen, guideSeq, pamSeq):
-        """ uses the rgen record to determine which order to display the pam and sequence in """
-        if rgen['PamLocation'] == 'downstream':
+        """uses the rgen record to determine which order to display the pam and sequence in"""
+        if rgen["PamLocation"] == "downstream":
             return guideSeq.upper() + ", " + pamSeq
-        elif rgen['PamLocation'] == 'upstream':
+        elif rgen["PamLocation"] == "upstream":
             return pamSeq.upper() + ", " + guideSeq.upper()
         else:
-            self.sendErrorHTML(f"Unrecognized PAM Location for RGEN: {self.rgen['PamLocation']}")
+            self.sendErrorHTML(
+                f"Unrecognized PAM Location for RGEN: {self.rgen['PamLocation']}"
+            )
 
     def insertGuide(self):
-        """ create a new record in the database for the guide """
+        """create a new record in the database for the guide"""
         newGuideRecord = {
-            'batchName': self.metadata['gene'],
-            'status': 'Accepted',
-            'guideScore': self.guide['MIT'] if 'MIT' in self.guide else '',
-            'guideSeq': self.guide['guide_seq'],
-            'Notes': self.notes,
-            'inputSearchCoordinates': self.metadata['inputSearchCoordinates'],
-            'pamGenomicStart': self.guide['pam_genomic_start'],
-            'pamSeq': self.guide['pam_seq'],
-            'guideGenomicStart': self.guide['guide_genomic_start'],
-            'pamId': '', # this should probably be replaced by guideID
-            'otDesc': '-'.join(str(count) for count in self.guide['offtarget_counts']),
-            'label': self.label,
-            'ENSID': self.metadata['ENSID'],
-            'guideLocation': self.guide['guideLocation'],
-            'rgenID': self.metadata['rgenID'],
-            'dateAdded': datetime.datetime.utcnow()
+            "batchName": self.metadata["gene"],
+            "status": "Accepted",
+            "guideScore": self.guide["MIT"] if "MIT" in self.guide else "",
+            "guideSeq": self.guide["guide_seq"],
+            "Notes": self.notes,
+            "inputSearchCoordinates": self.metadata["inputSearchCoordinates"],
+            "pamGenomicStart": self.guide["pam_genomic_start"],
+            "pamSeq": self.guide["pam_seq"],
+            "guideGenomicStart": self.guide["guide_genomic_start"],
+            "pamId": "",  # this should probably be replaced by guideID
+            "otDesc": "-".join(str(count) for count in self.guide["offtarget_counts"]),
+            "label": self.label,
+            "ENSID": self.metadata["ENSID"],
+            "guideLocation": self.guide["guideLocation"],
+            "rgenID": self.metadata["rgenID"],
+            "dateAdded": datetime.datetime.utcnow(),
         }
         # TODO: think about how best to display the scores -> on primer end need to allow for possibility of no score
         # store the off-targets as well
@@ -166,18 +242,20 @@ class GuideAdd:
             self.sendErrorHTML("Problem inserting record into Database")
 
     def updateGuide(self):
-        """ find the existing guide and update its notes and label"""
-        existing_id = self.existingGuide['_id']
-        update_result = self.dbConnection.guideCollection.update_one({"_id": existing_id}, {'$set': {'Notes': self.notes, 'label': self.label}})
+        """find the existing guide and update its notes and label"""
+        existing_id = self.existingGuide["_id"]
+        update_result = self.dbConnection.guideCollection.update_one(
+            {"_id": existing_id}, {"$set": {"Notes": self.notes, "label": self.label}}
+        )
         if update_result.matched_count != 1:
             self.sendErrorHTML("Problem Updating Guide Record")
 
     def existingGuideInDatabase(self):
-        """ determine whether the given guide is in the database, return its label and notes, plus a descriptor of the available action """
+        """determine whether the given guide is in the database, return its label and notes, plus a descriptor of the available action"""
         searchQuery = {
-            "guideSeq": self.guide['guide_seq'],
-            "pamSeq": self.guide['pam_seq'],
-            "guideLocation": self.guide['guideLocation']
+            "guideSeq": self.guide["guide_seq"],
+            "pamSeq": self.guide["pam_seq"],
+            "guideLocation": self.guide["guideLocation"],
         }
         if self.dbConnection.guideCollection.find(searchQuery).count() > 0:
             existingGuide = self.dbConnection.guideCollection.find_one(searchQuery)
@@ -186,69 +264,75 @@ class GuideAdd:
             return None
 
     def parseJSON(self):
-        """ access the batch's json file, parse the metadata for the run as well as the details of the guide of interest """
-        with open(os.path.join(tempfile.gettempdir(), self.batchID+'.json'), 'r') as json_file:
+        """access the batch's json file, parse the metadata for the run as well as the details of the guide of interest"""
+        with open(
+            os.path.join(tempfile.gettempdir(), self.batchID + ".json"), "r"
+        ) as json_file:
             jsonData = json.load(json_file)
 
-        if 'metadata' in jsonData:
+        if "metadata" in jsonData:
             if self.guideID in jsonData:
-                return jsonData['metadata'], jsonData[self.guideID]
+                return jsonData["metadata"], jsonData[self.guideID]
             else:
                 self.sendErrorHTML("Unable to find guide in batch JSON file")
         else:
             self.sendErrorHTML("Batch JSON file is misconfigured; no metadata found")
 
     def sendErrorHTML(self, errorString):
-        """ write error and exit the program """
+        """write error and exit the program"""
         print(errorString)
         sys.exit()
 
 
 def main():
     # check if running from web or command-line
-    if 'REQUEST_METHOD' in os.environ:
-            # running from web
-            print("Content-type: text/html\n")
-            inputForm = cgi.FieldStorage()
-            paramters = {}
-            try:
-                for arg in ['batchID', 'guideID', 'label', 'notes']:
-                    if inputForm.getvalue(arg) is not None:
-                        paramters[arg] = inputForm.getvalue(arg)
+    if "REQUEST_METHOD" in os.environ:
+        # running from web
+        print("Content-type: text/html\n")
+        inputForm = cgi.FieldStorage()
+        paramters = {}
+        try:
+            for arg in ["batchID", "guideID", "label", "notes"]:
+                if inputForm.getvalue(arg) is not None:
+                    paramters[arg] = inputForm.getvalue(arg)
 
-                GuideAdd(**paramters)
-            except Exception:
-                import traceback
-                print(traceback.format_exc())
+            GuideAdd(**paramters)
+        except Exception:
+            import traceback
+
+            print(traceback.format_exc())
     else:
-        #parameters = {'guideID': '92+', 'label': 'TestLabel', 'batchID': 'dda41408f7b56fcb3b', 'notes': 'nospecialcharacters'}
-        #parameters = {'notes': "Le'sfjkd%20fsj#%20s", 'batchID': 'bfd5911343bde9a7cd', 'label': 'Testing%20Update', 'guideID': '6-'}
-        #{'label': 'testinglabel', 'guideID': '6-', 'notes': 'testing notes', 'batchID': '6aa1c0912c773384c7'}
+        # parameters = {'guideID': '92+', 'label': 'TestLabel', 'batchID': 'dda41408f7b56fcb3b', 'notes': 'nospecialcharacters'}
+        # parameters = {'notes': "Le'sfjkd%20fsj#%20s", 'batchID': 'bfd5911343bde9a7cd', 'label': 'Testing%20Update', 'guideID': '6-'}
+        # {'label': 'testinglabel', 'guideID': '6-', 'notes': 'testing notes', 'batchID': '6aa1c0912c773384c7'}
 
         desc = """ The command-line version of GuideAdd.py will add or update guides in the database.
          """
-        
-        parser = argparse.ArgumentParser(prog='GuideAdd',description=desc)
+
+        parser = argparse.ArgumentParser(prog="GuideAdd", description=desc)
         parser._action_groups.pop()
-        required = parser.add_argument_group('required arguments')
-        optional = parser.add_argument_group('optional arguments')
-        required.add_argument('--batch', help='Batch ID', required=True)
-        required.add_argument('--guide', help='Guide ID', required=True)
-        required.add_argument('--label', help='Guide label', required=True)
-        optional.add_argument('--notes', nargs='?', default='', type=str, help='Guide notes')
+        required = parser.add_argument_group("required arguments")
+        optional = parser.add_argument_group("optional arguments")
+        required.add_argument("--batch", help="Batch ID", required=True)
+        required.add_argument("--guide", help="Guide ID", required=True)
+        required.add_argument("--label", help="Guide label", required=True)
+        optional.add_argument(
+            "--notes", nargs="?", default="", type=str, help="Guide notes"
+        )
         args = parser.parse_args()
 
         parameters = {
-            'batch': args.batch,
-            'guide': args.guide,
-            'label': args.label,
-            'notes': args.notes
+            "batch": args.batch,
+            "guide": args.guide,
+            "label": args.label,
+            "notes": args.notes,
         }
 
         try:
             GuideAdd(**parameters)
         except Exception as e:
             print(e)
+
 
 if __name__ == "__main__":
     main()

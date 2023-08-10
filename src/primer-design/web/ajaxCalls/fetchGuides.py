@@ -1,25 +1,28 @@
 #!/usr/bin/python3.7
 
 import cgi
-from urllib.parse import unquote
-import sys
 import os
+import sys
+from urllib.parse import unquote
+
 # import external classes based on relative file location
 dir_path = os.path.dirname(os.path.abspath(__file__))
-sys.path.append(os.path.join(dir_path, '../../../helpers'))
+sys.path.append(os.path.join(dir_path, "../../../helpers"))
 from Config import Config
 
+
 def getMongoRecord(ensid, genome):
-	dbConnection = Config(genome)
-	gRNACollection = dbConnection.guideCollection
-	guidesResult = gRNACollection.find({"ENSID": ensid})
-	return guidesResult
+    dbConnection = Config(genome)
+    gRNACollection = dbConnection.guideCollection
+    guidesResult = gRNACollection.find({"ENSID": ensid})
+    return guidesResult
+
 
 def printGuides(guides, geneName):
-	
-	# only print table if there are guides
-	if guides.count() > 0:
-		print('''
+    # only print table if there are guides
+    if guides.count() > 0:
+        print(
+            """
 		<table class="table table-bordered">
 			<thead>
 			<tr>
@@ -33,14 +36,21 @@ def printGuides(guides, geneName):
 			</tr>
 			</thead>
 			<tbody>
-		''')
-		for guideResult in guides:
-			try:
-				decodedNotes = unquote(guideResult['Notes'])
-				decodedLabel = unquote(guideResult['label'])
-				guideID, guideSeq, guideLocation, guideScore = str(guideResult['_id']), str(guideResult['guideSeq']), str(guideResult['guideLocation']), str(guideResult['guideScore'])
-				encodedOffTarget = guideResult['otDesc']
-				print(f'''
+		"""
+        )
+        for guideResult in guides:
+            try:
+                decodedNotes = unquote(guideResult["Notes"])
+                decodedLabel = unquote(guideResult["label"])
+                guideID, guideSeq, guideLocation, guideScore = (
+                    str(guideResult["_id"]),
+                    str(guideResult["guideSeq"]),
+                    str(guideResult["guideLocation"]),
+                    str(guideResult["guideScore"]),
+                )
+                encodedOffTarget = guideResult["otDesc"]
+                print(
+                    f"""
 				<tr id={guideID}>
 				<td contenteditable="false" class="guideLabels" spellcheck="false" onblur="updateGuideLabel(this, '{guideID}')">{decodedLabel}</td>
 				<td>{guideSeq}</td>
@@ -50,37 +60,44 @@ def printGuides(guides, geneName):
 				<td style="padding: 0px;">
 					<textarea disabled class="guideNotes" style="border:none; width: 100%; height: 75px; padding: 0px; vertical-align: middle;" onblur="updateGuideNote(this, '{guideID}')">{decodedNotes}</textarea>
 				</td>
-				''')
-				if str(guideResult['status']) == 'Accepted':
-					print(f'''
+				"""
+                )
+                if str(guideResult["status"]) == "Accepted":
+                    print(
+                        f"""
 					<td class="centreCell"><input type="checkbox" checked="checked" onclick="backendUpdateStatus(this, '{guideID}')">
-					</td>''')
-				else:
-					print(f'''<td class="centreCell"><input type="checkbox" onclick="backendUpdateStatus(this,'{guideID}')"></td>''')
-			except Exception as e:
-				print(e)
-		print('''</tr></table>''')
-	else:
-		print(f"<p>No saved guides for {geneName}</p>")
+					</td>"""
+                    )
+                else:
+                    print(
+                        f"""<td class="centreCell"><input type="checkbox" onclick="backendUpdateStatus(this,'{guideID}')"></td>"""
+                    )
+            except Exception as e:
+                print(e)
+        print("""</tr></table>""")
+    else:
+        print(f"<p>No saved guides for {geneName}</p>")
+
 
 def main():
-	print("Content-type: text/html\n")	
-	
-	try:
-		args = cgi.FieldStorage()
-		ensid = args.getvalue('ensid')
-		genome = args.getvalue('genome')
-		geneName = args.getvalue('geneName')
-	except Exception as e:
-		print(f"Error: {e}")
-		return
-	
-	if not ensid or not genome:
-		print("Error: missing required values for script (ensid or genome)")
-		return
-	
-	guides = getMongoRecord(ensid, genome)
-	printGuides(guides, geneName)
+    print("Content-type: text/html\n")
+
+    try:
+        args = cgi.FieldStorage()
+        ensid = args.getvalue("ensid")
+        genome = args.getvalue("genome")
+        geneName = args.getvalue("geneName")
+    except Exception as e:
+        print(f"Error: {e}")
+        return
+
+    if not ensid or not genome:
+        print("Error: missing required values for script (ensid or genome)")
+        return
+
+    guides = getMongoRecord(ensid, genome)
+    printGuides(guides, geneName)
+
 
 if __name__ == "__main__":
-	main()
+    main()
