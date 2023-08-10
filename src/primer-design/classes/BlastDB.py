@@ -1,4 +1,4 @@
-#!/usr/bin/python3.7
+#!/usr/bin/env python3.7
 
 """
 Hillary Elrick December 28th, 2018

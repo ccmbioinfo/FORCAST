@@ -1,4 +1,4 @@
-#!/usr/bin/python3.7
+#!/usr/bin/env python3.7
 """
 Hillary Elrick, adapted from Greg Clark's Code
 November 2018

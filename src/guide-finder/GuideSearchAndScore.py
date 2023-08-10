@@ -1,4 +1,4 @@
-#!/usr/bin/python3.7
+#!/usr/bin/env python3.7
 
 """
 Hillary Elrick, September 16th, 2019
@@ -334,12 +334,13 @@ class GuideSearchAndScore:
             self.sendError("Unrecognized strand for guide: " + str(guide["strand"]))
 
     def offtargetHTML(self, guideID, guide):
-        """creates the HTML for the off-target modal of a given guide"""
+        """ creates the HTML for the off-target modal of a given guide """
+        classNameGuideID = guideID.replace('+', 'plus').replace('-', 'minus')
         template_values = {
             "guideID": guideID,
             "guide": guide,
-            "offtargetCounts": self.offtargetCountsHTML(guideID, guide),
-            "offtargetModals": self.offtargetModalHTML(guideID, guide),
+            "offtargetCounts": self.offtargetCountsHTML(classNameGuideID, guide),
+            "offtargetModals": self.offtargetModalHTML(classNameGuideID, guide),
             "csvFile": os.path.join(
                 tempfile.gettempdir(), self.batchID + "_" + guideID + ".csv"
             ),

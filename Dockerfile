@@ -30,7 +30,7 @@ RUN apt-get update -y && \
     rm -rf /var/lib/apt/lists/*
 # Add a dummy sudo script as src/setup/load.sh uses sudo;
 # the Docker container runs as the root user, but sudo is needed for src/setup/load.sh in local FORCAST installations
-RUN echo "#!/bin/bash\n\$@" > /usr/bin/sudo && \
+RUN echo "#!/usr/bin/env bash\n\$@" > /usr/bin/sudo && \
     chmod +x /usr/bin/sudo
 RUN mkdir -p /var/www/html/bin
 # In-silico PCR tool for primer design

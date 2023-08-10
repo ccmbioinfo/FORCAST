@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 # given a genome and input fasta file, perform bwa align with predefined parameters
 # check parameters were passed
 : ${1?"path to bwa index of genome required"}

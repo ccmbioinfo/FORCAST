@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 # script to ensure these files and directories can be run from the web
 
 curr_dir=${PWD##*/}

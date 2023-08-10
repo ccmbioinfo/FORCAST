@@ -1,4 +1,4 @@
-#!/usr/bin/python3.7
+#!/usr/bin/env python3.7
 """
 Functions for adding a guide to the mongo database and generating GFF files
 based on the current database

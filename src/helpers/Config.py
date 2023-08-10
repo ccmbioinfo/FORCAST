@@ -1,4 +1,4 @@
-#!/usr/bin/python3.7
+#!/usr/bin/env python3.7
 """
 Hillary Elrick October 10th, 2018
 Converted to python3 on July 23rd, 2019 using the 2to3 program
