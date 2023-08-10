@@ -20,10 +20,9 @@ Steps:
 6) Puts the results into a jinja2 template and prints the html
 """
 
-import sys, os, cgi, binascii, re
+import sys, os, cgi, re
 from jinja2 import Template
-dir_path = os.path.dirname(os.path.abspath(__file__))
-sys.path.append(os.path.join(dir_path, "../helpers"))
+sys.path.append(os.path.join(os.path.dirname(os.path.abspath(__file__)), "../helpers"))
 from Config import Config
 
 # cgi debug module
@@ -75,8 +74,8 @@ class GuideSearch:
             try:
                 # attempt to get the rgen record
                 self.rgenRecord = self.getRGEN()
-            except ValueError as e:
-                self.sendErrorHTML("Invalid RGEN ID, " + str(self.rgenID))
+            except ValueError:
+                self.sendErrorHTML(f"Invalid RGEN ID, {self.rgenID}")
 
             print(self.getLengthsHTML())
 
@@ -190,7 +189,7 @@ class GuideSearch:
         try:
             start, end = re.search(r"chr.+?:(\d+)\-(\d+)", self.searchInput).groups()
             length = abs(int(start)-int(end))
-        except Exception as e:
+        except Exception:
             return "N/A"
         return length
 
@@ -198,7 +197,7 @@ class GuideSearch:
         """ using Teja's query to find genes in the mongodb that overlap the search input """
         try:
             chm, start, end = re.search(r"(chr.+?):(\d+)\-(\d+)", self.searchInput).groups()
-        except Exception as e:
+        except Exception:
             return ["Invalid Input Sequence"]
         start = int(start)
         end = int(end)
@@ -231,10 +230,9 @@ class GuideSearch:
         rgenCollection = self.dbConnection.rgenCollection
         rgenRecord = rgenCollection.find({"rgenID": str(self.rgenID)})
         if rgenRecord.count() == 1:
-                return rgenRecord.next()
+            return rgenRecord.next()
         else:
-                raise ValueError("Incorrect number of records returned from RGEN database for rgenID: " + str(rgenID))
-                return
+            raise ValueError(f"Incorrect number of records returned from RGEN database for rgenID: {self.rgenID}")
 
 def isValidInput(inputSeq):
     #TODO: code this. some validation done on front end but not for the chr number/letter

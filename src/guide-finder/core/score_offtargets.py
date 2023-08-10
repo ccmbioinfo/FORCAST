@@ -14,7 +14,6 @@ import os
 dir_path = os.path.dirname(os.path.abspath(__file__))
 sys.path.append(os.path.join(dir_path, "../../helpers"))
 from Config import Config
-from itertools import product
 import cfd_code.cfd_score_calculator3 as cfd
 sys.path.append(os.path.join(dir_path,"inDelphi-model"))
 import inDelphi
@@ -69,12 +68,12 @@ def inDelphiScore(guideDict,genome_fa,twoBitToFa_path,genome_2bit,tempfiles_path
 			coords=str("%s:%s-%s"%(guide['pam_chrom'],guide['guide_genomic_start'],(guide['pam_genomic_start']+cleavePos+20)))
 		elif guide['strand'] == "-":
 			coords=str("%s:%s-%s"%(guide['pam_chrom'],(guide['pam_genomic_start']-len(guide['guide_seq'])+3),(guide['pam_genomic_start']+1+cleavePos+22)))
-#		coords=str("%s:%s-%s"%(guide['pam_chrom'],guide['guide_genomic_start'],(guide['pam_genomic_start']+cleavePos+20)))
+		# coords=str("%s:%s-%s"%(guide['pam_chrom'],guide['guide_genomic_start'],(guide['pam_genomic_start']+cleavePos+20)))
 
 		#print(coords)
 
 		timestr = time.strftime("%Y%m%d-%H%M%S")
-		getseq=str(get_sequence.fetch_sequence(coords, genome_2bit, os.path.join(tempfiles_path,timestr+'_out.fa')))
+		get_sequence.fetch_sequence(coords, genome_2bit, os.path.join(tempfiles_path,timestr+'_out.fa'))
 		#print(os.path.join(tempfiles_path,timestr+'_out.fa'))
 
 		#get flanking sequence before and after cutsite

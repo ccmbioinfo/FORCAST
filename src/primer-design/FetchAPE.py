@@ -4,10 +4,9 @@ import cgi
 import sys
 import os.path
 import requests
-import json
 sys.path.append(os.path.join(os.path.dirname(os.path.abspath(__file__)), '../helpers'))
 from classes.Gene import Gene
-from classes.Gene import returnError
+from classes.Gene import printError
 from Config import Config
 
 # cgi debug module
@@ -35,43 +34,25 @@ def printHeader(geneSymbol):
 	print(f'''
 		<html>
 		<head>
-			<title>{geneSymbol} - APE</title>
+			<title>{{geneSymbol}} - APE</title>
 			<link rel="stylesheet" href="bootstrap-4.1.3/dist/css/bootstrap.min.css" as="style">
 			<style>
-			body {text-align: center;}
-			a {font-size: 14px;}
+			body {{text-align: center;}}
+			a {{font-size: 14px;}}
 			</style>
 		</head>
 		<body>
 		</br>
 		<h3>Fetching APE for {geneSymbol}</h3>''')
 
-def printError(errorString):
-	print('Content-type: text/html\r\n\r')
-	print('''
-	<html>
-	<head>
-		<title>Error Fetching APE</title>
-		<link rel="stylesheet" href="bootstrap-4.1.3/dist/css/bootstrap.min.css" as="style">
-		<style>
-		body {text-align: center;}
-		a {font-size: 14px;}
-		</style>
-	</head>
-	<body>
-	</br>
-	''')
-	returnError(errorString)
-	sys.exit()
-
 def fetchGeneSymbol(ENSID):
 	ext = "/lookup/id/"+str(ENSID)
 
 	try:
 		symbolRequest = requests.get(server + ext, headers={"Content-Type": "application/json"}, timeout=30)
-	except requests.exceptions.Timeout as e:
+	except requests.exceptions.Timeout:
 		printError("The Ensembl Rest API is not responding (https://rest.ensembl.org)")
-	except Exception as e:
+	except Exception:
 		printError("Problem with Ensembl Rest API call")
 
 	if not symbolRequest.ok:
@@ -84,7 +65,7 @@ def fetchGeneSymbol(ENSID):
 
 	try:
 		symbol = geneInfo['display_name']
-	except:
+	except Exception:
 		printError(f"Problem parsing result from Ensembl for ENSID: {ENSID}")
 
 	return symbol
@@ -127,7 +108,7 @@ def main():
 				geneObject = Gene(geneSymbol, genome)
 
 			geneObject.writeAPE(True)
-		except:
+		except Exception:
 			pass
 
 if __name__ == "__main__":

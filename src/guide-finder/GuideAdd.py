@@ -9,6 +9,7 @@ Requires: batch id, guideID, label, and notes
 """
 
 import os, sys, json, cgi, datetime
+import argparse
 import tempfile
 
 dir_path = os.path.dirname(os.path.abspath(__file__))
@@ -135,7 +136,7 @@ class GuideAdd:
         elif rgen['PamLocation'] == 'upstream':
             return pamSeq.upper() + ", " + guideSeq.upper()
         else:
-            sendErrorHMTL("Unrecognized PAM Location for RGEN: " + str(self.rgen['PamLocation']))
+            self.sendErrorHTML(f"Unrecognized PAM Location for RGEN: {self.rgen['PamLocation']}")
 
     def insertGuide(self):
         """ create a new record in the database for the guide """
@@ -216,17 +217,38 @@ def main():
                         paramters[arg] = inputForm.getvalue(arg)
 
                 GuideAdd(**paramters)
-            except Exception as e:
+            except Exception:
                 import traceback
                 print(traceback.format_exc())
     else:
         #parameters = {'guideID': '92+', 'label': 'TestLabel', 'batchID': 'dda41408f7b56fcb3b', 'notes': 'nospecialcharacters'}
         #parameters = {'notes': "Le'sfjkd%20fsj#%20s", 'batchID': 'bfd5911343bde9a7cd', 'label': 'Testing%20Update', 'guideID': '6-'}
         #{'label': 'testinglabel', 'guideID': '6-', 'notes': 'testing notes', 'batchID': '6aa1c0912c773384c7'}
+
+        desc = """ The command-line version of GuideAdd.py will add or update guides in the database.
+         """
+        
+        parser = argparse.ArgumentParser(prog='GuideAdd',description=desc)
+        parser._action_groups.pop()
+        required = parser.add_argument_group('required arguments')
+        optional = parser.add_argument_group('optional arguments')
+        required.add_argument('--batch', help='Batch ID', required=True)
+        required.add_argument('--guide', help='Guide ID', required=True)
+        required.add_argument('--label', help='Guide label', required=True)
+        optional.add_argument('--notes', nargs='?', default='', type=str, help='Guide notes')
+        args = parser.parse_args()
+
+        parameters = {
+            'batch': args.batch,
+            'guide': args.guide,
+            'label': args.label,
+            'notes': args.notes
+        }
+
         try:
             GuideAdd(**parameters)
         except Exception as e:
-            print(str(e))
+            print(e)
 
 if __name__ == "__main__":
     main()

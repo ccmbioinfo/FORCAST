@@ -1,7 +1,6 @@
 import sys
 import os.path
 import re
-import pymongo
 import pprint
 from pymongo import MongoClient
 

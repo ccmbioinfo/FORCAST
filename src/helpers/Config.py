@@ -7,12 +7,9 @@ Importable class that defines standard methods and attributes
 for database access and object storage
 '''
 import os
-import sys
 import re
 import json
 from urllib.parse import quote
-import pickle
-import pymongo
 from pymongo import MongoClient
 
 
@@ -90,7 +87,7 @@ class Config:
 		for chr in data:
 			try:
 				chr_sizes[chr['name']] = chr['end'] - chr['start']
-			except KeyError as e:
+			except KeyError:
 				# old format had length key, catch so code runs on both
 				chr_sizes[chr['name']] = chr['length']
 
@@ -129,18 +126,18 @@ class Config:
 
 		return orgName
 
-	def rewriteGFF(self):
-		# initialize the strings
-		mRNAGFF3str = ''
-		PAMGFF3str = ''
-		guideGFF3str = ''
-		mRNAIDCounter = 1
-		#TODO: is this gonna work for Cpf1?? ANS: NO!!
-		# format the gff string for the guide and pam to display correctly
-		for guideRecord in self.dbConnection.guideCollection.find({}):
-			chrom, guideCoordinates, strand = guideRecord['guideLocation'].split(":")
-			sortedCoordinates = sorted([int(x) for x in guideCoordinates.split('-')])
-			#TODO: finish this! it's gonna involve more work than I thought...
+	# def rewriteGFF(self):
+	# 	# initialize the strings
+	# 	mRNAGFF3str = ''
+	# 	PAMGFF3str = ''
+	# 	guideGFF3str = ''
+	# 	mRNAIDCounter = 1
+	# 	#TODO: is this gonna work for Cpf1?? ANS: NO!!
+	# 	# format the gff string for the guide and pam to display correctly
+	# 	for guideRecord in self.dbConnection.guideCollection.find({}):
+	# 		chrom, guideCoordinates, strand = guideRecord['guideLocation'].split(":")
+	# 		sortedCoordinates = sorted([int(x) for x in guideCoordinates.split('-')])
+	# 		#TODO: finish this! it's gonna involve more work than I thought...
 
 
 	@staticmethod
@@ -156,7 +153,7 @@ def getCredentials():
 	config = {}
 	try:
 		config_file = open("/var/www/mongo.cred")
-	except Exception as e:
+	except Exception:
 		# this is ok it just means there are no credentials
 		return
 	for line in config_file:

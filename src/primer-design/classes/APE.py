@@ -102,7 +102,7 @@ class APE(object):
 				guide['start'] = int(re.search(guideSeq, self.geneObject.sequence, re.IGNORECASE).start())
 				guide['end'] = guide['start'] + len(guideSeq)
 				guide['direction'] = 'F'
-			except Exception as e:
+			except Exception:
 				# guide sequence wasn't found
 				# reverse and search again
 				guideSeq = revSeq(guideSeq)				
@@ -110,7 +110,7 @@ class APE(object):
 					guide['start'] = int(re.search(guideSeq, self.geneObject.sequence, re.IGNORECASE).start())
 					guide['end'] = guide['start'] + len(guideSeq)
 					guide['direction'] = 'R'
-				except Exception as e:
+				except Exception:
 					print("Unable to find one of the guides in the gene sequence")
 
 		# sort the list of guides

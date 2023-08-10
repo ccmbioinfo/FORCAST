@@ -151,7 +151,7 @@ def __predict_dels(seq, cutsite):
 
   unfq = list(unfq)
 
-  pred_mhless_d = defaultdict(list)
+  # pred_mhless_d = defaultdict(list)
   # Include MH-less contributions at non-full MH deletion lengths
   nonfull_dls = []
   for dl in range(1, 60):

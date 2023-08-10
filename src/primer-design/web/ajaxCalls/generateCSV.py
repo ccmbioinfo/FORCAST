@@ -1,12 +1,10 @@
 #!/usr/bin/python3.7
+
 import cgi
 import sys
 import os
 import csv
-import bson
 from bson.objectid import ObjectId
-import pymongo
-from pymongo import MongoClient
 
 # import external classes based on relative file location
 dir_path = os.path.dirname(os.path.abspath(__file__))

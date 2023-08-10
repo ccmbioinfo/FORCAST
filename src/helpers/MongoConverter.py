@@ -6,7 +6,7 @@ Hillary Elrick, October 1st, 2019
 SCRIPT FOR MIGRATING FROM INITIAL BETA RELEASE OF CASCADE (now FORCAST) TO VERSION 1.0
 """
 
-import os, sys, json, cgi
+import os, sys
 
 dir_path = os.path.dirname(os.path.abspath(__file__))
 sys.path.append(dir_path)
@@ -29,7 +29,7 @@ def updateGuideRecords(org):
             elif guideRecord['pamSeq'].endswith('GT'):
                 rgenID = "4"
         elif len(guideRecord['pamSeq']) == 6:
-            regneID = "5"
+            rgenID = "5"
         else:
             sys.exit("Error: unrecognized PAM ("+str(guideRecord['pamSeq'])+")")
 

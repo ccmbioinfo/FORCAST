@@ -4,9 +4,7 @@ import cgi
 from urllib.parse import unquote
 import sys
 import os
-import bson
 from bson.objectid import ObjectId
-from pymongo import MongoClient
 
 # import external classes based on relative file location
 dir_path = os.path.dirname(os.path.abspath(__file__))
@@ -30,12 +28,11 @@ def getGuideLabel(guideID, dbConnection):
 		if 'label' in guideResult and guideResult['label'] != "":
 			decodedLabel = unquote(guideResult['label'])
 			label.append(str(decodedLabel))		
-	except:
+	except Exception:
 		# the guide the primer was designed with was not found
 		return ['*Guide Used in Design was Deleted*']
 	
 	return label
-
 
 def organizePrimers(primers, dbConnection):
 	primerDict = {}
@@ -89,11 +86,11 @@ def printRow(primerResult):
 	if primerStatus == "Accepted":
 		dropdownClass = "btn accepted-dropdown dropdown-toggle"
 		statusOption = "Reject"
-		checkFlag = 'checked="checked"'
+		# checkFlag = 'checked="checked"'
 	else:
 		dropdownClass = "btn rejected-dropdown dropdown-toggle"
 		statusOption = "Accept"
-		checkFlag = ''
+		# checkFlag = ''
 	decodedNotes = unquote(primerResult['notes'])
 	reversePrimer = primerResult['rightprimer']
 	reverseDetails = "Length: " +  primerResult['rightlen'] 

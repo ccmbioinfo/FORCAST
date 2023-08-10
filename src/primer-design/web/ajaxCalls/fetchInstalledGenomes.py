@@ -11,18 +11,16 @@ import cgi
 
 # import external classes based on relative file location
 dir_path = os.path.dirname(os.path.abspath(__file__))
-sys.path.append(os.path.join(dir_path, '../../../helpers'))
-from Config import Config
 
 def main():
 	print ('Content-Type: text/html\n')
 	try:
-		arg = cgi.FieldStorage()
-		genome = arg.getvalue("genome")
+		cgi.FieldStorage().getvalue("genome")
 	except Exception as e:
 		print(f"Incorrect information passed to script: {e}")
 		return
 	
+	sys.path.append(os.path.join(dir_path, '../../../helpers'))
 	from Config import fetchInstalledGenomes
 	result = fetchInstalledGenomes()
 	# print in an html option list for a dropdown selector

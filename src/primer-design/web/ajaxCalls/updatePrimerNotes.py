@@ -56,7 +56,7 @@ def main():
 		return
 	
 	dbConnection = Config(genome)
-	primerCollection = dbConnection.primerCollection
+	# primerCollection = dbConnection.primerCollection
 	updateDB(recordID, genome, newNotes, dbConnection)
 
 if __name__ == "__main__":

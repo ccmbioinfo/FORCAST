@@ -1,12 +1,9 @@
 #!/usr/bin/python3.7
+
 import cgi
 import sys
 import os
-import csv
-import bson
 from bson.objectid import ObjectId
-import pymongo
-from pymongo import MongoClient
 
 # import external classes based on relative file location
 dir_path = os.path.dirname(os.path.abspath(__file__))
@@ -49,7 +46,7 @@ def setGeneStrand(ensid, dbConnection):
 	
 	try:
 		STRAND = gene['strand']
-	except:
+	except Exception:
 		print(f"Error, unable to get strand information for gene with ENSID: {ensid}")
 		sys.exit()
 
@@ -90,10 +87,10 @@ def writeGuideTable(guideResults):
 		formatOffTargets = str(sumOffTargets) + " {" + (" - ").join(offTargets)  + "}"
 		tableHTML += f'''
 		<tr>
-		<td>{guide[label]}</td>
-		<td>{guide[guideSeq]}</td>
-		<td>{guide[guideLocation]}</td> 
-		<td>{guide[guideScore]}</td> 
+		<td>{guide['label']}</td>
+		<td>{guide['guideSeq']}</td>
+		<td>{guide['guideLocation']}</td> 
+		<td>{guide['guideScore']}</td> 
 		<td>{formatOffTargets}</td>'''
 
 	tableHTML += '''
@@ -136,18 +133,18 @@ def writePrimerTable(primerResults):
 			print(f"Error: invalid strand for gene '{STRAND}'")	
 		tableHTML += f'''
 		<tr>
-		<td rowspan="2">{primer[type]}</td>
+		<td rowspan="2">{primer['type']}</td>
 		<td>Forward</td>
-		<td>{primer[leftprimer]}</td>
-		<td>{primer[leftlen]}</td>
+		<td>{primer['leftprimer']}</td>
+		<td>{primer['leftlen']}</td>
 		<td>{leftTM}</td>
 		<td>{leftLocation}</td>
-		<td rowspan="2">{primer[productSize]}</td>
+		<td rowspan="2">{primer['productSize']}</td>
 		</tr>
 		<tr>
 		<td>Reverse</td>
-		<td>{primer[rightprimer]}</td>
-		<td>{primer[rightlen]}</td>
+		<td>{primer['rightprimer']}</td>
+		<td>{primer['rightlen']}</td>
 		<td>{rightTM}</td>
 		<td>{rightLocation}</td>
 		</tr>

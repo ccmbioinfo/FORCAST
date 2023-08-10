@@ -9,8 +9,6 @@ Class definition for interfacing to installed primer3 program using pre-defined 
 import sys
 import re
 import os
-import time
-import json
 from subprocess import Popen, PIPE
 
 from Gene import returnError
@@ -210,7 +208,7 @@ class Primer3:
 				 	return primerDict, htmlResult
 				try:
 					retryDesc = str(self.settingsDict[str(attemptNumber)]['desc'])
-				except Exception as e:
+				except Exception:
 					# nothing defined, set to blank string
 					retryDesc = ''
 				

@@ -1,11 +1,9 @@
 #!/usr/bin/python3.7
 
 import requests
-import time
 import os
 import sys
-from pymongo import MongoClient
-sys.path.append("..")
+sys.path.append(os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "..", "helpers"))
 from Config import Config
 from classes.APE import APE
 server = "https://rest.ensembl.org"
@@ -43,7 +41,7 @@ class Gene(object):
 			releaseRequest = requests.get(server + ext, headers={"Content-Type": "application/json"}, timeout=30)
 		except requests.exceptions.Timeout:
 			returnError("The Ensembl Rest API is not responding (https://rest.ensembl.org)")
-		except Exception as e:
+		except Exception:
 			returnError("Problem with Ensembl Rest API call")
 		if not releaseRequest.ok:
 			releaseRequest.raise_for_status()
@@ -67,7 +65,7 @@ class Gene(object):
 			featureRequest = requests.get(server + ext, headers={"Content-Type": "application/json"}, timeout=30)
 		except requests.exceptions.Timeout:
 			returnError("The Ensembl Rest API is not responding (https://rest.ensembl.org)")	
-		except Exception as e:
+		except Exception:
 			returnError("Problem with Ensembl Rest API call")
 			
 		if not featureRequest.ok:
@@ -78,7 +76,7 @@ class Gene(object):
 		try:
 			featureType = decodedFeature['object_type']
 		except Exception as e:
-			printError("Problem parsing result from Ensembl: " + str(e))
+			printError(f"Problem parsing result from Ensembl: {e}")
 
 		return featureType.lower()
 
@@ -103,7 +101,7 @@ class Gene(object):
 			geneRequest = requests.get(server + ext, headers={"Content-Type": "application/json"}, timeout=30)
 		except requests.exceptions.Timeout:
 			returnError("The Ensembl Rest API is not responding (https://rest.ensembl.org)")
-		except Exception as e:
+		except Exception:
 			returnError("Problem with Ensembl Rest API call")
 		if not geneRequest.ok:
 			geneRequest.raise_for_status()
@@ -114,7 +112,7 @@ class Gene(object):
 			if len(decodedGene) > 1:
 				returnError("More than one gene found with the same ensemblID, using first one found")
 			geneInfo = decodedGene[0]
-		except (KeyError, IndexError) as err:
+		except (KeyError, IndexError):
 			returnError("No features found for this gene")
 
 		if 'external_name' in geneInfo:
@@ -140,7 +138,7 @@ class Gene(object):
 			featureRequest = requests.get(server + ext, headers={"Content-Type": "application/json"}, timeout=30)
 		except requests.exceptions.Timeout:
 			returnError("The Ensembl Rest API is not responding (https://rest.ensembl.org).")
-		except Exception as e:
+		except Exception:
 			returnError("Problem with Ensembl Rest API call")
 		if not featureRequest.ok:
 			featureRequest.raise_for_status()
@@ -234,7 +232,7 @@ class Gene(object):
 			seqRequest = requests.get(server + ext, timeout=30)
 		except requests.exceptions.Timeout:
 			returnError("The Ensembl Rest API is not responding (https://rest.ensembl.org)")
-		except Exception as e:
+		except Exception:
 			returnError("Problem with Ensembl Rest API call")
 		if not seqRequest.ok:
 			try:
@@ -282,6 +280,24 @@ class Gene(object):
 
 def returnError(errorString):
 	print(f'''<p class="text-danger">Error: {errorString}</p>''')
+
+def printError(errorString):
+	print('Content-type: text/html\r\n\r')
+	print('''
+	<html>
+	<head>
+		<title>Error Fetching APE</title>
+		<link rel="stylesheet" href="bootstrap-4.1.3/dist/css/bootstrap.min.css" as="style">
+		<style>
+		body {text-align: center;}
+		a {font-size: 14px;}
+		</style>
+	</head>
+	<body>
+	</br>
+	''')
+	returnError(errorString)
+	sys.exit()
 
 def returnWarning(warningString):
 	print(f'''<p class="text-warning">Warning: {warningString}</p>''')

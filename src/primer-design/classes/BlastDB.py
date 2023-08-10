@@ -12,7 +12,7 @@ import os
 import subprocess
 
 # get the global root path from the Config object
-sys.path.append("..")
+sys.path.append(os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "..", "helpers"))
 from Config import Config
 
 class BlastDB:

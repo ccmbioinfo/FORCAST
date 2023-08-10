@@ -4,7 +4,6 @@ import cgi
 from urllib.parse import unquote
 import sys
 import os
-from pymongo import MongoClient
 # import external classes based on relative file location
 dir_path = os.path.dirname(os.path.abspath(__file__))
 sys.path.append(os.path.join(dir_path, '../../../helpers'))

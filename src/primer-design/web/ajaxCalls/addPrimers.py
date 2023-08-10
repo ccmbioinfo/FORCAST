@@ -34,7 +34,7 @@ def addToDatabase(dbConnection, geneName, release, primerPairs):
 		else:
 			print("Problem with primer selection")
 
-		count = 0
+		# count = 0
 
 		'''
 		json files are stored with the ensembl release at the time of design appended 
@@ -49,10 +49,9 @@ def addToDatabase(dbConnection, geneName, release, primerPairs):
 				return
 			json_filename = geneName + "_" + release + "_"
 			path = os.path.join(jsonDir, (json_filename + primerType + "-" + str(primerPairs[key]) + ".json"))
-			try:
-				fh = open(path, 'r')	
+			if os.path.isfile(path):
 				fileFound = True
-			except:
+			else:
 				release = str(int(release) + 1)	
 
 		with open((path), 'r') as primerJSON:
@@ -78,7 +77,7 @@ def addPrimerMongo(primerCollection, primerRecord):
 	del core_record['ENSID']
 	try:
 		del core_record['notes']
-	except:
+	except Exception:
 		# this is ok, it's just because the primer doesn't have notes
 		# we should add them to the base record though
 		primerRecord["notes"] = ""

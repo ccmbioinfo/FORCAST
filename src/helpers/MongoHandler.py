@@ -7,9 +7,6 @@ import cgi
 import sys
 import os
 import re
-import pymongo
-from pymongo import MongoClient
-from subprocess import call
 #import cgitb
 #cgitb.enable()
 
@@ -86,8 +83,8 @@ def writePrimerGFF(dbConnection, org):
 		# see if the gene is + or -
 		try:
 			strand = Config.fetchStrandofGene(primerRecord['ENSID'], org)
-		except ValueError as e:
-			print("Skipping writing primer record associated with "+str(primerRecord['batchName'])+" ("+str(primerRecord['ENSID'])+") as it cannot be found in the database")
+		except ValueError:
+			print(f"Skipping writing primer record associated with {primerRecord['batchName']} ({primerRecord['ENSID']}) as it cannot be found in the database")
 			continue
 
 		if strand == '+':
@@ -142,8 +139,8 @@ def writeGuideGFF(dbConnection, org):
 	gRNACollection = dbConnection.guideCollection
 
 	for gRNARecord in gRNACollection.find({}) :  #get all gRNA records from the database
-		mRNAstart = -1
-		mRNAend = -1
+		# mRNAstart = -1
+		# mRNAend = -1
 		# parse out elements of location
 		chrom, guideCoordinates, strand = gRNARecord['guideLocation'].split(':')
 		# sort the coordinates of the guide
@@ -247,8 +244,8 @@ def modifyDatabase(action, guideDict, geneCollection, gRNACollection):
 def writeGFF(org):
 	# connect to the organism's db
 	dbConnection = Config(org)
-	gRNACollection = dbConnection.guideCollection
-	primerCollection = dbConnection.primerCollection
+	# gRNACollection = dbConnection.guideCollection
+	# primerCollection = dbConnection.primerCollection
 	# rewrite the GFF files
 	writePrimerGFF(dbConnection, org)
 	writeGuideGFF(dbConnection, org)
@@ -259,10 +256,10 @@ def addGenomicLocation(org, guideDict):
 	pamSeq = guideDict['pamSeq']
 
 	# THIS IS A TEMPORARY FIX FOR CPF1 (PAM before guide)
-        if pamSeq[:3] == 'TTT':
-                searchSeq = pamSeq + guideSeq
-        else:
-                searchSeq = guideSeq + pamSeq
+	if pamSeq[:3] == 'TTT':
+		searchSeq = pamSeq + guideSeq
+	else:
+		searchSeq = guideSeq + pamSeq
 
 	seqSearch = BlastDB(org, searchSeq, True)  # true indicates that the matches should be identical only
 	hits = seqSearch.returnLocations()
@@ -279,7 +276,7 @@ def addGenomicLocation(org, guideDict):
 			else:
 				print("Unable to definitively place gRNA")
 				sys.exit()
-		except Exception as e:
+		except Exception:
 			print("BLAST search for sequence " + str(searchSeq) + " did not return a location")
 			sys.exit()
 
@@ -297,7 +294,7 @@ def addGenomicLocation(org, guideDict):
 		# reconstruct
 		guideLocation = chrom + ":" + str(start) + "-" + str(guideEnd) + ":" + strand
 		pamLocation = chrom + ":" + str(pamStart) + "-" + str(end) + ":" + strand
-		guideGenomicStart = start
+		# guideGenomicStart = start
 		pamGenomicStart = pamStart  # old code relies on this
 
 	# record in dict
@@ -355,7 +352,7 @@ def main():
 			dbConnection = Config(org)
 			gRNACollection = dbConnection.guideCollection
 			geneCollection = dbConnection.curr_geneCollection
-			primerCollection = dbConnection.primerCollection
+			# primerCollection = dbConnection.primerCollection
 
 			if action == "insert":
 				# when adding a gRNA, several fields are required. Ensure they are defined
@@ -377,7 +374,7 @@ def main():
 		except Exception as e:
 			print("Error occurred while updating database: " + str(e))
 
-	except AttributeError as att_err:
+	except AttributeError:
 		# no cgi arguments, will see if command-line arguments exist
 		try:
 			cli_arguments = sys.argv  # list of script and its arguments
@@ -393,7 +390,7 @@ def main():
 				writeGFF(org)
 				print("GFF files rewritten")
 				return
-		except IOError as io_err:
+		except IOError:
 			print("Unable to write GFF files. The script may need to be run with sudo privileges")
 			return
 	return

@@ -12,12 +12,9 @@
 import cgi
 import os
 import sys
-import pickle
 
 # import external classes based on relative file location
 dir_path = os.path.dirname(os.path.abspath(__file__))
-sys.path.append(os.path.join(dir_path, '../helpers'))
-from Config import Config
 
 from classes.Gene import Gene
 from classes.Guide import Guide

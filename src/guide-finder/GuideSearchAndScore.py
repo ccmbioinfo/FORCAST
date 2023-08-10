@@ -15,7 +15,7 @@ Steps:
 6) Puts the results into a jinja2 template and prints the html
 """
 
-import sys, os, cgi, binascii, re, csv, json, urllib.parse, argparse
+import sys, os, cgi, binascii, csv, json, urllib.parse, argparse
 from collections import OrderedDict
 from jinja2 import Template
 import logging
@@ -29,7 +29,7 @@ sys.path.append(os.path.join(dir_path, 'core'))
 import get_sequence, find_grna, find_offtargets, score_offtargets, categorize_offtargets
 
 logging.basicConfig(
-    filename=f"logs/GuideSearchAndScore.log",
+    filename="logs/GuideSearchAndScore.log",
     level=logging.DEBUG
 )
 
@@ -73,8 +73,8 @@ class GuideSearchAndScore:
             self.rgenID = kwargs['rgenID']
             try:
                 self.rgenRecord = self.getRGEN()
-            except ValueError as e:
-                self.sendError("Invalid RGEN ID, " + str(self.rgenID))
+            except ValueError:
+                self.sendError(f"Invalid RGEN ID, {self.rgenID}")
 
         # check guideLength sent
         if 'guideLength' not in kwargs:
@@ -146,7 +146,7 @@ class GuideSearchAndScore:
         logging.debug(f"TOTAL TIME ELAPSED: {round(time_9-time_0,4)}s\n\n")
 
     def setScores(self):
-        scores = set({}) # make a set
+        # scores = set({}) # make a set
         options = ['MIT', 'CFD', 'Precision', 'Frameshift Frequency', 'MH Strength']
         available = []
         for key, guide in self.guideDict.items():
@@ -330,7 +330,7 @@ class GuideSearchAndScore:
         # get only the off-targets with the selected number of mismatches
         offtarget_subset = self.subsetOffTargets(guide, num_mismatches)
         if len(offtarget_subset) > 0:
-            num_offtargets = len(offtarget_subset)
+            # num_offtargets = len(offtarget_subset)
             maxShown = 20
             standard_offtargets, none_in_seed = self.separateOffTargets(offtarget_subset)
             resultHTML = ''
@@ -451,9 +451,7 @@ class GuideSearchAndScore:
         if rgenCollection.count_documents(rgenQuery) == 1:
             return rgenCollection.find_one(rgenQuery)
         else:
-            raise ValueError("Incorrect number of records returned from RGEN database for rgenID: " + str(rgenID))
-            return
-
+            raise ValueError(f"Incorrect number of records returned from RGEN database for rgenID: {self.rgenID}")
 
     def writeCsvFiles(self):
         """ for each guide, write a csv file of its off-targets to the OS temporary file directory """
@@ -543,7 +541,7 @@ class GuideSearchAndScore:
                             offtarget_row.append(str(sum(1 for base in offtarget['seq'] if base.islower()))) # num mismatches
                             try:
                                 offtarget_row.append(offtarget['context'])
-                            except Exception as e:
+                            except Exception:
                                 offtarget_row.append('-')
                             if 'MIT' in self.scores and not (guide['max_exceeded'] or guide['skip']):
                                 offtarget_row.append(offtarget['MIT'])
@@ -642,7 +640,7 @@ class GuideSearchAndScore:
             self.sendError("Please enter an input region for the search")
             return False
         if inputSeq.count(":") == 1 and inputSeq.count("-") == 1:
-            chrm = inputSeq.split(":")[0]
+            # chrm = inputSeq.split(":")[0]
             start, end = list(map(int, (inputSeq.split(":")[1]).split("-")))
             if abs(start-end) > 3000:
                 self.sendError("Please enter an input sequence with fewer than 3000 bases")

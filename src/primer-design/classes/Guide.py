@@ -75,7 +75,7 @@ class Guide(Gene):
 			regulatoryRequest = requests.get(server + ext, headers={"Content-Type": "application/json"}, timeout=15)
 		except requests.exceptions.Timeout:
 			returnError("The Ensembl Rest API is not responding (https://rest.ensembl.org).")
-		except Exception as e:
+		except Exception:
 			returnError("Problem with Ensembl Rest API call")
 		if not regulatoryRequest.ok:
 			regulatoryRequest.raise_for_status()
@@ -433,7 +433,7 @@ class Guide(Gene):
 				g.append(start)
 				g.append(start + len(guideSeq))
 				g.append('F')
-			except Exception as e:
+			except Exception:
 				# the guide sequence wasn't found
 				# reverse it an search again
 				guideSeq = revSeq(g[1])
@@ -442,7 +442,7 @@ class Guide(Gene):
 					g.append(start)
 					g.append(start + len(guideSeq))
 					g.append('R')
-				except Exception as e:
+				except Exception:
 					returnError("Could not find one of the guides in the sequence for the gene")
 
 		# also do for the guide dict (slowly moving towards eliminating the list...)
@@ -452,7 +452,7 @@ class Guide(Gene):
 				g['start'] = start
 				g['end'] = int(start) + len(g['guideSeq'])
 				g['direction'] = 'F'
-			except Exception as e:
+			except Exception:
 				# guide sequence wasn't found
 				# reverse and search again
 				try:
@@ -460,7 +460,7 @@ class Guide(Gene):
 					g['start'] = start
 					g['end'] = int(start) + len(g['guideSeq'])
 					g['direction'] = 'R'
-				except Exception as e:
+				except Exception:
 					returnError("Unable to find one of the guides in the sequence for this gene")
 
 	# TODO: remove the gRNA code once converted to using gRNADict

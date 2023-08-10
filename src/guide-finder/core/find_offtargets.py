@@ -17,15 +17,11 @@ dir_path = os.path.dirname(os.path.abspath(__file__))
 sys.path.append(os.path.join(dir_path, "../../helpers"))
 from Config import Config
 from itertools import product
-import score_offtargets
-import categorize_offtargets
 
 logging.basicConfig(
 	filename="logs/GuideSearchAndScore.log",
 	level=logging.DEBUG
 )
-
-dir_path = os.path.dirname(os.path.abspath(__file__))
 
 nucleotide_codes = {
 	'A': ['A'],
@@ -43,18 +39,16 @@ nucleotide_codes = {
 	'H': ['A','C','T'],
 	'V': ['A','C','G'],
 	'N': ['A','C','G','T']
-	}
-
+}
 
 def getRgenRecord(rgenID):
-        dbConnection = Config()
-        rgenCollection = dbConnection.rgenCollection
-        rgenRecord = rgenCollection.find({"rgenID": str(rgenID)})
-        if rgenRecord.count() == 1:
-                return rgenRecord.next()
-        else:
-                raise Exception("Incorrect number of records returned from RGEN database for rgenID " + str(rgenID))
-                return
+	dbConnection = Config()
+	rgenCollection = dbConnection.rgenCollection
+	rgenRecord = rgenCollection.find({"rgenID": str(rgenID)})
+	if rgenRecord.count() == 1:
+		return rgenRecord.next()
+	else:
+		raise Exception("Incorrect number of records returned from RGEN database for rgenID " + str(rgenID))
 
 def expandSequence(seq):
 	""" accepts a nucleotide sequence with ILAR codes and returns a list of the possible expansions """
@@ -213,8 +207,8 @@ def processOffTarget(guideDict, rgen, offTargetLoc, offTargetSeq):
 		guideDict['offtarget_counts'] =  initializeMismatchCount(mismatches) if 'offtarget_counts' not in guideDict else incrementMismatchCount(guideDict['offtarget_counts'], mismatches)
 		if noneInSeed:
 			guideDict['offtargets_seed'] = initializeMismatchCount(mismatches) if 'offtargets_seed' not in guideDict else incrementMismatchCount(guideDict['offtargets_seed'], mismatches)
-	except Exception as e:
-		print("Error: Update of Guide Dict failed. Number of mismatches: " + str(mismatches) + ", " + offTargetSeq + " " + guideDict['guide_seq'])
+	except Exception:
+		print(f"Error: Update of Guide Dict failed. Number of mismatches: {mismatches}, {offTargetSeq} {guideDict['guide_seq']}")
 
 	# change case of the off-target sequence based on the mismatched bases (lowercase)
 	offTargetGuide = changeCase(guideDict['guide_seq'], offTargetGuide)
@@ -258,7 +252,7 @@ def countOffTargets(batchID, potentialGuides, rgen, maxOffTargets, tempfile_dire
 	"""
 	offTargetMotifs = getMotifs(rgen['OffTargetPAMS']) # NB: OffTargetPAMS should also include the classical PAM for the rgen
 	pamLocation = rgen['PamLocation']
-	rgenSeed = rgen['SeedRegion']
+	# rgenSeed = rgen['SeedRegion']
 
 	# initialize the counts, offtarget list, and max_exceeded flag
 	for guideID, guide in potentialGuides.items():
@@ -289,9 +283,6 @@ def countOffTargets(batchID, potentialGuides, rgen, maxOffTargets, tempfile_dire
 
 def convertExtendedBedToFasta(batchID, genome, genome_fa, tempfile_directory):
 	""" uses bedtools to convert the extended bed to fasta """
-
-	import time
-
 	# template command
 	extendedBed = os.path.join(tempfile_directory, str(batchID)+"_extended.bed")
 	extendedFasta = os.path.join(tempfile_directory, str(batchID)+"_extended.fa")
@@ -388,7 +379,6 @@ def screenRepetetive(batchID, potentialGuides, tempfile_directory):
 			else:
 				potentialGuides[guideID]['skip'] = False
 
-
 def findOffTargets(potentialGuides, rgenID, genome, maxOffTargets, batchID, genome_fa, tempfile_directory):
 	time_0 = time.time()
 	logging.debug("\t\t\t\t[STARTED]\t\tGetting rgen record...")
@@ -448,6 +438,7 @@ def main():
 	if len(sys.argv) != 6:
 		print("Requires a dictionary of potentialGuides, rgenID, genome, bwa_index, and tempfile directory")
 	else:
+		guides, rgenID, genome, genome_fa, tempfile_directory = sys.argv[1:]
 		batchID = binascii.b2a_hex(os.urandom(9)).decode('utf-8')
 		#guides, rgenID, genome, genome_fa, tempfile_directory = sys.argv[1:]
 		result = findOffTargets(guides, rgenID, genome, batchID, genome_fa, tempfile_directory)

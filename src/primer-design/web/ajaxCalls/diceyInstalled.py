@@ -24,7 +24,7 @@ def main():
 		args = cgi.FieldStorage()
 		# get genome variable
 		genome = args.getvalue('genome')
-	except:
+	except Exception:
 		sys.exit("Problem fetching genome variable passed to function")
 
 	if not genome:

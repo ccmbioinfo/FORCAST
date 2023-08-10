@@ -7,12 +7,10 @@ Accepts a dictionary of potential guides and their off-targets along with the rg
 Categorizes the off-targets into intergenic, intronic, and exonic using the segments file for the passed genome.
 """
 
-import os, sys, re
-from subprocess import Popen, PIPE, DEVNULL
-from itertools import product
+import os, sys
 import tempfile
-dir_path = os.path.dirname(os.path.abspath(__file__))
-sys.path.append(os.path.join(dir_path, "../../helpers"))
+from subprocess import Popen, PIPE
+sys.path.append(os.path.join(os.path.dirname(os.path.abspath(__file__)), "../../helpers"))
 from Config import Config
 
 
@@ -37,7 +35,7 @@ def categorizeOffTargets(guideDict, rgenID, genome, batchID):
 	"""
 	# connect to database and get the rgen variables from id
 	dbConnection = Config(genome)
-	rgen = getRgenRecord(rgenID, dbConnection)
+	# rgen = getRgenRecord(rgenID, dbConnection)
 	# construct bed intersect command
 	segmentsFile = os.path.join(dbConnection.ROOT_PATH, "jbrowse/data/"+genome, "processed", genome+".segments.bed")
 	extendedBed = os.path.join(tempfile.gettempdir(), str(batchID)+"_extended.bed")
@@ -47,7 +45,7 @@ def categorizeOffTargets(guideDict, rgenID, genome, batchID):
 	if err:
 		sys.exit(err)
 
-	categorized = []
+	# categorized = []
 	for line in out.splitlines():
 		# assign every intersection to its off-target
 		intersect = line.split("\t")

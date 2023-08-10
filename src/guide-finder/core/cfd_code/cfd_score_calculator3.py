@@ -9,10 +9,7 @@
 import pickle
 import argparse
 import re
-
-
 import os
-dir_path = os.path.dirname(os.path.abspath(__file__))
 
 def get_parser():
     parser = argparse.ArgumentParser(description='Calculates CFD score')
@@ -34,10 +31,11 @@ def revcom(s):
 #Unpickle mismatch scores and PAM scores
 def get_mm_pam_scores():
     try:
+        dir_path = os.path.dirname(os.path.abspath(__file__))
         mm_scores = pickle.load(open(os.path.join(dir_path,'mismatch_score.pkl'),'rb'))
         pam_scores = pickle.load(open(os.path.join(dir_path,'pam_scores.pkl'),'rb'))
         return (mm_scores,pam_scores)
-    except Exception as e:
+    except Exception:
         raise Exception("Could not find file with mismatch scores or PAM scores")
 
 #Calculates CFD score

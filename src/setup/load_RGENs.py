@@ -18,30 +18,26 @@ If the RGEN database does not exist, a new one will be created regardless of the
 
 import sys
 import os
-import glob
-import pymongo
-from pymongo import MongoClient
 import json
 dir_path = os.path.dirname(os.path.abspath(__file__))
 sys.path.append(os.path.join(dir_path, "../helpers"))
 from Config import Config
 
 def load_RGENs_into_Mongo(action):
-
     dbConnection = Config() # genome agnostic
 
     try:
         # load in the rgens.json file
         rgen_file = open('rgens.json', 'r')
     except Exception as e:
-        print("Error opening rgens.json file: " + str(e))
+        print(f"Error opening rgens.json file: {e}")
         return False
     
     try:
         # read the json file
         rgenJSON = json.load(rgen_file)
     except Exception as e:
-        print("Error parsing rgens.json file: " + str(e))
+        print(f"Error parsing rgens.json file: {e}")
         return False
 
     if 'RGEN' not in dbConnection.client.list_database_names():
@@ -49,10 +45,9 @@ def load_RGENs_into_Mongo(action):
         print("Building RGEN database from scratch")
         rgenDB = dbConnection.client['RGEN']
         try:
-            with open(os.path.join(dir_path,'rgens.json')) as json_file:
-                collection = rgenDB['rgenCollection']
-                collection.insertMany(rgenJSON)
-                return True
+            collection = rgenDB['rgenCollection']
+            collection.insertMany(rgenJSON)
+            return True
         except Exception as e:
             print(f"Error inserting RGENs into Mongo database: {e}")
             return False
