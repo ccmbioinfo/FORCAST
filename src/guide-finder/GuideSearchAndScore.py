@@ -290,7 +290,7 @@ class GuideSearchAndScore:
             'guide': guide,
             'offtargetCounts': self.offtargetCountsHTML(classNameGuideID, guide),
             'offtargetModals': self.offtargetModalHTML(classNameGuideID, guide),
-            'csvFile': os.path.join(tempfile.gettempdir(), self.batchID+"_"+guideID+".csv"),
+            'csvFile': f"/download/{self.batchID}_{guideID}.csv",
             'totalCount': str(sum(guide['offtarget_counts']))
         }
         return self.renderTemplate("offtarget_cell.html", template_values)
@@ -605,14 +605,14 @@ class GuideSearchAndScore:
         time_0 = time.time()
         logging.debug("\t\t[STARTED]\t\tFetching sequence...")
 
-        get_sequence.fetch_sequence(self.searchInput, genome_2bit, os.path.join(tempfile.gettempdir(),batchID+'_out.fa'))
+        get_sequence.fetch_sequence(self.searchInput, genome_2bit, os.path.join(tempfiles_path,batchID+'_out.fa'))
 
         time_1 = time.time()
         logging.debug(f"\t\t[FINISHED]\tFetched sequence in {str(round(time_1-time_0,4))}s")
         logging.debug("\t\t[STARTED]\t\tDetermining guides in search region...")
 
         protospacer_length = getattr(self, 'guideLength', 0) # passing 0 indicates default should be used
-        guideDict = find_grna.find_grna(self.rgenID, protospacer_length, os.path.join(tempfile.gettempdir(), batchID+'_out.fa'))
+        guideDict = find_grna.find_grna(self.rgenID, protospacer_length, os.path.join(tempfiles_path, batchID+'_out.fa'))
 
         time_2 = time.time()
         logging.debug(f"\t\t[FINISHED]\tFound gRNAs in {str(round(time_2-time_1,4))}s")
