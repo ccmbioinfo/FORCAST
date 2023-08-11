@@ -640,7 +640,7 @@ def printPrimers(primerDict, primer):
 		htmlTable += "<br>"
 	htmlTable += "<h4 id=\"tableTitle\"> Top " + str(len(primerDict)) + " " + primer + " Primers</h4>"
 	htmlTable += """
-	<table class="primerTable table table-bordered center">
+	<table class="primerTable {}PrimerTable table table-bordered center">
 		<thead>
 		<tr>
 		<th scope="col" class="centreCell">Select</th>
@@ -653,7 +653,7 @@ def printPrimers(primerDict, primer):
 		</tr>
 		</thead>
 		<tbody>
-	"""
+	""".format(primer.lower())
 	rank = 1
 	idCount = 0
 	for pairNum in sorted(primerDict.iterkeys()):
