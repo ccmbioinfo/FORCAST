@@ -871,20 +871,15 @@ function updateGuideDOC(ids){
 		
 //updates the download link for newly designed primers
 function updateDownloadLink() {
-
-        var values = new Array();
-        $.each($("#primerResultsTable input:checked").closest("td").siblings("td"),
-                function () {
-       			values.push($(this).text());
-                });
-
-	var oldAPELocation = $('#apeDownload').attr('href');
-        newAPELocation = String(oldAPELocation.substring(0, oldAPELocation.length-7) + String(values[0]-1) + "_" + String(values[6]-1) + ".ape").replace(/\s+/g,'');
-	$('#apeDownload').attr("href",newAPELocation); 
-
-	var oldCSVLocation = $('#csvDownload').attr('href');
-	newCSVLocation = String(oldCSVLocation.substring(0, oldCSVLocation.length-7) + String(values[0]-1) + "_" + String(values[6]-1) + ".csv").replace(/\s+/g,'');
-	$('#csvDownload').attr("href",newCSVLocation);	
+	const wtPrimerRankIndex = (parseInt($(".wtPrimerTable input:checked").parent().next().text()) - 1) || 0,
+				emPrimerRankIndex = (parseInt($(".emPrimerTable input:checked").parent().next().text()) - 1) || 0,
+				oldAPELocation = $("#apeDownload").attr("href"),
+				oldCSVLocation = $("#csvDownload").attr("href"),
+        newAPELocation = `${oldAPELocation.slice(0, -7)}${wtPrimerRankIndex}_${emPrimerRankIndex}.ape`,
+				newCSVLocation = `${oldCSVLocation.slice(0, -7)}${wtPrimerRankIndex}_${emPrimerRankIndex}.csv`;
+	
+	$("#apeDownload").attr("href", newAPELocation);
+	$("#csvDownload").attr("href", newCSVLocation);	
 }
 
 function getSelected() {

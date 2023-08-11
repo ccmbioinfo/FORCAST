@@ -841,8 +841,8 @@ def printPrimers(primerDict, primer):
         + primer
         + " Primers</h4>"
     )
-    htmlTable += """
-	<table class="primerTable table table-bordered center">
+    htmlTable += f"""
+	<table class="primerTable {primer.lower()}PrimerTable table table-bordered center">
 		<thead>
 		<tr>
 		<th scope="col" class="centreCell">Select</th>

@@ -334,16 +334,14 @@ class GuideSearchAndScore:
             self.sendError("Unrecognized strand for guide: " + str(guide["strand"]))
 
     def offtargetHTML(self, guideID, guide):
-        """ creates the HTML for the off-target modal of a given guide """
-        classNameGuideID = guideID.replace('+', 'plus').replace('-', 'minus')
+        """creates the HTML for the off-target modal of a given guide"""
+        classNameGuideID = guideID.replace("+", "plus").replace("-", "minus")
         template_values = {
             "guideID": guideID,
             "guide": guide,
             "offtargetCounts": self.offtargetCountsHTML(classNameGuideID, guide),
             "offtargetModals": self.offtargetModalHTML(classNameGuideID, guide),
-            "csvFile": os.path.join(
-                tempfile.gettempdir(), self.batchID + "_" + guideID + ".csv"
-            ),
+            "csvFile": f"/download/{self.batchID}_{guideID}.csv",
             "totalCount": str(sum(guide["offtarget_counts"])),
         }
         return self.renderTemplate("offtarget_cell.html", template_values)
@@ -778,7 +776,7 @@ class GuideSearchAndScore:
         get_sequence.fetch_sequence(
             self.searchInput,
             genome_2bit,
-            os.path.join(tempfile.gettempdir(), batchID + "_out.fa"),
+            os.path.join(tempfiles_path, batchID + "_out.fa"),
         )
 
         time_1 = time.time()
@@ -793,7 +791,7 @@ class GuideSearchAndScore:
         guideDict = find_grna.find_grna(
             self.rgenID,
             protospacer_length,
-            os.path.join(tempfile.gettempdir(), batchID + "_out.fa"),
+            os.path.join(tempfiles_path, batchID + "_out.fa"),
         )
 
         time_2 = time.time()

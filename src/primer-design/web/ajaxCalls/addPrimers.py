@@ -46,7 +46,7 @@ def addToDatabase(dbConnection, geneName, release, primerPairs):
         ens_release_num = fetchEnsemblRelease.getRelease()
         fileFound = False
         while not fileFound:
-            if int(release) > ens_release_num:
+            if int(release) > int(ens_release_num):
                 print("Unable to find " + primerType + " file")
                 return
             json_filename = geneName + "_" + release + "_"
