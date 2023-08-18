@@ -27,7 +27,6 @@ def fetch_sequence(chrom_coord, genome_twobit, output_fasta):
     # end for twoBitToFa is non-inclusive, add extra base
     start = str(int(start)-1)
     seq_param, start_param, end_param = '-seq={0}'.format(chrom), '-start={0}'.format(start), '-end={0}'.format(end)
-    tmp_fasta = os.path.join(dir_path,"tmp.fa")
 
     try:
         twoBitToFaOut = (
