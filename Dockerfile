@@ -64,6 +64,6 @@ RUN python3.7 -m pip install --upgrade pip && \
 WORKDIR /var/www/html
 # Replace the /usr/sbin/apachectl script that is called with the Apache master process that respects signals
 ENV APACHE_HTTPD exec /usr/sbin/apache2
-CMD chmod 777 ./src/guide-finder/core ./src/guide-finder/logs ./src/primer-design/files/* && \
+CMD chmod 777 ./src/guide-finder/logs ./src/primer-design/files/* && \
     mongod --fork --logpath /var/log/mongodb/mongod.log --dbpath /var/lib/mongodb && \
     exec apache2-foreground
