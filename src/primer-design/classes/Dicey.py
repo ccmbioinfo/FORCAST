@@ -77,12 +77,8 @@ class Dicey:
             else:
                 try:
                     jsonResult = json.loads(dicey_process.stdout)
-                    if "errors" in jsonResult and len(jsonResult["errors"]) > 0:
-                        print("Error(s) from Dicey program: ")
-                        for error in jsonResult["errors"]:
-                            print(error["title"])
-                        return
-                    return jsonResult["data"]
+
+                    return {key: jsonResult[key] for key in ["data", "errors"]}
                 except Exception as e:
                     print("Error reading Dicey results: " + str(e))
                     return

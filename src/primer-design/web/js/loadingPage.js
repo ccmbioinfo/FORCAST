@@ -452,6 +452,95 @@ function inSilica() {
   });
 }
 
+const createDiceyMessagesModal = (messages, rowID) => {
+  const [warnings, errors] = messages.reduce(
+      (acc, { title, type }) => {
+        acc[type === "warning" ? 0 : 1].push(title);
+
+        return acc;
+      },
+      [[], []],
+    ),
+    numWarnings = warnings.length,
+    numErrors = errors.length;
+
+  let html = `
+		<button
+			type="button"
+			class="btn btn-link no-padding"
+			style="background-color: #ffe9a8; border: 1px solid #b90e1e; color: #b90e1e; border-radius: 20px; padding: 0 0.5rem; font-size: 0.75rem;"
+			data-toggle="modal"
+			data-target="#${rowID}-qa-messages-modal"
+		>
+			${numErrors} Error${numErrors !== 1 ? "s" : ""} / ${numWarnings} Warning${numWarnings !== 1 ? "s" : ""}
+		</button>
+		<div class="modal fade" id="${rowID}-qa-messages-modal">
+			<div class="modal-dialog modal-lg">
+				<div class="modal-content">
+					<div class="modal-header" style="padding-bottom: 0.25rem">
+						<h4 class="modal-title">Dicey Errors / Warnings</h4>
+						<br>
+						<button type="button" class="close" data-dismiss="modal">&times;</button>
+					</div>
+					<div class="modal-body">
+						<ul class="nav nav-tabs" role="tablist">
+							<li class="nav-item">
+								<button class="nav-link active" id="${rowID}-errors-tab" data-toggle="tab" href="#${rowID}-errors" type="button" role="tab" aria-controls="${rowID}-errors" aria-selected="true">Errors (${numErrors})</button>
+							</li>
+							<li class="nav-item">
+								<button class="nav-link" id="${rowID}-warnings-tab" data-toggle="tab" href="#${rowID}-warnings" type="button" role="tab" aria-controls="${rowID}-warnings" aria-selected="false">Warnings (${numWarnings})</button>
+							</li>
+						</ul>
+						<div class="tab-content pt-3 px-3">
+							<div class="tab-pane fade show active" id="${rowID}-errors" role="tabpanel" aria-labelledby="${rowID}-errors-tab">
+								<ul class="list-group">
+								
+	`;
+
+  if (errors.length) {
+    errors.forEach((error) => {
+      html += `
+									<li class="list-group-item">${error}</li>
+			`;
+    });
+  } else {
+    html += `
+									<li class="list-group-item p-1">No errors.</li>
+		`;
+  }
+
+  html += `
+								</ul>
+							</div>
+							<div class="tab-pane fade" id="${rowID}-warnings" role="tabpanel" aria-labelledby="${rowID}-warnings-tab">
+								<ul class="list-group">
+	`;
+
+  if (warnings.length) {
+    warnings.forEach((warning) => {
+      html += `
+									<li class="list-group-item">${warning}</li>
+			`;
+    });
+  } else {
+    html += `
+									<li class="list-group-item p-1">No warnings.</li>	
+		`;
+  }
+
+  html += `
+								</ul>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	`;
+
+  return html;
+};
+
 function diceyCall(primers, productCell) {
   // populate with loading graphic at start of ajax call
   productCell.append('<span id="diceyLoader"><br><i class="fa fa-spinner fa-spin"></i></span>');
@@ -462,13 +551,18 @@ function diceyCall(primers, productCell) {
     success: function (json) {
       // remove spinner
       productCell.children("#diceyLoader").remove();
-      rowID = productCell.parent().attr("id");
-      amplicons = json["amplicons"];
-      bindingSites = json["primers"];
-      numAmplicons = amplicons.length;
-      numBindingSites = bindingSites.length;
+      const rowID = productCell.parent().attr("id"),
+        messages = json["errors"],
+        jsonData = json["data"],
+        amplicons = jsonData["amplicons"],
+        bindingSites = jsonData["primers"],
+        numAmplicons = amplicons.length,
+        numBindingSites = bindingSites.length;
       if (numAmplicons > 1) {
-        productCell.css("background-color", "#f8d7da");
+        productCell.css({
+          "background-color": "#f8d7da",
+          color: "#b90e1e",
+        });
         preformattedString =
           '<br><button type="button" class="btn btn-link no-padding" data-toggle="modal" data-target="#' +
           rowID +
@@ -505,14 +599,17 @@ function diceyCall(primers, productCell) {
         productCell.append(preformattedString);
       } else {
         //TODO: change, this is for degbug
-        productCell.append(
-          '<br><pre style="font-size:0.75rem;padding: 0.25rem;text-decoration: underline; color:red;">Error: No Amplicons</pre>',
-        );
+        productCell.append('<br><pre style="padding: 0.25rem; font-size: 0.75rem;">No Amplicons</pre>');
       }
+
+      if (messages.length) productCell.append(createDiceyMessagesModal(messages, rowID));
     },
     error: function (xhr, status, err) {
       // remove spinner
       productCell.children("#diceyLoader").remove();
+      productCell.append(
+        '<br><span style="display: inline-block; max-width: 20vw; background-color: #e9f3fd; border: 1px solid #b90e1e; color: #b90e1e; border-radius: 30px; padding: 0.25rem 0.5rem; font-size: 0.75rem; word-break: break-word;"><i class="fa fa-exclamation-triangle"></i><br>An error ocurred while performing primer QA</span>',
+      );
       console.log("Problem performing primer QA with locally installed dicey program");
     },
   });
@@ -532,8 +629,8 @@ function createDiceyModal(rowID, amplicons, bindingSites) {
 			  <br>
 			  <button type="button" class="close" data-dismiss="modal">&times;</button>
 			</div>
-			<p style="text-align: left;padding-left: 1rem;">generated by in silico PCR tool <a href="https://github.com/gear-genomics/dicey/" target="_blank">Dicey</a></p>
-		<div class="modal-body">`;
+		<div class="modal-body">
+			<p style="text-align: left;">Generated by in silico PCR tool <a href="https://github.com/gear-genomics/dicey/" target="_blank">Dicey</a></p>`;
 
   //the ids need to be specific to the row ID (for the divs as well)
   html +=
@@ -746,7 +843,7 @@ function blastCall(primerSeq, locationElement) {
         locationElement.css("background-color", "#dff0d8");
       } else if (numBlastHits == 0) {
         locationElement.html("No BLAST Hits");
-        locationElement.css("background-color", "#f8d7da");
+        locationElement.css("background-color", "rgba(0,0,0,0.075)");
       } else {
         rowID = locationElement.parent().attr("id");
         primerModal = displayHitResults(json, rowID);
@@ -756,6 +853,10 @@ function blastCall(primerSeq, locationElement) {
     },
     error: function (xhr, status, err) {
       console.log("Primer Blast program stopped before completing search for: " + primerSeq);
+      locationElement.html(
+        '<span style="font-size: 0.75rem;"><i class="fa fa-exclamation-triangle"></i><br>An error occured while getting BLAST results</span>',
+      );
+      locationElement.css("color", "#b90e1e");
     },
   });
 }

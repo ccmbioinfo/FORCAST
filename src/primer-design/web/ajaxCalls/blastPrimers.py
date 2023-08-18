@@ -37,7 +37,6 @@ def main():
         primerBLAST = BlastDB(genome, primers, "0.01", False)
         hits = primerBLAST.blastSequences()
         for hitDict in hits:
-            hitDict.pop("numHits")
             # encode the hit dictionary into a json object & print it for the ajax request
             print(json.JSONEncoder().encode(hitDict))
     else:

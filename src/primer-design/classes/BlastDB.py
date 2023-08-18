@@ -237,10 +237,6 @@ class BlastDB:
                         hitDict[locationCount]["end"] = locationHit.group(7)
 
                     locationCount += 1
-        if locationCount <= 0:
-            sys.exit("Problem parsing BLAST output, unexpected output")
-
-        hitDict["numHits"] = locationCount
 
         return hitDict
 
