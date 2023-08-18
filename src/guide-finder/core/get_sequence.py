@@ -32,32 +32,40 @@ def fetch_sequence(chrom_coord, genome_twobit, output_fasta):
         "-start={0}".format(start),
         "-end={0}".format(end),
     )
-    tmp_fasta = os.path.join(dir_path, "tmp.fa")
-
+    
     try:
-        subprocess.run(
-            ["twoBitToFa", seq_param, start_param, end_param, genome_twobit, tmp_fasta]
+        twoBitToFaOut = (
+            subprocess.check_output(
+                [
+                    "twoBitToFa",
+                    seq_param,
+                    start_param,
+                    end_param,
+                    genome_twobit,
+                    "stdout",
+                ],
+                encoding="utf-8",
+            )
+            .rstrip("\n")
+            .splitlines()
         )
+
+        if len(twoBitToFaOut):
+            with open(output_fasta, "w") as out_fa:
+                out_fa.write(">" + chrom + ":" + str(int(start) + 1) + "-" + end + "\n")
+                for line in twoBitToFaOut:
+                    if not line.startswith(">"):
+                        out_fa.write(line)
+        else:
+            print(
+                "twobitToFasta failed: "
+                + " ".join([seq_param, start_param, end_param, genome_twobit, "stdout"])
+            )
+            sys.exit(
+                "sequence is empty for given parameters. Please check your parameters again"
+            )
     except Exception as err:
         print(err)
-
-    if not os.path.isfile(tmp_fasta) or os.path.getsize(tmp_fasta) == 0:
-        print(
-            "twobitToFasta failed: "
-            + " ".join([seq_param, start_param, end_param, genome_twobit, tmp_fasta])
-        )
-        sys.exit(
-            "sequence is empty for given parameters. Please check your parameters again"
-        )
-
-    with open(tmp_fasta, "r") as inp_fa, open(output_fasta, "w") as out_fa:
-        out_fa.write(">" + chrom + ":" + str(int(start) + 1) + "-" + end + "\n")
-        for line in inp_fa:
-            if not line.startswith(">"):
-                out_fa.write(line)
-    inp_fa.close()
-    out_fa.close()
-    os.remove(tmp_fasta)
 
     return 1
 
