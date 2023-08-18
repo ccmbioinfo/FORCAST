@@ -1,105 +1,150 @@
-<!DOCTYPE html>
+<!doctype html>
 <html>
-<head>
-	<script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.1/dist/umd/popper.min.js" integrity="sha384-9/reFTGAW83EW2RDu2S0VKaIzap3H66lZH81PoYlFhbGU+6BZp6G7niu735Sk7lN" crossorigin="anonymous"></script>
-	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
-	<!-- <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-Fy6S3B9q64WdZWQUiU+q4/2Lc9npb8tCaSX9FK7E8HnRr0Jz8D6OP9dO5Vg3Q9ct" crossorigin="anonymous"></script> -->
-	<script src="../../../docs/bin/bootstrap-4.6.2-dist/js/bootstrap.min.js"></script>
-	<script src="./js/manualPrimerEntry.js"></script>
-	<!-- <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/css/bootstrap.min.css" integrity="sha384-xOolHFLEh07PJGoPkLv1IbcEPTNtaed2xpHsD9ESMhqIYd0nLMwNLD69Npy4HI+N" crossorigin="anonymous"> -->
-	<link rel="stylesheet" href="../../../docs/bin/bootstrap-4.6.2-dist/css/bootstrap.min.css">
-	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
-	<link rel="stylesheet" type="text/css" href="./css/manualPrimerEntry.css">
-</head>
-<body onload="populateOnLoad()">
-	<h3 id="page-title"></h3>
-	<br>
-	<form id="primerPairForm" onsubmit="return false;">
-	<div class="row">
-		<div class="col-1 less-padding vertical-align">
-			<label for="pairTypeSelect">Type</label>	
-			<select name="type" class="form-control no-padding" id="pairTypeSelect">
-				<option>WT</option>
-				<option>EM</option>
-			</select>
-		</div>	
-		<div class="col-11">
-			<div class="row">
-				<div class="col-1 less-padding">
-				</div>
-				<div class="col-4 left-align less-padding vertical-align">
-					<label class="padding-left" for="forwardSequenceInput">Forward Primer:</label>
-					<input name="leftprimer" class="form-control" id="forwardSequenceInput" type="text" placeholder="Enter Forward Sequence" onfocusout="calculateFields(this)">
-				</div>
-				<div class="col-2 less-padding vertical-align">
-					<label for="forwardTmInput">Tm</label>
-					<input name="leftTM" class="form-control center-align" id="forwardTmInput" type="text" placeholder="Tm in &#8451">
-				</div>
-				<div class="col-1 less-padding vertical-align">
-					<label for="forwardGC">GC%</label>
-					<input name="leftGC" class="form-control center-align no-side-padding" id="forwardGC" type="text" readonly>
-				</div>
-				<div class="col-1 less-padding vertical-align">
-					<label for="forwardLength">Length</label>
-					<input name="leftlen" class="form-control center-align" id="forwardLength" type="text" readonly>
-				</div>
-				<div class="col-3 less-padding vertical-align">
-					<label for="forwardChrLocation">Location</label>
-					<div id="blastForwardMsg" class="loading-msg">Searching <i class="fa fa-spinner fa-spin"></i></div>
-					<input name="left_genomicLocation" class="form-control center-align" id="forwardLocation" type="text" readonly>
-				</div>
-			</div>
-			<div class="row">
-				<div class="col-1 less-padding">
-				</div>
-				<div class="col-4 left-align less-padding vertical-align">
-					<label class="padding-left" for="reverseSequenceInput">Reverse Primer:</label>
-					<input name="rightprimer" class="form-control" id="reverseSequenceInput" type="text" placeholder="Enter Reverse Sequence" onfocusout="calculateFields(this)">
-				</div>
-				<div class="col-2 less-padding vertical-align">
-					<label for="reverseTmInput">Tm</label>
-					<input name="rightTM" class="form-control center-align" id="reverseTmInput" type="text" placeholder="Tm in &#8451">
-				</div>
-				<div class="col-1 less-padding vertical-align">
-					<label for="reverseGC">GC%</label>
-					<input name="rightGC" class="form-control center-align no-side-padding" id="reverseGC" type="text" readonly>
-				</div>
-				<div class="col-1 less-padding vertical-align">
-					<label for="reverseLength">Length</label>
-					<input name="rightlen" class="form-control center-align" id="reverseLength" type="text" readonly>
-				</div>
-				<div class="col-3 less-padding vertical-align">
-					<label for="reverseChrLocation">Location</label>
-					<div id="blastReverseMsg" class="loading-msg">Searching <i class="fa fa-spinner fa-spin"></i></div>
-					<input name="right_genomicLocation" class="form-control center-align" id="reverseLocation" type="text" readonly>
-				</div>
-			</div>
-		</div>
-	</div>
-	<div class="row">
-		<div class="col-12 mb-4">
-		</div>	
-	</div>
-	<div class="row">
-		<div class="col-8 less-padding">
-		</div>
-		<div class="col-4 less-padding right-align">
-		<button class="btn btn-sm btn-secondary" onclick="window.close()">Cancel</button>
-		<button type="button" class="btn btn-sm  btn-primary" id="addToDatabaseButton" onclick="submitForm()">Add to Database</button>
-		</div>
-	</div>	
-	</div>
-	</form>
+  <head>
+    <script
+      src="https://cdn.jsdelivr.net/npm/popper.js@1.16.1/dist/umd/popper.min.js"
+      integrity="sha384-9/reFTGAW83EW2RDu2S0VKaIzap3H66lZH81PoYlFhbGU+6BZp6G7niu735Sk7lN"
+      crossorigin="anonymous"
+    ></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+    <!-- <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-Fy6S3B9q64WdZWQUiU+q4/2Lc9npb8tCaSX9FK7E8HnRr0Jz8D6OP9dO5Vg3Q9ct" crossorigin="anonymous"></script> -->
+    <script src="../../../docs/bin/bootstrap-4.6.2-dist/js/bootstrap.min.js"></script>
+    <script src="./js/manualPrimerEntry.js"></script>
+    <!-- <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/css/bootstrap.min.css" integrity="sha384-xOolHFLEh07PJGoPkLv1IbcEPTNtaed2xpHsD9ESMhqIYd0nLMwNLD69Npy4HI+N" crossorigin="anonymous"> -->
+    <link rel="stylesheet" href="../../../docs/bin/bootstrap-4.6.2-dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css" />
+    <link rel="stylesheet" type="text/css" href="./css/manualPrimerEntry.css" />
+  </head>
+  <body onload="populateOnLoad()">
+    <h3 id="page-title"></h3>
+    <br />
+    <form id="primerPairForm" onsubmit="return false;">
+      <div class="row">
+        <div class="col-1 less-padding vertical-align">
+          <label for="pairTypeSelect">Type</label>
+          <select name="type" class="form-control no-padding" id="pairTypeSelect">
+            <option>WT</option>
+            <option>EM</option>
+          </select>
+        </div>
+        <div class="col-11">
+          <div class="row">
+            <div class="col-1 less-padding"></div>
+            <div class="col-4 left-align less-padding vertical-align">
+              <label class="padding-left" for="forwardSequenceInput">Forward Primer:</label>
+              <input
+                name="leftprimer"
+                class="form-control"
+                id="forwardSequenceInput"
+                type="text"
+                placeholder="Enter Forward Sequence"
+                onfocusout="calculateFields(this)"
+              />
+            </div>
+            <div class="col-2 less-padding vertical-align">
+              <label for="forwardTmInput">Tm</label>
+              <input
+                name="leftTM"
+                class="form-control center-align"
+                id="forwardTmInput"
+                type="text"
+                placeholder="Tm in &#8451;"
+              />
+            </div>
+            <div class="col-1 less-padding vertical-align">
+              <label for="forwardGC">GC%</label>
+              <input
+                name="leftGC"
+                class="form-control center-align no-side-padding"
+                id="forwardGC"
+                type="text"
+                readonly
+              />
+            </div>
+            <div class="col-1 less-padding vertical-align">
+              <label for="forwardLength">Length</label>
+              <input name="leftlen" class="form-control center-align" id="forwardLength" type="text" readonly />
+            </div>
+            <div class="col-3 less-padding vertical-align">
+              <label for="forwardChrLocation">Location</label>
+              <div id="blastForwardMsg" class="loading-msg">Searching <i class="fa fa-spinner fa-spin"></i></div>
+              <input
+                name="left_genomicLocation"
+                class="form-control center-align"
+                id="forwardLocation"
+                type="text"
+                readonly
+              />
+            </div>
+          </div>
+          <div class="row">
+            <div class="col-1 less-padding"></div>
+            <div class="col-4 left-align less-padding vertical-align">
+              <label class="padding-left" for="reverseSequenceInput">Reverse Primer:</label>
+              <input
+                name="rightprimer"
+                class="form-control"
+                id="reverseSequenceInput"
+                type="text"
+                placeholder="Enter Reverse Sequence"
+                onfocusout="calculateFields(this)"
+              />
+            </div>
+            <div class="col-2 less-padding vertical-align">
+              <label for="reverseTmInput">Tm</label>
+              <input
+                name="rightTM"
+                class="form-control center-align"
+                id="reverseTmInput"
+                type="text"
+                placeholder="Tm in &#8451;"
+              />
+            </div>
+            <div class="col-1 less-padding vertical-align">
+              <label for="reverseGC">GC%</label>
+              <input
+                name="rightGC"
+                class="form-control center-align no-side-padding"
+                id="reverseGC"
+                type="text"
+                readonly
+              />
+            </div>
+            <div class="col-1 less-padding vertical-align">
+              <label for="reverseLength">Length</label>
+              <input name="rightlen" class="form-control center-align" id="reverseLength" type="text" readonly />
+            </div>
+            <div class="col-3 less-padding vertical-align">
+              <label for="reverseChrLocation">Location</label>
+              <div id="blastReverseMsg" class="loading-msg">Searching <i class="fa fa-spinner fa-spin"></i></div>
+              <input
+                name="right_genomicLocation"
+                class="form-control center-align"
+                id="reverseLocation"
+                type="text"
+                readonly
+              />
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="row">
+        <div class="col-12 mb-4"></div>
+      </div>
+      <div class="row">
+        <div class="col-8 less-padding"></div>
+        <div class="col-4 less-padding right-align">
+          <button class="btn btn-sm btn-secondary" onclick="window.close()">Cancel</button>
+          <button type="button" class="btn btn-sm btn-primary" id="addToDatabaseButton" onclick="submitForm()">
+            Add to Database
+          </button>
+        </div>
+      </div>
+    </form>
 
-	<div class="alert alert-danger mt-2" role="alert" id="blastWarning">
-		<div id="forwardBlastResults"></div>
-		<div id="reverseBlastResults"></div>
-	</div>
-	
-
-
-
-
-
-</body>
-</html>	
+    <div class="alert alert-danger mt-2" role="alert" id="blastWarning">
+      <div id="forwardBlastResults"></div>
+      <div id="reverseBlastResults"></div>
+    </div>
+  </body>
+</html>

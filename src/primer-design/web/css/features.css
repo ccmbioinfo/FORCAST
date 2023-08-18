@@ -1,125 +1,129 @@
-body{
-	padding: 30px;
-	text-align: center;
-	min-width:1024px;
+body {
+  padding: 30px;
+  text-align: center;
+  min-width: 1024px;
 }
 
 #removedNote {
-	text-align: left;
+  text-align: left;
 }
 
 .downloadLink {
-	text-decoration: none;
+  text-decoration: none;
 }
 
 #loadingIcon {
-	vertical-align: middle;
+  vertical-align: middle;
 }
 
 .centreCell {
-	text-align: center;
-	padding-top: 0;
-	padding-bottom: 0;
+  text-align: center;
+  padding-top: 0;
+  padding-bottom: 0;
 }
 
 #retryText {
-	display: block;
-	text-align: center;
+  display: block;
+  text-align: center;
 }
 
 .card-header {
-	text-align: left;
+  text-align: left;
 }
 
 .card-link {
-	font-size: 1.25rem;
-	font-weight: 600;
+  font-size: 1.25rem;
+  font-weight: 600;
 }
 
 pre {
-	margin-bottom: 0;
-	font-family: -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif,"Apple Color Emoji","Segoe UI Emoji","Segoe UI Symbol";
+  margin-bottom: 0;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif,
+    "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
 }
 
-
 .table td {
-	padding: 0.25rem;
-	vertical-align: middle;
+  padding: 0.25rem;
+  vertical-align: middle;
 }
 
 .primerNotes {
-	height: 100%;
-	padding: 0;
-	vertical-align: middle;
+  height: 100%;
+  padding: 0;
+  vertical-align: middle;
 }
 
-.alignButton{
-	float: right;
-	display: block;
-	clear: both;
-	margin-right: 5px;
+.alignButton {
+  float: right;
+  display: block;
+  clear: both;
+  margin-right: 5px;
 }
 
 table.center {
-	margin: auto;
+  margin: auto;
 }
 
-#primerResultsTable {	
-	text-align: center;	
-	max-width: 1500px;
-	margin: auto;
+#primerResultsTable {
+  text-align: center;
+  max-width: 1500px;
+  margin: auto;
 }
 
-#existingPrimersTable{
-	max-width: 1350px;
-	margin: auto;
+#existingPrimersTable {
+  max-width: 1350px;
+  margin: auto;
 }
 
 #dropdownDownloadLinks {
-	float: left;	
+  float: left;
 }
 
-.table-bordered, .table-bordered td, .table-bordered th{
-	border: 1px solid #adadad;	
+.table-bordered,
+.table-bordered td,
+.table-bordered th {
+  border: 1px solid #adadad;
 }
 
 .table-bordered thead th {
-	border: 1px solid #adadad;
-
+  border: 1px solid #adadad;
 }
 
-#existingPrimersTable tr:nth-child(4n), #existingPrimersTable tr:nth-child(4n - 1) , .primerTable tr:nth-child(4n), .primerTable tr:nth-child(4n -1){
-	background-color: rgba(0,0,0,0.075);
+#existingPrimersTable tr:nth-child(4n),
+#existingPrimersTable tr:nth-child(4n - 1),
+.primerTable tr:nth-child(4n),
+.primerTable tr:nth-child(4n -1) {
+  background-color: rgba(0, 0, 0, 0.075);
 }
 
 th {
-	background-color: rgba(0,0,0,.05);
+  background-color: rgba(0, 0, 0, 0.05);
 }
 
 #primerResultsTable td {
-	padding: 0.5rem;
-
+  padding: 0.5rem;
 }
 
-#blastHitsTable tr, #forwardBindingSitesTable tr, #reverseBindingSitesTable tr{
-	background-color: rgba(0,0,0,0);
+#blastHitsTable tr,
+#forwardBindingSitesTable tr,
+#reverseBindingSitesTable tr {
+  background-color: rgba(0, 0, 0, 0);
 }
 
 .no-padding {
-	padding: 0px;
+  padding: 0px;
 }
 
 .accepted-dropdown {
-	color: green;
-	background: Transparent;
+  color: green;
+  background: Transparent;
 }
 
 .rejected-dropdown {
-	color: #fb3c3c;
-	background: Transparent;
+  color: #fb3c3c;
+  background: Transparent;
 }
 
 .bordered-button {
-	border: 1px solid #334456;		
+  border: 1px solid #334456;
 }
-

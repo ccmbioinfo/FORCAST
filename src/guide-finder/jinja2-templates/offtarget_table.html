@@ -1,33 +1,29 @@
 <table class="table table-bordered">
-	<thead>
-		<th>Location</th>
-		<th>Sequence</th>
-		{% if 'context' in offtargetSubset[0] %}
-			<th>Context</th>
-		{% endif %}
-		{% if 'MIT' in offtargetSubset[0] %}
-			<th>MIT</th>
-		{% endif %}
-		{% if 'CFD' in offtargetSubset[0] %}
-			<th>CFD</th>
-		{% endif %}
-	</thead>
-	<tbody>
-		{% for offtarget in offtargetSubset %}
-			<tr class="small-font">
-				<td class="no-padding no-wrap">{{offtarget['loc']}}</td>
-				<td class="no-padding no-wrap">{{offtarget['formatted_seq']}}</td>
-				{% if 'context' in offtarget %}
-					<td class="no-padding">{{offtarget['context']}}</td>
-				{% endif %}
-				{% if 'MIT' in offtarget %}
-					<td class="no-padding no-wrap">{{offtarget['MIT']}}</td>
-				{% endif %}
-				{% if 'CFD' in offtarget %}
-					<td class="no-padding no-wrap">{{offtarget['CFD']}}</td>
-				{% endif %}
-			</tr>
-		{% endfor %}
-	</tbody>
+  <thead>
+    <th>Location</th>
+    <th>Sequence</th>
+    {% if 'context' in offtargetSubset[0] %}
+    <th>Context</th>
+    {% endif %} {% if 'MIT' in offtargetSubset[0] %}
+    <th>MIT</th>
+    {% endif %} {% if 'CFD' in offtargetSubset[0] %}
+    <th>CFD</th>
+    {% endif %}
+  </thead>
+  <tbody>
+    {% for offtarget in offtargetSubset %}
+    <tr class="small-font">
+      <td class="no-padding no-wrap">{{offtarget['loc']}}</td>
+      <td class="no-padding no-wrap">{{offtarget['formatted_seq']}}</td>
+      {% if 'context' in offtarget %}
+      <td class="no-padding">{{offtarget['context']}}</td>
+      {% endif %} {% if 'MIT' in offtarget %}
+      <td class="no-padding no-wrap">{{offtarget['MIT']}}</td>
+      {% endif %} {% if 'CFD' in offtarget %}
+      <td class="no-padding no-wrap">{{offtarget['CFD']}}</td>
+      {% endif %}
+    </tr>
+    {% endfor %}
+  </tbody>
 </table>
 {{totalCount}}

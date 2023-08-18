@@ -1,86 +1,119 @@
-<!DOCTYPE html>
+<!doctype html>
 <html>
-<head>
-	<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.3/umd/popper.min.js" integrity="sha384-ZMP7rVo3mIykV+2+9J3UJ46jBk0WLaUAdn689aCwoqbBJiSnjAK/l8WvCWPIPm49" crossorigin="anonymous"></script>
-	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
-	<script src="../../../docs/bin/bootstrap-4.6.2-dist/js/bootstrap.min.js"></script>
-	<script src="js/loadingPage.js"></script>
-	<!-- <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/css/bootstrap.min.css" integrity="sha384-xOolHFLEh07PJGoPkLv1IbcEPTNtaed2xpHsD9ESMhqIYd0nLMwNLD69Npy4HI+N" crossorigin="anonymous"> -->
-	<link rel="stylesheet" href="../../../docs/bin/bootstrap-4.6.2-dist/css/bootstrap.min.css">
-	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
-	<link rel="stylesheet" type="text/css" href="css/features.css">
-</head>
-<body onload="PopulatePage()">
-	<h1 id="pageHeading"></h1>
-	<p id="warningMessage" class="text-warning"></p>
-</br>
-<div id="container">
-	<div class="row">
-		<div class="col-0"></div>
-		<div class="col-12">
-			<div id="accordion">
-				<div class="card">
-					<div class="card-header">
-						<a class="card-link" data-toggle="collapse" href="#collapseOne">
-							Guides
-						</a>
-					</div>
-					<div id="collapseOne" class="collapse show">
-						<div class="card-body">
-							<div class="row">	
-								<div class="col-12">
-									<div id="guideTable"></div>
-									<div class="btn-group" role="group" style="float: right;" id="guideButtonGroup">
-										<button type="button" class="btn btn-sm btn-primary bordered-button" onclick="manuallyEnterPrimers()">Manually Enter Primers</button>	
-										<button type="button" class="btn btn-sm btn-primary bordered-button" onclick="RunPrimerDesignScript()">Design Primers</button>
-										<div class="btn-group" role="group">
-											<button type="button" class="btn btn-sm btn-secondary dropdown-toggle bordered-button" data-toggle="dropdown">
-											Download
-											</button>
-											<div class="dropdown-menu">
-												<a class="dropdown-item" id="DownloadGuideAPE" title="Download APE of selected guides and their accepted primers" download href="#">APE File</a>
-												<a class="dropdown-item" id="DownloadGuideCSV" title="Download CSV of selected guides and their accepted primers" download href="#">CSV File</a>
-												<a class="dropdown-item" id="DownloadGuideDOC" title="Download document with a table of accepted guide details" download href="#">DOC File</a>
-											</div>
-										</div>
-									</div>
-								</div>
-							</div>		
-						</div>
-					</div>
-					<div class="card">
-						<div class="card-header">
-							<a class="collapsed card-link" data-toggle="collapse" href="#collapseTwo">
-								Primers
-							</a>
-						</div>
-						<div id="collapseTwo" class="collapse">
-							<div class="card-body">
-								<div id="existingPrimersTable"></div>	
-							</div>
-						</div>
-					</div>
+  <head>
+    <script
+      src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.3/umd/popper.min.js"
+      integrity="sha384-ZMP7rVo3mIykV+2+9J3UJ46jBk0WLaUAdn689aCwoqbBJiSnjAK/l8WvCWPIPm49"
+      crossorigin="anonymous"
+    ></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+    <script src="../../../docs/bin/bootstrap-4.6.2-dist/js/bootstrap.min.js"></script>
+    <script src="js/loadingPage.js"></script>
+    <!-- <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/css/bootstrap.min.css" integrity="sha384-xOolHFLEh07PJGoPkLv1IbcEPTNtaed2xpHsD9ESMhqIYd0nLMwNLD69Npy4HI+N" crossorigin="anonymous"> -->
+    <link rel="stylesheet" href="../../../docs/bin/bootstrap-4.6.2-dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css" />
+    <link rel="stylesheet" type="text/css" href="css/features.css" />
+  </head>
+  <body onload="PopulatePage()">
+    <h1 id="pageHeading"></h1>
+    <p id="warningMessage" class="text-warning"></p>
+    <br />
+    <div id="container">
+      <div class="row">
+        <div class="col-0"></div>
+        <div class="col-12">
+          <div id="accordion">
+            <div class="card">
+              <div class="card-header">
+                <a class="card-link" data-toggle="collapse" href="#collapseOne"> Guides </a>
+              </div>
+              <div id="collapseOne" class="collapse show">
+                <div class="card-body">
+                  <div class="row">
+                    <div class="col-12">
+                      <div id="guideTable"></div>
+                      <div class="btn-group" role="group" style="float: right" id="guideButtonGroup">
+                        <button
+                          type="button"
+                          class="btn btn-sm btn-primary bordered-button"
+                          onclick="manuallyEnterPrimers()"
+                        >
+                          Manually Enter Primers
+                        </button>
+                        <button
+                          type="button"
+                          class="btn btn-sm btn-primary bordered-button"
+                          onclick="RunPrimerDesignScript()"
+                        >
+                          Design Primers
+                        </button>
+                        <div class="btn-group" role="group">
+                          <button
+                            type="button"
+                            class="btn btn-sm btn-secondary dropdown-toggle bordered-button"
+                            data-toggle="dropdown"
+                          >
+                            Download
+                          </button>
+                          <div class="dropdown-menu">
+                            <a
+                              class="dropdown-item"
+                              id="DownloadGuideAPE"
+                              title="Download APE of selected guides and their accepted primers"
+                              download
+                              href="#"
+                              >APE File</a
+                            >
+                            <a
+                              class="dropdown-item"
+                              id="DownloadGuideCSV"
+                              title="Download CSV of selected guides and their accepted primers"
+                              download
+                              href="#"
+                              >CSV File</a
+                            >
+                            <a
+                              class="dropdown-item"
+                              id="DownloadGuideDOC"
+                              title="Download document with a table of accepted guide details"
+                              download
+                              href="#"
+                              >DOC File</a
+                            >
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div class="card">
+                <div class="card-header">
+                  <a class="collapsed card-link" data-toggle="collapse" href="#collapseTwo"> Primers </a>
+                </div>
+                <div id="collapseTwo" class="collapse">
+                  <div class="card-body">
+                    <div id="existingPrimersTable"></div>
+                  </div>
+                </div>
+              </div>
 
-
-					<div class="card">
-						<div class="card-header">
-							<a class="collapsed card-link" data-toggle="collapse" href="#collapseThree">
-								Primer Design
-							</a>
-						</div>
-						<div id="collapseThree" class="collapse">
-							<div class="card-body">
-								<img src="img/loading.gif" alt="loading icon" title="Designing Primers" id="loadingIcon">
-								<div id="primerResultsTable"></div>	
-							</div>
-						</div>
-					</div>
-				</div>
-			</div>	
-		</div>		
-		<div class="col-0"></div>
-	</div>
-</div>
-</body>
+              <div class="card">
+                <div class="card-header">
+                  <a class="collapsed card-link" data-toggle="collapse" href="#collapseThree"> Primer Design </a>
+                </div>
+                <div id="collapseThree" class="collapse">
+                  <div class="card-body">
+                    <img src="img/loading.gif" alt="loading icon" title="Designing Primers" id="loadingIcon" />
+                    <div id="primerResultsTable"></div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="col-0"></div>
+      </div>
+    </div>
+  </body>
 </html>
-

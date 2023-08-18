@@ -8,6 +8,7 @@ jbrowse/plugins/*
 !jbrowse/plugins/ColorByCDS
 !jbrowse/plugins/ExportSequence
 mongodb
+node_modules
 
 # filetypes
 *.pyc

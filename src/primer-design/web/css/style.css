@@ -1,32 +1,30 @@
 body {
-	margin: 15px;
-	text-align: center;
+  margin: 15px;
+  text-align: center;
 }
 #writePrimersButton {
-	//float: right;
-	//margin-right: 150px;
-	width: 125px;
-	white-space: normal;
-
+  //float: right;
+  //margin-right: 150px;
+  width: 125px;
+  white-space: normal;
 }
 #primerType {
-	text-align: left;
-	text-decoration: none;
-	font-weight: bold;
-	padding-left: 10px;
+  text-align: left;
+  text-decoration: none;
+  font-weight: bold;
+  padding-left: 10px;
 }
 #removedNote {
-	text-align: left;
-	padding-left: 10px;
+  text-align: left;
+  padding-left: 10px;
 }
 .downloadLink {
-	text-decoration: none;
+  text-decoration: none;
 }
 .centreCell {
-	text-align: center;
+  text-align: center;
 }
 #retryText {
-	display: block;
-	text-align: center;
+  display: block;
+  text-align: center;
 }
-
