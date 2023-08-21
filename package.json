@@ -1,4 +1,5 @@
 {
+  "name": "forcast",
   "scripts": {
     "format": "npx prettier --write src/**/*.{css,html,js}"
   },
