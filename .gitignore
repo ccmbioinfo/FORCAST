@@ -3,6 +3,9 @@
 bin
 config
 jbrowse/*
+!jbrowse/data
+jbrowse/data/*
+!jbrowse/data/datasets.sample.conf
 !jbrowse/plugins
 jbrowse/plugins/*
 !jbrowse/plugins/ColorByCDS

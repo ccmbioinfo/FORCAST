@@ -1,2 +1,3 @@
 *
-!config-template
+!config-sample
+!jbrowse/data/datasets.sample.conf
