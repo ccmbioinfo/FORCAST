@@ -55,6 +55,9 @@ RUN curl -LO https://github.com/GMOD/jbrowse/releases/download/1.12.5-release/JB
 # Dependencies for FORCAST CGI scripts + inDelphi
 RUN python3.7 -m pip install --upgrade pip && \
     python3.7 -m pip install --no-cache-dir pymongo==3.12.3 Jinja2==2.8 markupsafe==2.0.1 pandas==0.23.4 scikit-learn==0.20.0 scipy==1.1.0 numpy==1.15.3
+# Copy sample files and directories
+COPY config-sample /var/www/html/config
+COPY jbrowse/data/datasets.sample.conf /var/www/html/jbrowse/data/datasets.conf
 WORKDIR /var/www/html
 # Increase Apache timeout
 RUN sed -i 's/^Timeout [[:digit:]]\+/Timeout 1200/g' /etc/apache2/apache2.conf

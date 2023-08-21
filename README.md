@@ -28,9 +28,10 @@ Clone this repository. Note: an image will be provided at a later date, and clon
 git clone https://github.com/ccmbioinfo/FORCAST.git
 ```
 
-Navigate to the cloned repository folder, build the Docker image, and start the service container.
+Navigate to the cloned repository folder, copy the sample `config-sample` directory and `datasets.sample.conf` file, build the Docker image, and start the service container.
 
 ```bash
+cp -r config-sample config && cp jbrowse/data/datasets.sample.conf jbrowse/data/datasets.conf
 docker compose up
 ```
 
