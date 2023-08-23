@@ -468,7 +468,7 @@ const createDiceyMessagesModal = (messages, rowID) => {
 		<button
 			type="button"
 			class="btn btn-link no-padding"
-			style="background-color: #ffe9a8; border: 1px solid #b90e1e; color: #b90e1e; border-radius: 20px; padding: 0 0.5rem; font-size: 0.75rem;"
+			style="display: block; margin: 0 auto; background-color: #ffe9a8; border: 1px solid #b90e1e; color: #b90e1e; border-radius: 20px; padding: 0 0.5rem; font-size: 0.75rem;"
 			data-toggle="modal"
 			data-target="#${rowID}-qa-messages-modal"
 		>
