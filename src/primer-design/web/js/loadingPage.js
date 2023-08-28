@@ -13,37 +13,42 @@ var GENOME = getUrlVars()["org"];
 document.title = geneName + " Info";
 var existingPrimersCount = 0;
 
-// get the release mongo/jbrowse is using
-var RELEASE = (function () {
-  var tempRelease = null;
-  $.ajax({
-    type: "POST",
-    dataType: "html",
-    data: { genome: GENOME },
-    async: false,
-    url: "./ajaxCalls/fetchRelease.py",
-    success: function (html) {
-      tempRelease = html.toString().trim();
-    },
+// Check if FORCAST is using the most up-to-date Ensembl release
+const checkRelease = () => {
+  let ensemblRelease;
+  let forcastEnsemblRelease;
+  $.when(
+    $.ajax({
+      type: "POST",
+      dataType: "html",
+      data: { genome: GENOME },
+      url: "./ajaxCalls/fetchRelease.py",
+      success: function (html) {
+        forcastEnsemblRelease = html.toString().trim();
+      },
+    }),
+    $.ajax({
+      type: "POST",
+      dataType: "html",
+      url: "./ajaxCalls/fetchEnsemblRelease.py",
+      success: function (html) {
+        ensemblRelease = html.toString().trim();
+      },
+    }),
+  ).then(() => {
+    setTimeout(() => {
+      if (ensemblRelease.startsWith("The Ensembl Rest API is not responding")) {
+        $("#warningMessage").html(`JBrowse is using release ${forcastEnsemblRelease}. ${ensemblRelease}`);
+      } else if (forcastEnsemblRelease !== ensemblRelease) {
+        $("#warningMessage").html(
+          `Warning: JBrowse is using release ${forcastEnsemblRelease}, Ensembl is on release ${ensemblRelease}`,
+        );
+      } else {
+        $("#warningMessage").html("");
+      }
+    }, 1000);
   });
-  return tempRelease;
-})();
-
-// get the ensembl current release
-var ENSMBL_RELEASE = (function () {
-  var ensRelease = null;
-  $.ajax({
-    type: "POST",
-    dataType: "html",
-    async: false,
-    url: "./ajaxCalls/fetchEnsemblRelease.py",
-    success: function (html) {
-      ensRelease = html.toString().trim();
-      //console.log(ensRelease);
-    },
-  });
-  return ensRelease;
-})();
+};
 
 //boolean to indicate whether the design script has been run yet during this session
 var primersDesigned = false;
@@ -57,14 +62,6 @@ function PopulatePage() {
   $("#pageHeading").append(geneName + " Info");
   checkRelease();
   $("#updateNotesSpinner").hide();
-}
-
-function checkRelease() {
-  if (ENSMBL_RELEASE.toString() != RELEASE.toString()) {
-    $("#warningMessage").append(
-      "Warning: JBrowse is using release " + RELEASE + ", Ensembl is on release " + ENSMBL_RELEASE,
-    );
-  }
 }
 
 function unlockLabel(e) {

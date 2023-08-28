@@ -16,7 +16,16 @@
   </head>
   <body onload="PopulatePage()">
     <h1 id="pageHeading"></h1>
-    <p id="warningMessage" class="text-warning"></p>
+    <p id="warningMessage" class="text-warning">
+      <img
+        src="img/loading.gif"
+        width="20"
+        alt="Loading icon"
+        title="Fetching Ensembl release information"
+        style="margin-right: 10px; filter: hue-rotate(180deg)"
+      />
+      <span style="vertical-align: middle">Fetching Ensembl release information...</span>
+    </p>
     <br />
     <div id="container">
       <div class="row">
