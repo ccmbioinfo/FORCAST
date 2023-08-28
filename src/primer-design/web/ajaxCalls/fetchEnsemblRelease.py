@@ -10,18 +10,20 @@ import requests
 
 
 def getRelease():
-    url = "https://rest.ensembl.org/info/data/?"
+    url = "https://rest.ensembl.org/info/data"
 
     try:
         releaseRequest = requests.get(
             url, headers={"Content-Type": "application/json"}, timeout=15
         )
     except requests.exceptions.Timeout:
-        return "The Ensembl Rest API is not responding (https://rest.ensembl.org). Some functionality may be unavailable"
+        return f"The Ensembl Rest API is not responding ({url}). Some functionality may be unavailable"
 
     if not releaseRequest.ok:
-        releaseRequest.raise_for_status()
-        return "Problem fetching information from Ensembl"
+        try:
+            releaseRequest.raise_for_status()
+        except Exception as e:
+            return f"Problem fetching release information from Ensembl: {e}"
 
     release = releaseRequest.json()["releases"]
 

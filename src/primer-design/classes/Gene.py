@@ -52,20 +52,20 @@ class Gene(object):
         self.APE = self.APEObj.geneAPE
 
     def checkRelease(self):
-        ext = "/info/data/?"
+        ext = "/info/data"
         try:
             releaseRequest = requests.get(
                 server + ext, headers={"Content-Type": "application/json"}, timeout=30
             )
         except requests.exceptions.Timeout:
-            returnError(
-                "The Ensembl Rest API is not responding (https://rest.ensembl.org)"
-            )
+            returnError(f"The Ensembl Rest API is not responding ({server + ext})")
         except Exception:
             returnError("Problem with Ensembl Rest API call")
         if not releaseRequest.ok:
-            releaseRequest.raise_for_status()
-            returnError("Problem fetching gene information from Ensembl")
+            try:
+                releaseRequest.raise_for_status()
+            except Exception as e:
+                returnError(f"Problem fetching release information from Ensembl: {e}")
         release = releaseRequest.json()["releases"]
 
         if len(release) != 1:
@@ -83,21 +83,21 @@ class Gene(object):
 	"""
 
     def getFeatureType(self):
-        ext = "/lookup/id/%s?" % self.ensemblID
+        ext = f"/lookup/id/{self.ensemblID}"
         try:
             featureRequest = requests.get(
                 server + ext, headers={"Content-Type": "application/json"}, timeout=30
             )
         except requests.exceptions.Timeout:
-            returnError(
-                "The Ensembl Rest API is not responding (https://rest.ensembl.org)"
-            )
+            returnError(f"The Ensembl Rest API is not responding ({server + ext})")
         except Exception:
             returnError("Problem with Ensembl Rest API call")
 
         if not featureRequest.ok:
-            featureRequest.raise_for_status()
-            returnError("Problem fetching feature type")
+            try:
+                featureRequest.raise_for_status()
+            except Exception as e:
+                returnError(f"Problem fetching feature type from Ensembl: {e}")
 
         decodedFeature = featureRequest.json()
         try:
@@ -129,20 +129,20 @@ class Gene(object):
         return geneMatch[0]["ENSID"], "gene"
 
     def getGeneCoordinates(self):
-        ext = "/overlap/id/%s?feature=%s" % (self.ensemblID, self.featureType)
+        ext = f"/overlap/id/{self.ensemblID}?feature={self.featureType}"
         try:
             geneRequest = requests.get(
                 server + ext, headers={"Content-Type": "application/json"}, timeout=30
             )
         except requests.exceptions.Timeout:
-            returnError(
-                "The Ensembl Rest API is not responding (https://rest.ensembl.org)"
-            )
+            returnError(f"The Ensembl Rest API is not responding ({server + ext})")
         except Exception:
             returnError("Problem with Ensembl Rest API call")
         if not geneRequest.ok:
-            geneRequest.raise_for_status()
-            returnError("Problem fetching gene features")
+            try:
+                geneRequest.raise_for_status()
+            except Exception as e:
+                returnError(f"Problem fetching gene features from Ensembl: {e}")
         decodedGene = geneRequest.json()
         try:
             decodedGene = list(
@@ -173,25 +173,22 @@ class Gene(object):
 
     def getExons(self):
         # gets the transcripts and exons in the gene's region, only fetching protein-coding transcripts
-        ext = (
-            "/overlap/region/"
-            + str(self.Config.organismName)
-            + "/%s:%s-%s?;feature=exon;feature=transcript;biotype=protein_coding"
-            % (self.chromosome, self.gene_start, self.gene_end)
-        )
+        ext = f"/overlap/region/{self.Config.organismName}/{self.chromosome}:{self.gene_start}-{self.gene_end}?feature=exon;feature=transcript;biotype=protein_coding"
         try:
             featureRequest = requests.get(
                 server + ext, headers={"Content-Type": "application/json"}, timeout=30
             )
         except requests.exceptions.Timeout:
-            returnError(
-                "The Ensembl Rest API is not responding (https://rest.ensembl.org)."
-            )
+            returnError(f"The Ensembl Rest API is not responding ({server + ext})")
         except Exception:
             returnError("Problem with Ensembl Rest API call")
         if not featureRequest.ok:
-            featureRequest.raise_for_status()
-            returnError("Problem fetching protein-coding transcripts for this gene")
+            try:
+                featureRequest.raise_for_status()
+            except Exception as e:
+                returnError(
+                    f"Problem fetching protein-coding transcripts for this gene from Ensembl: {e}"
+                )
 
         # get all the transcripts from the gene and remove those that are poorly supported
         # commenting out the transcript support level for now some genes don't have it defined which causes the program to halt
@@ -295,26 +292,18 @@ class Gene(object):
                     "No protein-coding exons found, unable to get strand from gene coordinates"
                 )
 
-        ext = "/sequence/region/%s/%s:%s..%s:%s?content-type=text/plain;mask=soft" % (
-            str(self.Config.organismName),
-            str(self.chromosome),
-            str(seqStart),
-            str(seqEnd),
-            str(strand),
-        )
+        ext = f"/sequence/region/{self.Config.organismName}/{self.chromosome}:{seqStart}..{seqEnd}:{strand}?content-type=text/plain;mask=soft"
         try:
             seqRequest = requests.get(server + ext, timeout=30)
         except requests.exceptions.Timeout:
-            returnError(
-                "The Ensembl Rest API is not responding (https://rest.ensembl.org)"
-            )
+            returnError(f"The Ensembl Rest API is not responding ({server + ext})")
         except Exception:
             returnError("Problem with Ensembl Rest API call")
         if not seqRequest.ok:
             try:
                 seqRequest.raise_for_status()
             except Exception as e:
-                returnError("Problem fetching sequence from ENSEMBL: " + str(e))
+                returnError(f"Problem fetching sequence from Ensembl: {e}")
 
         seq = seqRequest.text.strip()
 

@@ -59,7 +59,7 @@ def fetchGeneSymbol(ENSID):
             server + ext, headers={"Content-Type": "application/json"}, timeout=30
         )
     except requests.exceptions.Timeout:
-        printError("The Ensembl Rest API is not responding (https://rest.ensembl.org)")
+        printError(f"The Ensembl Rest API is not responding ({server + ext})")
     except Exception:
         printError("Problem with Ensembl Rest API call")
 

@@ -92,10 +92,12 @@ class Guide(Gene):
         except Exception:
             returnError("Problem with Ensembl Rest API call")
         if not regulatoryRequest.ok:
-            regulatoryRequest.raise_for_status()
-            returnError(
-                "Problem fetching the regulatory elements for the excised sequence"
-            )
+            try:
+                regulatoryRequest.raise_for_status()
+            except Exception as e:
+                returnError(
+                    f"Problem fetching the regulatory elements for the excised sequence from Ensembl: {e}"
+                )
 
         elements = regulatoryRequest.json()
 
@@ -232,7 +234,7 @@ class Guide(Gene):
                         + "_"
                         + str(self.super.release)
                         + "-automated_0_"
-                        + str(key[0])
+                        + str(key[1])
                         + ".ape"
                     )
                 else:
@@ -263,111 +265,71 @@ class Guide(Gene):
             # create if it doesn't exist yet
             os.makedirs(csvDir_genome)
         # write a csv for every pair of wt and em primers
-        for w, wPrimer in self.wtPrimers.items():
-            if len(self.emPrimers) > 0:
-                for e, ePrimer in self.emPrimers.items():
-                    filename = str(
-                        self.super.geneName
-                        + "_"
-                        + str(self.super.release)
-                        + "-primers_"
-                        + str(w)
-                        + "_"
-                        + str(e)
-                        + ".csv"
-                    )
-                    filepath = os.path.join(csvDir_genome, filename)
-                    try:
-                        with open(filepath, mode="w") as csv_file:
-                            # write Guide Header
-                            writer = csv.writer(csv_file, delimiter=",")
-                            writer.writerow(["Guides:"])
-                            writer.writerow(["Sequence", "PAM"])
-                            # print guides from dictionary
-                            guideFields = ["sequence", "PAM"]
-                            writer = csv.DictWriter(csv_file, fieldnames=guideFields)
-                            for g, guide in guideDict.items():
-                                writer.writerow(guide)
-                            writer = csv.writer(csv_file, delimiter=",")
-                            writer.writerow([])
-                            writer.writerow(["Primers:"])
-                            writer.writerow(["Primer Name", "Sequence", "Tm"])
-                            primerName = str(self.super.geneName + "_")
-                            writer.writerow(
-                                [
-                                    (primerName + "wt_F1"),
-                                    wPrimer["leftprimer"],
-                                    str(wPrimer["leftTM"]),
-                                ]
-                            )
-                            writer.writerow(
-                                [
-                                    (primerName + "wt_R1"),
-                                    wPrimer["rightprimer"],
-                                    str(wPrimer["rightTM"]),
-                                ]
-                            )
-                            writer.writerow(
-                                [
-                                    (primerName + "em_F1"),
-                                    ePrimer["leftprimer"],
-                                    str(ePrimer["leftTM"]),
-                                ]
-                            )
-                            writer.writerow(
-                                [
-                                    (primerName + "em_R1"),
-                                    ePrimer["rightprimer"],
-                                    str(ePrimer["rightTM"]),
-                                ]
-                            )
-                        emCounter += 1
-                    except Exception as e:
-                        returnError("Problem writing csv file : " + str(e))
-            else:
-                filename = str(
-                    self.super.geneName
-                    + "_"
-                    + str(self.super.release)
-                    + "-primers_"
-                    + str(w)
-                    + "_0.csv"
-                )
-                filepath = os.path.join(csvDir_genome, filename)
-                try:
-                    with open(filepath, mode="w") as csv_file:
-                        # write Guide Header
-                        writer = csv.writer(csv_file, delimiter=",")
-                        writer.writerow(["Guides:"])
-                        writer.writerow(["Sequence", "PAM"])
-                        # print guides from dictionary
-                        guideFields = ["sequence", "PAM"]
-                        writer = csv.DictWriter(csv_file, fieldnames=guideFields)
-                        for g, guide in guideDict.items():
-                            writer.writerow(guide)
-                        writer = csv.writer(csv_file, delimiter=",")
-                        writer.writerow([])
-                        writer.writerow(["Primers:"])
-                        writer.writerow(["Primer Name", "Sequence", "Tm"])
-                        primerName = str(self.super.geneName + "_")
+        wt_primers = self.wtPrimers.items()
+        em_primers = self.emPrimers.items()
+        wt_em_primer_pairs = [
+            (wt_primer, em_primer)
+            for wt_primer in (wt_primers if len(wt_primers) else [(0, None)])
+            for em_primer in (em_primers if len(em_primers) else [(0, None)])
+        ]
+
+        for (wt_primer_index, wt_primer), (
+            em_primer_index,
+            em_primer,
+        ) in wt_em_primer_pairs:
+            filename = f"{self.super.geneName}_{self.super.release}-primers_{wt_primer_index}_{em_primer_index}.csv"
+            filepath = os.path.join(csvDir_genome, filename)
+
+            try:
+                with open(filepath, mode="w") as csv_file:
+                    # write Guide Header
+                    writer = csv.writer(csv_file, delimiter=",")
+                    writer.writerow(["Guides:"])
+                    writer.writerow(["Sequence", "PAM"])
+                    # print guides from dictionary
+                    guide_fields = ["sequence", "PAM"]
+                    writer = csv.DictWriter(csv_file, fieldnames=guide_fields)
+                    for g, guide in guideDict.items():
+                        writer.writerow(guide)
+                    writer = csv.writer(csv_file, delimiter=",")
+                    writer.writerow([])
+                    writer.writerow(["Primers:"])
+                    writer.writerow(["Primer Name", "Sequence", "Tm"])
+                    primer_name = str(self.super.geneName + "_")
+
+                    if wt_primer is not None:
                         writer.writerow(
                             [
-                                (primerName + "wt_F1"),
+                                (primer_name + "wt_F1"),
                                 wPrimer["leftprimer"],
                                 str(wPrimer["leftTM"]),
                             ]
                         )
                         writer.writerow(
                             [
-                                (primerName + "wt_R1"),
-                                wPrimer["rightprimer"],
-                                str(wPrimer["rightTM"]),
+                                (primer_name + "wt_R1"),
+                                wt_primer["rightprimer"],
+                                str(wt_primer["rightTM"]),
                             ]
                         )
-                except Exception as e:
-                    returnError("Problem writing csv file : " + str(e))
-            wtCounter += 1
-        return
+
+                    if em_primer is not None:
+                        writer.writerow(
+                            [
+                                (primer_name + "em_F1"),
+                                em_primer["leftprimer"],
+                                str(em_primer["leftTM"]),
+                            ]
+                        )
+                        writer.writerow(
+                            [
+                                (primer_name + "em_R1"),
+                                em_primer["rightprimer"],
+                                str(em_primer["rightTM"]),
+                            ]
+                        )
+            except Exception as e:
+                returnError(f"Problem writing csv file: {e}")
 
     def writePrimerJSON(self):
         # get ids of guides used in design

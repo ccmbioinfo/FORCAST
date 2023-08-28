@@ -32,7 +32,7 @@ def fetch_sequence(chrom_coord, genome_twobit, output_fasta):
         "-start={0}".format(start),
         "-end={0}".format(end),
     )
-    
+
     try:
         twoBitToFaOut = (
             subprocess.check_output(

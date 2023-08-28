@@ -395,7 +395,7 @@ function RunPrimerDesignScript() {
           $.ajax(this);
           return;
         } else {
-          $("#loadingIcon").attr("src", "web/img/warning-icon.png");
+          $("#loadingIcon").attr("src", "img/warning-icon.png");
           $("#loadingIcon").attr("title", "Design Timed Out. Please try again");
         }
       }
@@ -656,10 +656,11 @@ function createDiceyModal(rowID, amplicons, bindingSites) {
     rowID +
     `" role="tabpanel" style="text-align:left; padding:1rem; margin:0;">`;
   // print out all the amplicon details
-  for (var a in amplicons) {
+  Object.keys(amplicons).forEach((a, i) => {
     if (amplicons.hasOwnProperty(a)) {
       rank = amplicons[a]["Id"] + 1;
-      html += "<br><b>Amplicon " + rank + "</b><br>";
+      if (i !== 0) html += "<br>";
+      html += "<b>Amplicon " + rank + "</b><br>";
       html += "Length: " + amplicons[a]["Seq"].length + "<br>";
       html +=
         "Location: chr" + amplicons[a]["Chrom"] + ":" + amplicons[a]["ForPos"] + "-" + amplicons[a]["RevEnd"] + "<br>";
@@ -681,7 +682,7 @@ function createDiceyModal(rowID, amplicons, bindingSites) {
         console.log("Primer Names not Set Correctly in Dicey Backend");
       }
     }
-  }
+  });
 
   // open up the div for the binding sites tab
   html +=
