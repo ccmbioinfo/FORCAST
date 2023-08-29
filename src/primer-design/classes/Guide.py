@@ -301,8 +301,8 @@ class Guide(Gene):
                         writer.writerow(
                             [
                                 (primer_name + "wt_F1"),
-                                wPrimer["leftprimer"],
-                                str(wPrimer["leftTM"]),
+                                wt_primer["leftprimer"],
+                                str(wt_primer["leftTM"]),
                             ]
                         )
                         writer.writerow(
