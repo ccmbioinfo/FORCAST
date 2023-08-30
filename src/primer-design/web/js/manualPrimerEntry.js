@@ -2,20 +2,19 @@ var params = new URLSearchParams(location.search);
 var geneName = params.get("gene");
 var ENSID = params.get("ensid");
 var GENOME = params.get("org");
-var RELEASE = (function () {
-  var tempRelease = null;
-  $.ajax({
-    type: "POST",
-    dataType: "html",
-    data: { genome: GENOME },
-    async: false,
-    url: "./ajaxCalls/fetchRelease.py",
-    success: function (html) {
-      tempRelease = html.toString().trim();
-    },
-  });
-  return tempRelease;
-})();
+
+let forcastEnsemblRelease;
+
+$.ajax({
+  type: "POST",
+  dataType: "html",
+  data: { genome: GENOME },
+  url: "./ajaxCalls/fetchRelease.py",
+  success: function (html) {
+    forcastEnsemblRelease = html.toString().trim();
+    $("#addToDatabaseButton").prop("disabled", false);
+  },
+});
 
 document.title = geneName + " Manual Primer Entry";
 
@@ -160,7 +159,7 @@ function submitForm() {
   var form = $("#primerPairForm").serialize();
   form += "&gene=" + geneName;
   form += "&ensid=" + ENSID;
-  form += "&release=" + RELEASE;
+  form += "&release=" + forcastEnsemblRelease;
   form += "&genome=" + GENOME;
 
   $.ajax({
