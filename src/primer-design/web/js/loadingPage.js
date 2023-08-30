@@ -13,10 +13,11 @@ var GENOME = getUrlVars()["org"];
 document.title = geneName + " Info";
 var existingPrimersCount = 0;
 
+let forcastEnsemblRelease;
+
 // Check if FORCAST is using the most up-to-date Ensembl release
 const checkRelease = () => {
   let ensemblRelease;
-  let forcastEnsemblRelease;
   $.when(
     $.ajax({
       type: "POST",
@@ -25,6 +26,7 @@ const checkRelease = () => {
       url: "./ajaxCalls/fetchRelease.py",
       success: function (html) {
         forcastEnsemblRelease = html.toString().trim();
+        $("#primer-design-button").prop("disabled", false);
       },
     }),
     $.ajax({
@@ -309,7 +311,7 @@ function addPrimersToDatabase() {
   var values = getSelected();
   var data = {};
   data["gene"] = geneName;
-  data["release"] = RELEASE;
+  data["release"] = forcastEnsemblRelease;
   data["wtPair"] = values[0];
   data["emPair"] = values[1];
   data["genome"] = GENOME;
