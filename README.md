@@ -6,6 +6,10 @@ A fully-integrated and open-source pipeline to design CRISPR mutagenesis experim
 
 - [Hardware Requirements](#hardware-requirements)
 - [Installing with Docker](#installing-with-docker)
+  - [Setup](#setup)
+  - [Production environment](#for-production-environment-using-stable-tagged-docker-image)
+  - [Staging environment](#for-staging-environment-using-latest-tagged-docker-image)
+  - [Local development environment](#for-local-development-environment-using-locally-built-docker-image)
 - [Customization](#customization)
 - [Migration](#migration)
 - [Citation](#citation)
@@ -19,10 +23,12 @@ Storage should expand as needed to store however many genome assemblies you wish
 
 ## Installing with Docker
 
+### Setup
+
 On the host computer or server, install the [Docker Engine](https://docs.docker.com/engine/install/) and, if you are not using Docker Desktop, [Docker Compose](https://docs.docker.com/compose/install/linux/) on Linux. Note the licensing requirements for
 Docker Desktop, though the Docker Engine and Compose for Linux remain free and open source.
 
-Clone this repository. Note: an image will be provided at a later date, and cloning will not be required.
+Clone this repository:
 
 ```bash
 git clone https://github.com/ccmbioinfo/FORCAST.git
@@ -32,8 +38,51 @@ Navigate to the cloned repository folder, copy the sample `config-sample` direct
 
 ```bash
 cp -r config-sample config && cp jbrowse/data/datasets.sample.conf jbrowse/data/datasets.conf
+```
+
+### For production environment (using `stable` tagged Docker image)
+
+To start and run the FORCAST Docker container:
+
+```bash
+docker compose -f docker-compose-prod.yaml up
+```
+
+To stop and remove the FORCAST Docker container:
+
+```bash
+docker compose -f docker-compose-prod.yaml down
+```
+
+### For staging environment (using `latest` tagged Docker image)
+
+To start and run the FORCAST Docker container:
+
+```bash
+docker compose -f docker-compose-dev.yaml up
+```
+
+To stop and remove the FORCAST Docker container:
+
+```bash
+docker compose -f docker-compose-dev.yaml down
+```
+
+### For local development environment (using locally built Docker image)
+
+To start and run the FORCAST Docker container:
+
+```bash
 docker compose up
 ```
+
+To stop and remove the FORCAST Docker container:
+
+```bash
+docker compose down
+```
+
+---
 
 FORCAST should now be available on `localhost:80`, or port 80 of the hosting machine.
 

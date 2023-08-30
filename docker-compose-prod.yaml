@@ -1,8 +1,7 @@
 version: "3.9"
 services:
   forcast:
-    build: .
-    image: ghcr.io/ccmbioinfo/forcast:dev
+    image: ghcr.io/ccmbioinfo/forcast:stable
     ports:
       - 80:80
     tmpfs:
