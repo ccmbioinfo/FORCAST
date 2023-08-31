@@ -12,7 +12,7 @@ $.ajax({
   url: "./ajaxCalls/fetchRelease.py",
   success: function (html) {
     forcastEnsemblRelease = html.toString().trim();
-    $("#addToDatabaseButton").prop("disabled", false);
+    $("#addToDatabaseButton").prop("disabled", false).text("Add to Database");
   },
 });
 

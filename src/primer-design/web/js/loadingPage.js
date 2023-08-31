@@ -26,7 +26,7 @@ const checkRelease = () => {
       url: "./ajaxCalls/fetchRelease.py",
       success: function (html) {
         forcastEnsemblRelease = html.toString().trim();
-        $("#primer-design-button").prop("disabled", false);
+        $("#primer-design-button").prop("disabled", false).text("Design Primers");
       },
     }),
     $.ajax({
