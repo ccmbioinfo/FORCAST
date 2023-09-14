@@ -16,7 +16,7 @@ services:
       - ./jbrowse/data:/var/www/html/jbrowse/data
       - ./jbrowse/plugins/ColorByCDS:/var/www/html/jbrowse/plugins/ColorByCDS
       - ./jbrowse/plugins/ExportSequence:/var/www/html/jbrowse/plugins/ExportSequence
-      - ./sites-enabled:/etc/apache2/sites-enabled
+      - ./apache2/sites-enabled/forcast.conf:/etc/apache2/sites-enabled/000-default.conf
       - ./src:/var/www/html/src
       - mongodb:/var/lib/mongodb
 volumes:

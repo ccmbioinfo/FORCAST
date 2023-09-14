@@ -1,5 +1,9 @@
 # program/data folders
 .env
+apache2/certs/*
+!apache2/certs/.gitkeep
+apache2/sites-enabled/*
+!apache2/sites-enabled/sample
 bin
 config
 jbrowse/*

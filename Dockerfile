@@ -48,7 +48,7 @@ RUN curl -LO https://github.com/GMOD/jbrowse/releases/download/1.12.5-release/JB
     mv JBrowse-1.12.5 /var/www/html/jbrowse && \
     rm JBrowse-1.12.5.zip && \
     cd /var/www/html/jbrowse && ./setup.sh && \
-    # Default FORCAST configuration for JBrowse. jbrowse/data/datasets.conf is mounted as a volume inside docker-compose.yaml for editing.
+    # Default FORCAST configuration for JBrowse. jbrowse/data/datasets.conf is mounted as a volume inside docker-compose.yaml, docker-compose-dev.yaml, and docker-compose-prod.yaml for editing.
     bash -c "echo -e 'classicMenu = true\ninclude += data/datasets.conf\n\n[aboutThisBrowser]\ntitle = FORCAST' >> /var/www/html/jbrowse/jbrowse.conf" && \
     # Add favicon
     sed -i '6i\    <link rel="icon" href="../docs/img/crispr-icon.png" sizes="100x100">' /var/www/html/jbrowse/index.html
@@ -63,6 +63,7 @@ WORKDIR /var/www/html
 RUN sed -i 's/^Timeout [[:digit:]]\+/Timeout 1200/g' /etc/apache2/apache2.conf
 # Replace the /usr/sbin/apachectl script that is called with the Apache master process that respects signals
 ENV APACHE_HTTPD exec /usr/sbin/apache2
+RUN a2enmod ssl
 CMD chmod 777 ./src/guide-finder/logs ./src/primer-design/files/* && \
     mongod --fork --logpath /var/log/mongodb/mongod.log --dbpath /var/lib/mongodb && \
     exec apache2-foreground
