@@ -11,6 +11,7 @@ services:
       - /run/lock
       - /tmp
     volumes:
+      - ./logs:/var/log/FORCAST
       - ./config:/var/www/html/config
       - ./docs:/var/www/html/docs
       - ./jbrowse/data:/var/www/html/jbrowse/data

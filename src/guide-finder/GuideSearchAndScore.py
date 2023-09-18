@@ -19,6 +19,7 @@ import argparse
 import binascii
 import cgi
 import csv
+import datetime
 import json
 import logging
 import os
@@ -42,7 +43,19 @@ import find_offtargets
 import get_sequence
 import score_offtargets
 
-logging.basicConfig(filename="logs/GuideSearchAndScore.log", level=logging.DEBUG)
+today = datetime.date.today()
+log_filename = (
+    f"/var/log/FORCAST/GuideSearchAndScore/{today.year}/{today:%m}/{today:%d}.log"
+)
+log_file_dir = os.path.dirname(log_filename)
+
+if not os.path.exists(log_file_dir):
+    os.makedirs(log_file_dir)
+
+logging.basicConfig(
+    filename=log_filename,
+    level=logging.DEBUG,
+)
 
 
 class GuideSearchAndScore:

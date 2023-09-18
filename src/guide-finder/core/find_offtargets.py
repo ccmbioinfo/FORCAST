@@ -8,6 +8,7 @@ For each guide, find and categorizes its off-targets with 0-1-2-3-4 mismatches i
 
 """
 import binascii
+import datetime
 import logging
 import os
 import sys
@@ -20,7 +21,19 @@ from itertools import product
 
 from Config import Config
 
-logging.basicConfig(filename="logs/GuideSearchAndScore.log", level=logging.DEBUG)
+today = datetime.date.today()
+log_filename = (
+    f"/var/log/FORCAST/GuideSearchAndScore/{today.year}/{today:%m}/{today:%d}.log"
+)
+log_file_dir = os.path.dirname(log_filename)
+
+if not os.path.exists(log_file_dir):
+    os.makedirs(log_file_dir)
+
+logging.basicConfig(
+    filename=log_filename,
+    level=logging.DEBUG,
+)
 
 nucleotide_codes = {
     "A": ["A"],
