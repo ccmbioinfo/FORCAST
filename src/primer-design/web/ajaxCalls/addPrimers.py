@@ -43,21 +43,25 @@ def addToDatabase(dbConnection, geneName, release, primerPairs):
 		"""
         import fetchEnsemblRelease
 
+        release_num = release
         ens_release_num = fetchEnsemblRelease.getRelease()
-        fileFound = False
-        while not fileFound:
-            if int(release) > int(ens_release_num):
-                print("Unable to find " + primerType + " file")
-                return
-            json_filename = geneName + "_" + release + "_"
-            path = os.path.join(
+        path = None
+
+        while int(release_num) <= int(ens_release_num):
+            json_filename = geneName + "_" + release_num + "_"
+            release_path = os.path.join(
                 jsonDir,
                 (json_filename + primerType + "-" + str(primerPairs[key]) + ".json"),
             )
-            if os.path.isfile(path):
-                fileFound = True
-            else:
-                release = str(int(release) + 1)
+            
+            if os.path.isfile(release_path):
+                path = release_path
+            
+            release_num = str(int(release_num) + 1)
+
+        if not path:
+            print("Unable to find " + primerType + " file")
+            return
 
         with open((path), "r") as primerJSON:
             primerRecord = json.load(primerJSON)
