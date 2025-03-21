@@ -689,7 +689,7 @@ function createDiceyModal(rowID, amplicons, bindingSites) {
 	</div>
   	<div class="tab-pane fade" id="bindingSitesTab-` +
     rowID +
-    `" role="tabpanel"><br>`;
+    `" role="tabpanel" style="overflow-x: auto;"><br>`;
 
   // split the binding sites so they're separated by primer & can be reported in separate tables
   var forwardBindingSites = {};

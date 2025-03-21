@@ -78,7 +78,9 @@ class Guide(Gene):
         ext = (
             "/overlap/region/"
             + self.super.Config.organismName
-            + "/%s:%s-%s?feature=transcript;feature=regulatory;feature=other_regulatory"
+            + "/%s:%s-%s?feature=transcript;feature=regulatory"
+            # `other_regulatory` (which we previously included) has been removed as a valid feature type for the Ensembl REST API
+            # + "/%s:%s-%s?feature=transcript;feature=regulatory;feature=other_regulatory"
             % (self.super.chromosome, earliestStart, latestEnd)
         )
         try:
